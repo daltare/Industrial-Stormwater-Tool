@@ -41,18 +41,42 @@ library(leaflet)
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Define UI --------------------------------------------------------------------
     ui <- fluidPage(
-            
         # Application title
         titlePanel("Stormwater Enforcement Tool"),
             
         sidebarLayout(
             # Sidebar with inputs     
             sidebarPanel(
+                withMathJax(),
+                # h3('Filters:'),
                 selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL')),
                 selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = c('2016 - 2017', '2015 - 2016')),
                 selectInput(inputId = 'WDID', label = 'Select a Facility WDID (Optional):', choices = c('All', '9 37I005157')),
-                sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100))#,
+                sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100)),
                 # actionButton('refresh','Update')
+                hr(style="border: 1px solid darkgrey"),
+                tags$b(h4('Water Quality Index (WQI):')),
+                p('This is based on the San Diego Coastkeeper\'s WQI, an adapted version of the official Canadian WQI (CWQI), which was adoped by
+                the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
+                score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
+                of those exceedances, as follows:'),
+                # h5('Frequency:'),
+                tags$li('Frequency:'),
+                tags$ul(helpText('\\(F1=\\frac{\\text{Number of Samples Exceeding Standard}}{\\text{Total Number of Samples}}\\times{100}\\)')),
+                # h5('Magnitude:'),
+                tags$li('Magnitude:'),
+                tags$ul(helpText('\\(Excursion_i=\\frac{\\text{Value of Sample Exceeding Standard}_i}{\\text{Standard Value}}-1\\)')),
+                tags$ul(helpText('\\(NSE=\\frac{\\sum{Excursion}}{\\text{Total Number of Samples}}\\)')),
+                tags$ul(helpText('\\(F2=\\frac{NSE}{0.01(NSE)+0.01}\\)')),
+                # h5('WQI:'),
+                tags$li('WQI:'),
+                # tags$ul(helpText('\\(\\text{WQI=}100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
+                tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
+                hr(style="border: 1px solid darkgrey"),
+                # p('For more information, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
+                tags$b(h4('Application Information:')),
+                actionButton(inputId = 'github', label = 'Code on GitHub', icon = icon('github', class = 'fa-1x'),
+                             onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
             ),
                 
             # Show map

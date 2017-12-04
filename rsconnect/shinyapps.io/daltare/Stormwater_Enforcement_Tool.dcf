@@ -1,0 +1,12 @@
+name: Stormwater_Enforcement_Tool
+title: Stormwater_Enforcement_Tool
+username:
+account: daltare
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 244198
+bundleId: 1115050
+url: https://daltare.shinyapps.io/Stormwater_Enforcement_Tool/
+when: 1512422329.97851
+asMultiple: FALSE
+asStatic: FALSE
