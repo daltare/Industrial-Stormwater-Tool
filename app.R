@@ -2,34 +2,63 @@ library(shiny)
 library(DT)
 library(crosstalk)
 library(leaflet)
+library(magrittr)
+# library(DBI)
+# library(odbc)
+library(dplyr)
+library(tidyverse)
 
 `%>%` <- magrittr::`%>%`
 
-# get data from the database --------------------------------------------------------------------------------------------------------------------
-    # NOTE: HAVE TO SET THE R VERSION TO 32 BIT FIRST (go to: Tools -> Global Options -> General -> R version)
-    # Set up the connection
-        dbPath <- 'data/Industrial_Stormwaterv24.accdb'
-        # dbPath <- 'C:/David/Stormwater/Enforcement_AnalyticalTool/Industrial_Stormwaterv24.accdb'
-        con <- DBI::dbConnect(drv = odbc::odbc(), .connection_string = paste0("Driver={Microsoft Access Driver (*.mdb, *.accdb)}; Dbq=", dbPath))
-    # Read the data
-        standards <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'Standards'))
-        monitoring.data <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'SMARTS monitoring data'))
-        facilities <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'NOIs'))
-        receiving.waters <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'Recieving Waters'))
-    # Close the connection
-        DBI::dbDisconnect(con)
+# # get data from the database --------------------------------------------------------------------------------------------------------------------
+#     # NOTE: HAVE TO SET THE R VERSION TO 32 BIT FIRST (go to: Tools -> Global Options -> General -> R version)
+#     # Set up the connection
+#         dbPath <- 'data/Industrial_Stormwaterv24.accdb'
+#         con <- DBI::dbConnect(drv = odbc::odbc(), .connection_string = paste0("Driver={Microsoft Access Driver (*.mdb, *.accdb)}; Dbq=", dbPath))
+#     # Read the data
+#         standards <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'Standards'))
+#         monitoring.data <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'SMARTS monitoring data'))
+#         facilities <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'NOIs'))
+#         receiving.waters <- tibble::as_tibble(DBI::dbReadTable(conn = con, name = 'Recieving Waters'))
+#     # Close the connection
+#         DBI::dbDisconnect(con)
+# 
+# get data from extracted tables ------------------------------------------------------------------------------------------------------------------
+    # standards
+        standards <- readr::read_tsv('data/Standards.txt')
+        names(standards) <- make.names(names(standards))
+    # monitoring data
+        monitoring.data <- readr::read_tsv('data/SMARTS_monitoring_data.txt')
+        names(monitoring.data) <- make.names(names(monitoring.data))
+        monitoring.data <- tidyr::separate(data = monitoring.data, col = Date.time.of.sample.collection, into = c('Date.of.sample.collection','Time.of.sample.collection'), sep = ' ')
+        monitoring.data <- monitoring.data %>% dplyr::mutate(Date.of.sample.collection = lubridate::mdy(Date.of.sample.collection))
+    # facilities
+        facilities <- readr::read_tsv('data/NOIs.txt')
+        names(facilities) <- make.names(names(facilities))
+    # receiving waters
+        receiving.waters <- readr::read_tsv('data/Receiving_Waters.txt')
+        names(receiving.waters) <- make.names(names(receiving.waters))
 
 # Data transformations (monitoring data) --------------------------------------------------------------------------------------------------------
+    # drop unreasonable dates !!!!! NOTE: MAY WANT TO REVISIT THESE
+        monitoring.data <- monitoring.data %>% dplyr::filter(lubridate::year(Date.of.sample.collection) <= lubridate::year(Sys.Date()) & 
+                                                                 lubridate::year(Date.of.sample.collection)>=2010)
+        
     # Create a column for monitoring period
         monitoring.data <- monitoring.data %>% dplyr::mutate(Monitoring.Period = dplyr::if_else(
-            lubridate::month(Date.time.of.sample.collection) >= 7, 
-            paste0(lubridate::year(Date.time.of.sample.collection), ' - ', lubridate::year(Date.time.of.sample.collection) + 1), 
-            paste0(lubridate::year(Date.time.of.sample.collection)-1, ' - ', lubridate::year(Date.time.of.sample.collection))
+            lubridate::month(Date.of.sample.collection) >= 7, 
+            paste0(lubridate::year(Date.of.sample.collection), ' - ', lubridate::year(Date.of.sample.collection) + 1), 
+            paste0(lubridate::year(Date.of.sample.collection)-1, ' - ', lubridate::year(Date.of.sample.collection))
         ))    
+        
+    # Create a list of the monitoring periods
+        periods.list <- monitoring.data %>% dplyr::group_by(Monitoring.Period) %>% summarise(count = n())
+        periods.list <- periods.list$Monitoring.Period
         
     # Create a column with ug/L Results converted to mg/L
         monitoring.data <- monitoring.data %>% dplyr::mutate(Result.Conv = dplyr::if_else(Units=='ug/L', Result / 1000, Result))
         monitoring.data <-  monitoring.data %>% dplyr::mutate(Unit.Conv = dplyr::if_else(Units=='ug/L', 'mg/L', Units))
+        
         
 # Data transformations (standards) --------------------------------------------------------------------------------------------------------------
     # change water type column name
@@ -47,36 +76,40 @@ library(leaflet)
         sidebarLayout(
             # Sidebar with inputs     
             sidebarPanel(
-                withMathJax(),
-                # h3('Filters:'),
-                selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL')),
-                selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = c('2016 - 2017', '2015 - 2016')),
-                selectInput(inputId = 'WDID', label = 'Select a Facility WDID (Optional):', choices = c('All', '9 37I005157')),
-                sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100)),
-                # actionButton('refresh','Update')
+                withMathJax(), # to create equations
+                # Filters
+                    # h3('Filters:'),
+                    selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL')),
+                    selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
+                    # htmlOutput('monitoring.period.selector'),
+                    # selectInput(inputId = 'WDID', label = 'Select a Facility WDID (Optional):', choices = c('All', '9 37I005157')),
+                    sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100)),
+                    # actionButton('refresh','Update')
                 hr(style="border: 1px solid darkgrey"),
-                tags$b(h4('Water Quality Index (WQI):')),
-                p('This is based on the San Diego Coastkeeper\'s WQI, an adapted version of the official Canadian WQI (CWQI), which was adoped by
-                the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
-                score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
-                of those exceedances, as follows:'),
-                # h5('Frequency:'),
-                tags$li('Frequency:'),
-                tags$ul(helpText('\\(F1=\\frac{\\text{Number of Samples Exceeding Standard}}{\\text{Total Number of Samples}}\\times{100}\\)')),
-                # h5('Magnitude:'),
-                tags$li('Magnitude:'),
-                tags$ul(helpText('\\(Excursion_i=\\frac{\\text{Value of Sample Exceeding Standard}_i}{\\text{Standard Value}}-1\\)')),
-                tags$ul(helpText('\\(NSE=\\frac{\\sum{Excursion}}{\\text{Total Number of Samples}}\\)')),
-                tags$ul(helpText('\\(F2=\\frac{NSE}{0.01(NSE)+0.01}\\)')),
-                # h5('WQI:'),
-                tags$li('WQI:'),
-                # tags$ul(helpText('\\(\\text{WQI=}100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
-                tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
+                # Describe the WQI Calculations:
+                    tags$b(h4('Water Quality Index (WQI):')),
+                    p('Based on the San Diego Coastkeeper\'s WQI, this is an adapted version of the official Canadian WQI (CWQI), which was adoped by
+                    the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
+                    score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
+                    of those exceedances, as follows:'),
+                    # h5('Frequency:'),
+                    tags$li('Frequency:'),
+                    tags$ul(helpText('\\(F1=\\frac{\\text{Number of Samples Exceeding Standard}}{\\text{Total Number of Samples}}\\times{100}\\)')),
+                    # h5('Magnitude:'),
+                    tags$li('Magnitude:'),
+                    tags$ul(helpText('\\(Excursion_i=\\frac{\\text{Value of Sample Exceeding Standard}_i}{\\text{Standard Value}}-1\\)')),
+                    tags$ul(helpText('\\(NSE=\\frac{\\sum{Excursion}}{\\text{Total Number of Samples}}\\)')),
+                    tags$ul(helpText('\\(F2=\\frac{NSE}{0.01(NSE)+0.01}\\)')),
+                    # h5('WQI:'),
+                    tags$li('WQI:'),
+                    # tags$ul(helpText('\\(\\text{WQI=}100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
+                    tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
                 hr(style="border: 1px solid darkgrey"),
-                # p('For more information, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
-                tags$b(h4('Application Information:')),
-                actionButton(inputId = 'github', label = 'Code on GitHub', icon = icon('github', class = 'fa-1x'),
-                             onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
+                # Link to the code, etc...
+                    # p('For more information, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
+                    tags$b(h4('Application Information:')),
+                    actionButton(inputId = 'github', label = 'Code on GitHub', icon = icon('github', class = 'fa-1x'),
+                                 onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
             ),
                 
             # Show map
@@ -84,7 +117,7 @@ library(leaflet)
                 leaflet::leafletOutput('monitoring.map'),
                 # tags$br(), 
                 tags$hr(),
-                h3('Data:'),
+                # h3('Data:'),
                 DT::dataTableOutput('WQI.table')
             )
         )
@@ -92,6 +125,13 @@ library(leaflet)
 
 # Define server logic required to draw map -------------------------------------
 server <- function(input, output) {
+    
+    # output$monitoring.period.selector <- renderUI({
+    #     # periods.list <- monitoring.data.WQI %>% dplyr::distinct(Monitoring.Period)
+    #     # periods.list <- periods.list$Monitoring.Period
+    #     selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period', choices = periods.list)
+    # })
+    
     # reactive({
     # observeEvent(input$standard, {
     observe({
@@ -114,7 +154,6 @@ server <- function(input, output) {
                 # For F2, compute excursion for each sample
                     monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Excursion = dplyr::if_else(Result.Conv > Standard, (Result.Conv / Standard - 1), 0))
                 # NOTE -- SHOULD WE CHECK WHETHER THE RECEIVING WATER IS FRESHWATER BEFORE THE ABOVE STEPS, AND MAYBE REMOVE SALTWATER??? DON'T THINK THE ACCESS DB DOES THIS
-                    
     
         # Calculate the WQI Scores 
             # Calculate Exceedance (for F1) and Excursion (for F2)
@@ -140,6 +179,7 @@ server <- function(input, output) {
     
             # Draw the map (filter for the selected monitoring period and WQI range)
                 map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == input$monitoring.period & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
+                # map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == '2016 - 2017' & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
                 shared.map.data <- crosstalk::SharedData$new(map.data)
                 
                 output$monitoring.map <- leaflet::renderLeaflet({
@@ -186,7 +226,7 @@ server <- function(input, output) {
                                                   list(extend='excel', filename= 'cedenData')),
                                    text = 'Download Data' )),
                                scrollX = TRUE,
-                               scrollY = 300, 
+                               scrollY = 250, 
                                scroller = TRUE, 
                                deferRender = TRUE),
                 class = 'cell-border stripe',
