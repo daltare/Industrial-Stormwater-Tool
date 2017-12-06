@@ -52,13 +52,17 @@ library(tidyverse)
         ))    
         
     # Create a list of the monitoring periods
-        periods.list <- monitoring.data %>% dplyr::group_by(Monitoring.Period) %>% summarise(count = n())
+        periods.list <- monitoring.data %>% dplyr::group_by(Monitoring.Period) %>% dplyr::summarise(count = n()) %>% dplyr::arrange(desc(Monitoring.Period))
         periods.list <- periods.list$Monitoring.Period
         
     # Create a column with ug/L Results converted to mg/L
         monitoring.data <- monitoring.data %>% dplyr::mutate(Result.Conv = dplyr::if_else(Units=='ug/L', Result / 1000, Result))
         monitoring.data <-  monitoring.data %>% dplyr::mutate(Unit.Conv = dplyr::if_else(Units=='ug/L', 'mg/L', Units))
         
+    # Create a list of WDIDs
+        WDID.list <- monitoring.data %>% dplyr::filter(Parameter %in% standards$Parameter) %>% dplyr::distinct(WDID)
+        WDID.list <- WDID.list$WDID
+        WDID.list <- c('All WDIDs', WDID.list)
         
 # Data transformations (standards) --------------------------------------------------------------------------------------------------------------
     # change water type column name
@@ -82,13 +86,13 @@ library(tidyverse)
                     selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL')),
                     selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
                     # htmlOutput('monitoring.period.selector'),
-                    # selectInput(inputId = 'WDID', label = 'Select a Facility WDID (Optional):', choices = c('All', '9 37I005157')),
+                    selectInput(inputId = 'WDID.selected', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
                     sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100)),
                     # actionButton('refresh','Update')
                 hr(style="border: 1px solid darkgrey"),
                 # Describe the WQI Calculations:
                     tags$b(h4('Water Quality Index (WQI):')),
-                    p('Based on the San Diego Coastkeeper\'s WQI, this is an adapted version of the official Canadian WQI (CWQI), which was adoped by
+                    p('Based on the San Diego Coastkeeper\'s WQI, this is an adapted version of the official Canadian WQI, which was adoped by
                     the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
                     score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
                     of those exceedances, as follows:'),
@@ -112,13 +116,17 @@ library(tidyverse)
                                  onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
             ),
                 
-            # Show map
+            # Show map and data table
             mainPanel(
                 leaflet::leafletOutput('monitoring.map'),
                 # tags$br(), 
                 tags$hr(),
                 # h3('Data:'),
-                DT::dataTableOutput('WQI.table')
+                DT::dataTableOutput('WQI.table'),
+                hr(),
+                downloadButton('downloadRawData', 'Download Sampling Data Used in WQI Calculations', class = "buttonstyle"),
+                # tags$head(tags$style(".butt{background-color:#add8e6;} .butt{color: white;}")) # background color and font color
+                tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")) # background color and font color
             )
         )
     )
@@ -177,18 +185,32 @@ server <- function(input, output) {
                     reverse = TRUE
                 )
     
-            # Draw the map (filter for the selected monitoring period and WQI range)
+            # Draw the map (filter for the selected monitoring period and WQI range, and for WDIDs if selected)
                 map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == input$monitoring.period & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
+                map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
                 # map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == '2016 - 2017' & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
                 shared.map.data <- crosstalk::SharedData$new(map.data)
-                
+            
                 output$monitoring.map <- leaflet::renderLeaflet({
-                    leaflet::leaflet(shared.map.data) %>% 
-                        # leaflet::addTiles() %>% 
-                        leaflet::addProviderTiles('Esri.WorldStreetMap') %>% 
-                        # leaflet::addProviderTiles('CartoDB.PositronOnlyLabels') %>% 
+                    l <- leaflet::leaflet(shared.map.data)
+                    basemap.options <- c('Esri.WorldStreetMap', 'Esri.WorldTopoMap', 'Esri.WorldImagery', 
+                                         'Esri.WorldGrayCanvas', 'CartoDB.Positron') #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
+                    for (provider in basemap.options) {
+                        l <- l %>% addProviderTiles(provider, group = provider)
+                    }
+                    l <- l %>% 
+                        addMiniMap(tiles = basemap.options[[1]], toggleDisplay = TRUE, position = "bottomleft") %>%
+                        htmlwidgets::onRender("
+                                                function(el, x) {
+                                                    var myMap = this;
+                                                    myMap.on('baselayerchange',
+                                                    function (e) {
+                                                        myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                                                    })
+                                                }") %>%
                         leaflet::addCircleMarkers(
-                            radius = 2, 
+                            group = 'SampleMarkers',
+                            radius = 2,
                             opacity = 1,
                             # clusterOptions = leaflet::markerClusterOptions(),
                             color = ~leaflet.pal(WQI),
@@ -200,21 +222,30 @@ server <- function(input, output) {
                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
                                             '<br/>',
-                                            # '<hr/>',
                                             '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>')
-                        ) %>% 
-                        leaflet::addEasyButton(leaflet::easyButton(
+                        ) %>%
+                        leaflet::addEasyButton(leaflet::easyButton( # create a button to re-center the map
                             icon="fa-globe", title="Center Map",
-                            # onClick=JS("function(btn, map){ map.fitBounds([[40.712, -74.227],[40.774, -74.125]]); }"))),
-                            onClick=JS(paste0('function(btn, map){ map.fitBounds([[', min(map.data$Latitude), ', ', min(map.data$Longitude), '],[', max(map.data$Latitude), ', ', max(map.data$Longitude), ']]); }'))))
-                            
+                            onClick=JS(paste0('function(btn, map){ map.fitBounds([[', 
+                                              min(map.data$Latitude), ', ', 
+                                              min(map.data$Longitude), '],[', 
+                                              max(map.data$Latitude), ', ', 
+                                              max(map.data$Longitude), ']]); }')))) %>% 
+                        leaflet::addLegend("bottomright", pal = leaflet.pal, values = WQI.Scores$WQI,
+                                           title = "WQI",
+                                           # labFormat = labelFormat(prefix = "$"),
+                                           opacity = 1)
+                    l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options, 
+                                                    overlayGroups = c('SampleMarkers'), 
+                                                    options = layersControlOptions(collapsed = FALSE))  
+                    l
                 })
-                # ~min(Longitude), ~min(Latitude), ~max(Longitude), ~max(Latitude))))
+                
         # Data Table -----------------------------------------------------------
             output$WQI.table <- DT::renderDataTable(
                 shared.map.data, 
@@ -230,12 +261,24 @@ server <- function(input, output) {
                                scroller = TRUE, 
                                deferRender = TRUE),
                 class = 'cell-border stripe',
-                # class = 'compact', 
                 server = FALSE,
-                rownames = FALSE#,
-                # style = 'bootstrap'
+                rownames = FALSE
             )
+                
+        # Monitoring Data Download
+            output$downloadRawData <- downloadHandler(
+                filename = 'WQI_Monitoring_Data.csv', #content = write.csv(monitoring.data.WQI)
+                content = function(con) {
+                    write.csv(monitoring.data.WQI, con, row.names = FALSE)
+                  },
+                contentType = 'text/csv'
+                )
     })
+    
+    observe({
+        
+    })
+    
 }
 
 # Run the application 
