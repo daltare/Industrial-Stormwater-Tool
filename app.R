@@ -235,10 +235,10 @@ server <- function(input, output, session) {
                     l <- l %>% leaflet::addEasyButton(leaflet::easyButton(
                         icon="fa-globe", title="Center Map",
                         onClick=JS(paste0('function(btn, map){ map.fitBounds([[',
-                                          min(monitoring.data$Latitude, na.rm = TRUE), ', ',
-                                          min(monitoring.data$Longitude, na.rm = TRUE), '],[',
-                                          max(monitoring.data$Latitude, na.rm = TRUE), ', ',
-                                          max(monitoring.data$Longitude, na.rm = TRUE), ']]); }'))))
+                                          min(map.data$Latitude, na.rm = TRUE), ', ',
+                                          min(map.data$Longitude, na.rm = TRUE), '],[',
+                                          max(map.data$Latitude, na.rm = TRUE), ', ',
+                                          max(map.data$Longitude, na.rm = TRUE), ']]); }'))))
 
                 # add in the selected WQI data and associated legend
                     l <- l %>% leaflet::addCircleMarkers(#data = shared.map.data,
