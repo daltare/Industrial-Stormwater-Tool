@@ -282,8 +282,8 @@ server <- function(input, output, session) {
             options = list(dom = 'Bfrtip', 
                            buttons = list('colvis', list(
                                extend = 'collection',
-                               buttons = list(list(extend='csv', filename = 'cedenData'),
-                                              list(extend='excel', filename= 'cedenData')),
+                               buttons = list(list(extend='csv', filename = 'WQI_Scores'),
+                                              list(extend='excel', filename= 'WQI_Scores')),
                                text = 'Download Data' )),
                            scrollX = TRUE,
                            scrollY = 250, 
