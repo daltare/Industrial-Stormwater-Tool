@@ -70,6 +70,9 @@ library(tidyverse)
 
         
         
+        
+
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Define UI --------------------------------------------------------------------
@@ -131,22 +134,68 @@ library(tidyverse)
         )
     )
 
+        
+        
+        
+        
+        
 # Define server logic required to draw map -------------------------------------
-server <- function(input, output) {
-    
+server <- function(input, output, session) {
+
     # output$monitoring.period.selector <- renderUI({
     #     # periods.list <- monitoring.data.WQI %>% dplyr::distinct(Monitoring.Period)
     #     # periods.list <- periods.list$Monitoring.Period
     #     selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period', choices = periods.list)
     # })
     
-    # reactive({
-    # observeEvent(input$standard, {
-    observe({
-        # STANDARDS (create a new table with relevant standards)
+    # draw the static portions of the map
+    output$monitoring.map <- leaflet::renderLeaflet({
+        # create the empty map
+            l <- leaflet::leaflet()
+        # enter the basemap options to allow the user to select
+            basemap.options <- c('Esri.WorldStreetMap', 'Esri.WorldTopoMap', 'Esri.WorldImagery', 
+                             'Esri.WorldGrayCanvas', 'CartoDB.Positron') #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
+        # add the basemaps listed above to the map (for options, see: http://leaflet-extras.github.io/leaflet-providers/preview/)
+            for (provider in basemap.options) {
+                l <- l %>% addProviderTiles(provider, group = provider)
+            }
+        # add the min-map window
+            l <- l %>% addMiniMap(tiles = basemap.options[[1]], toggleDisplay = TRUE, position = "bottomleft")
+        # code to make the basemap/min-map selector work (copied from: https://rstudio.github.io/leaflet/morefeatures.html)
+            l <- l %>% htmlwidgets::onRender("
+                                  function(el, x) {
+                                  var myMap = this;
+                                  myMap.on('baselayerchange',
+                                  function (e) {
+                                  myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                                  })
+                                  }")
+        # Add controls to select the basemap
+            l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options, 
+                                                 # overlayGroups = c('SampleMarkers'), 
+                                                 options = layersControlOptions(collapsed = FALSE))
+        # Set the bounds of the initial view
+            l <- l %>% leaflet::fitBounds(lng1 = min(monitoring.data$Longitude, na.rm = TRUE), lat1 = min(monitoring.data$Latitude, na.rm = TRUE),
+                                          lng2 = max(monitoring.data$Longitude, na.rm = TRUE), lat2 = max(monitoring.data$Latitude, na.rm = TRUE))
+        # create a button to re-center the map
+            l <- l %>% leaflet::addEasyButton(leaflet::easyButton( 
+                icon="fa-globe", title="Center Map",
+                onClick=JS(paste0('function(btn, map){ map.fitBounds([[',
+                                  min(monitoring.data$Latitude, na.rm = TRUE), ', ',
+                                  min(monitoring.data$Longitude, na.rm = TRUE), '],[',
+                                  max(monitoring.data$Latitude, na.rm = TRUE), ', ',
+                                  max(monitoring.data$Longitude, na.rm = TRUE), ']]); }'))))
+        l
+    })
+        
+   observe({     
+    # STANDARDS (create a new table with relevant standards)
+            # standards.applied <- reactive({standards %>% dplyr::filter(Standard.Type == input$standard)})
+            # standards.applied <- reactive({
+                # standards[standards$Standard.Type == input$standard,]
+                # })
             standards.applied <- standards %>% dplyr::filter(Standard.Type == input$standard)
-            # standards.applied <- standards %>% dplyr::filter(Standard.Type == standard)
-         
+      
         # MONITORING DATA
             # Filter for the relevant parameters, and compare the results to standards
                 monitoring.data.WQI <- monitoring.data %>% dplyr::filter(Parameter %in% standards.applied$Parameter)
@@ -176,77 +225,58 @@ server <- function(input, output) {
                 # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Frequency = round(F1,0))
                 # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Magnitude = round(F2,0))
                 WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID')
-                
+
+   
+   
         # Map ------------------------------------------------------------------
-            # Create the color palette
+            # Create the color palette for the map
                 leaflet.pal <- leaflet::colorNumeric(
                     palette = colorRamp(c('olivedrab2', 'red3'), interpolate='spline'),
                     domain = WQI.Scores$WQI,
                     reverse = TRUE
                 )
     
-            # Draw the map (filter for the selected monitoring period and WQI range, and for WDIDs if selected)
+            # Create the mapping data (filter for the selected monitoring period and WQI range, and for WDIDs if selected)
                 map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == input$monitoring.period & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
                 map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
                 # map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == '2016 - 2017' & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
                 shared.map.data <- crosstalk::SharedData$new(map.data)
-            
-                output$monitoring.map <- leaflet::renderLeaflet({
-                    l <- leaflet::leaflet(shared.map.data)
-                    basemap.options <- c('Esri.WorldStreetMap', 'Esri.WorldTopoMap', 'Esri.WorldImagery', 
-                                         'Esri.WorldGrayCanvas', 'CartoDB.Positron') #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
-                    for (provider in basemap.options) {
-                        l <- l %>% addProviderTiles(provider, group = provider)
-                    }
-                    l <- l %>% 
-                        addMiniMap(tiles = basemap.options[[1]], toggleDisplay = TRUE, position = "bottomleft") %>%
-                        htmlwidgets::onRender("
-                                                function(el, x) {
-                                                    var myMap = this;
-                                                    myMap.on('baselayerchange',
-                                                    function (e) {
-                                                        myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
-                                                    })
-                                                }") %>%
-                        leaflet::addCircleMarkers(
-                            group = 'SampleMarkers',
-                            radius = 2,
-                            opacity = 1,
-                            # clusterOptions = leaflet::markerClusterOptions(),
-                            color = ~leaflet.pal(WQI),
-                            popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
-                                            '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                            '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                            '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                            '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                            '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                            '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                            '<br/>',
-                                            '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
-                                            '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                            '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                            '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                            '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                            '<b>', 'WQI: ', '</b>', WQI, '<br/>')
-                        ) %>%
-                        leaflet::addEasyButton(leaflet::easyButton( # create a button to re-center the map
-                            icon="fa-globe", title="Center Map",
-                            onClick=JS(paste0('function(btn, map){ map.fitBounds([[', 
-                                              min(map.data$Latitude), ', ', 
-                                              min(map.data$Longitude), '],[', 
-                                              max(map.data$Latitude), ', ', 
-                                              max(map.data$Longitude), ']]); }')))) %>% 
-                        leaflet::addLegend("bottomright", pal = leaflet.pal, values = WQI.Scores$WQI,
-                                           title = "WQI",
-                                           # labFormat = labelFormat(prefix = "$"),
-                                           opacity = 1)
-                    l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options, 
-                                                    overlayGroups = c('SampleMarkers'), 
-                                                    options = layersControlOptions(collapsed = FALSE))  
-                    l
-                })
+   # })
+            # add the data to the map, along with other dependent elements of the map (button to re-center based on extent, legend)
+            # observe({
+                leaflet::leafletProxy('monitoring.map', data = shared.map.data) %>% 
+                    leaflet::clearShapes() %>% 
+                    leaflet::clearControls() %>% 
+                    leaflet::addCircleMarkers(
+                        group = 'SampleMarkers',
+                        radius = 2,
+                        opacity = 1,
+                        # clusterOptions = leaflet::markerClusterOptions(),
+                        color = ~leaflet.pal(WQI),
+                        popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                        '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                        '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                        '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                        '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                        '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                        '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                        '<br/>',
+                                        '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                        '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                        '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                        '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                        '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                        '<b>', 'WQI: ', '</b>', WQI, '<br/>')
+                    ) %>% 
+                    leaflet::addLegend("bottomright", pal = leaflet.pal, values = WQI.Scores$WQI,
+                                       title = "WQI",
+                                       # labFormat = labelFormat(prefix = "$"),
+                                       opacity = 1, layerId = 'map.legend')
+            # })
+                
                 
         # Data Table -----------------------------------------------------------
+        # observe({
             output$WQI.table <- DT::renderDataTable(
                 shared.map.data, 
                 extensions = c('Buttons', 'Scroller'),
@@ -264,6 +294,7 @@ server <- function(input, output) {
                 server = FALSE,
                 rownames = FALSE
             )
+
                 
         # Monitoring Data Download
             output$downloadRawData <- downloadHandler(
@@ -273,12 +304,7 @@ server <- function(input, output) {
                   },
                 contentType = 'text/csv'
                 )
-    })
-    
-    observe({
-        
-    })
-    
+   }) 
 }
 
 # Run the application 
