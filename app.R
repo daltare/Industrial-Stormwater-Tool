@@ -7,6 +7,7 @@ library(magrittr)
 # library(odbc)
 library(dplyr)
 library(tidyverse)
+library(rhandsontable)
 
 `%>%` <- magrittr::`%>%`
 
@@ -86,7 +87,7 @@ library(tidyverse)
                 withMathJax(), # to create equations
                 # Filters
                     # h3('Filters:'),
-                    selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL')),
+                    selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL', 'Custom')),
                     selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
                     # htmlOutput('monitoring.period.selector'),
                     selectInput(inputId = 'WDID.selected', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
@@ -121,17 +122,22 @@ library(tidyverse)
                 
             # Show map and data table
             mainPanel(
+                tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
                 leaflet::leafletOutput('monitoring.map'),
-                # tags$br(), 
-                tags$hr(),
-                # h3('Data:'),
+                textOutput('zoom'),
+                hr(),
                 DT::dataTableOutput('WQI.table'),
                 hr(),
-                h4('Additional Data:'),
-                downloadButton('downloadRawData', 'Download Sampling Data Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
-                downloadButton('downloadStandards', 'Download Standards Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
-                downloadButton('downloadFacilities', 'Download All Facility Information', class = "buttonstyle"),
-                tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")) # background color and font color
+                h4('Enter / Edit Standards:'),
+                rHandsontableOutput("hot"),
+                br(),
+                actionButton("reset", "Reset Standards",class = 'buttonstyle'),
+                hr(),
+                h4('Download Additional Data:'),
+                downloadButton('downloadRawData', 'Sampling Data Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
+                downloadButton('downloadStandards', 'Standards Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
+                downloadButton('downloadFacilities', 'All Facility Information', class = "buttonstyle"),
+                br(),br()
             )
         )
     )
@@ -144,9 +150,44 @@ library(tidyverse)
 # Define server logic required to draw map -------------------------------------
 server <- function(input, output, session) {
         
-   observe({     
-    # STANDARDS (create a new table with relevant standards)
-            standards.applied <- standards %>% dplyr::filter(Standard.Type == input$standard)
+    ## User Entered Standards --------------------------------------------------
+        values <- reactiveValues()
+        observe({
+            DF <- standards %>% select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
+            DF$Custom <- as.numeric(DF$Custom)
+
+            if (!is.null(input$hot)) {
+                DF = hot_to_r(input$hot)
+            } else {
+                if (is.null(values[["DF"]]))
+                    DF <- DF
+                else
+                    DF <- values[["DF"]]
+            }
+            values[["DF"]] <- DF
+            
+            # Get the standards to apply in calculations
+                standards.applied <- as.data.frame(DF) %>% select(Parameter, input$standard)
+                tf <- !is.na(standards.applied %>% select(input$standard))
+                standards.applied <- standards.applied[tf,]
+                names(standards.applied)[2] <- 'Standard'
+                standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = input$standard)
+            
+            # Standards Data Download --------------------------------------------------
+                output$downloadStandards <- downloadHandler(
+                    filename = 'WQI_Standards.csv',
+                    content = function(con) {
+                        write.csv(as.data.frame(DF), con, row.names = FALSE)
+                    },
+                    contentType = 'text/csv'
+                )
+        # }) 
+    
+    
+   # observe({     
+       
+       # STANDARDS (create a new table with relevant standards)
+            # standards.applied <- standards %>% dplyr::filter(Standard.Type == input$standard)
       
         # MONITORING DATA
             # Filter for the relevant parameters, and compare the results to standards
@@ -240,36 +281,37 @@ server <- function(input, output, session) {
                                           max(map.data$Latitude, na.rm = TRUE), ', ',
                                           max(map.data$Longitude, na.rm = TRUE), ']]); }'))))
 
-                # add in the selected WQI data and associated legend
-                    l <- l %>% leaflet::addCircleMarkers(#data = shared.map.data,
-                                              # lat = ~Latitude,
-                                              # lng = ~Longitude,
-                                              group = 'SampleMarkers',
-                                              radius = 2,
-                                              opacity = 1,
-                                              # clusterOptions = leaflet::markerClusterOptions(),
-                                              color = ~leaflet.pal(WQI),
-                                              popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
-                                                              '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                              '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                              '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                              '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                              '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                              '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                              '<br/>',
-                                                              '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
-                                                              '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                              '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                              '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                              '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                              '<b>', 'WQI: ', '</b>', WQI, '<br/>')) %>%
-                        leaflet::addLegend("bottomright", pal = leaflet.pal, values = WQI.Scores$WQI,
-                                           title = "WQI", opacity = 1, layerId = 'map.legend')
+                # add in the selected WQI data
+                    l <- l %>% leaflet::addCircleMarkers(
+                                          stroke = TRUE,
+                                          fill = TRUE,
+                                          group = 'SampleMarkers',
+                                          radius = 2,
+                                          opacity = 1,
+                                          clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                          color = ~leaflet.pal(WQI),
+                                          popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                                          '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                          '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                          '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                          '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                          '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                          '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                          '<br/>',
+                                                          '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                                          '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                          '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                          '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                          '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                          '<b>', 'WQI: ', '</b>', WQI, '<br/>'))
+                
+                # add the legend
+                    l <- l %>% leaflet::addLegend("bottomright", pal = leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'map.legend')
                 
                 # Add controls to select the basemap
                     l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
                                                          overlayGroups = c('SampleMarkers'),
-                                                         options = layersControlOptions(collapsed = FALSE))
+                                                         options = layersControlOptions(collapsed = TRUE))
                     
                 # output the map object
                     l
@@ -304,16 +346,16 @@ server <- function(input, output, session) {
             contentType = 'text/csv'
         )
             
-    # Standards Data Download --------------------------------------------------
-        output$downloadStandards <- downloadHandler(
-            filename = 'WQI_Standards.csv', 
-            content = function(con) {
-                write.csv(standards, con, row.names = FALSE)
-            },
-            contentType = 'text/csv'
-        )
+    # # Standards Data Download ------------------------------------------------
+    #     output$downloadStandards <- downloadHandler(
+    #         filename = 'WQI_Standards.csv', 
+    #         content = function(con) {
+    #             write.csv(standards, con, row.names = FALSE)
+    #         },
+    #         contentType = 'text/csv'
+    #     )
             
-    # Facilities Data Download --------------------------------------------------
+    # Facilities Data Download -------------------------------------------------
         output$downloadFacilities <- downloadHandler(
             filename = 'WQI_Facilities.csv', 
             content = function(con) {
@@ -321,7 +363,23 @@ server <- function(input, output, session) {
             },
             contentType = 'text/csv'
         )    
-   }) 
+   })
+    
+    
+    # Reset Standards
+            observeEvent(input$reset, {
+                DF <- standards %>% select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
+                DF$Custom <- as.numeric(DF$Custom)
+                values[["DF"]] <- DF
+            })   
+    
+    output$hot <- renderRHandsontable({
+        DF <- values[["DF"]]
+        if (!is.null(DF))
+            rhandsontable(DF, useTypes = FALSE, stretchH = "all")
+    })    
+    
+
 }
 
 # Run the application 
