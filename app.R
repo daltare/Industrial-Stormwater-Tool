@@ -8,6 +8,8 @@ library(magrittr)
 library(dplyr)
 library(tidyverse)
 library(rhandsontable)
+library(sf)
+library(rmapshaper)
 
 `%>%` <- magrittr::`%>%`
 
@@ -70,9 +72,74 @@ library(rhandsontable)
         standards <- standards %>% dplyr::rename(Standard.water.type = Water.type)
 
         
+# CalEnviroScreen Polygons
+        # These steps show how to access and transform the CES geospatial data, but they only need to be done once:
+            # temp_zip <- tempfile()
+            # ces_url <- 'https://oehha.ca.gov/media/downloads//ces3shp.zip'  # ALTERNATVIE: ces_url <- 'https://data.ca.gov/sites/default/files/CES3Results_SHP.zip'
+            # download.file(url = ces_url, destfile = temp_zip, method = 'curl')
+            # unzip(zipfile = temp_zip, exdir = 'data/CES3Results') #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
+            # unlink(temp_zip)
+            # ces <- sf::st_read('data/CES3Results/CES3Results.shp')
+            # ces_transform <- st_transform(ces, 4326)
+            # ces_simple <- rmapshaper::ms_simplify(ces_transform)
+            # saveRDS(object = ces_simple, file = 'data/simplified_CalEnvironScreen_poly.RDS')
+        # Read the data from the saved RDS file
+            ces_poly <- read_rds('data/simplified_CalEnvironScreen_poly.RDS')
+            
+        # create a polygon that bounds the monitoring data, then create sf variable with the CES polygons in the study 
+            lat_min <- min(monitoring.data$Latitude, na.rm = TRUE)
+            lat_max <- max(monitoring.data$Latitude, na.rm = TRUE)
+            lon_min <- min(monitoring.data$Longitude, na.rm = TRUE)
+            lon_max <- max(monitoring.data$Longitude, na.rm = TRUE)
+            poly_bounds <- st_polygon(list(rbind(c(lon_min,lat_max),
+                                                 c(lon_max,lat_max),
+                                                 c(lon_max,lat_min),
+                                                 c(lon_min,lat_min),
+                                                 c(lon_min,lat_max))))
+            # tf_poly_bounds <- st_within(ces_poly, poly_bounds, sparse = FALSE)
+            tf_poly_bounds <- st_intersects(ces_poly, poly_bounds, sparse = FALSE)
+            
+            ces_poly_study_area <- ces_poly[tf_poly_bounds,]
+            # plot
+                # g <- ggplot() + geom_sf(data = ces_poly_study_area, aes(fill = Poll_pctl))
+            
+            
+            
+        # create a sf variable for the monitoring data
+            monitoring_sf <- sf::st_as_sf(monitoring.data[!is.na(monitoring.data$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+                
+        # make a sf variable with unique monitoring points (1 per WDID in monitoring data)
+            unique_points <- monitoring_sf %>% distinct(WDID, .keep_all = TRUE)                
         
+        # filter for CES polygons that contain monitoring points
+            ces_monitoring_points <- st_within(unique_points, ces_poly, sparse = TRUE) # lists the polygon number for each monitoring point
+            tf_ces_monitoring_points <- (1:nrow(ces_poly)) %in% ces_monitoring_points # checks to see if each polygon is in the list created above
+            ces_poly_monitoring_points <- ces_poly[tf_ces_monitoring_points,] # filters for the polygons in the list
         
+        # filter for CES polygons with high pollution load
+            ces_highPol <- ces_poly %>% filter(Poll_pctl >= 80)                
+            ces_study_area_highPol <- ces_poly_study_area %>% filter(Poll_pctl >= 80)
+        
+        # get the monitoring points in the high pollution polygons
+            points_within_hipoll_polygon <- st_within(unique_points, ces_highPol, sparse = TRUE) # lists the polygon number for each monitoring point
+            tf_points <- !is.na(as.logical(points_within_hipoll_polygon)) # creates a true/false list of the same lenth as the number of monitoring points (true = point in selected polygons)
+            
+        # map only polygons in the study area, along with the points
+            g <- ggplot() + geom_sf(data = ces_poly_study_area)
+            g <- g + geom_sf(data = unique_points)
+            
+        # map high pollution polygons in the study area, and monitoring points in those polygons
+            g1 <- ggplot() + geom_sf(data = ces_study_area_highPol) + geom_sf(data = unique_points[tf_points,])
+            
+        # map high pollution polygons in the study area, and all monitoring points
+            g2 <- ggplot() + geom_sf(data = ces_study_area_highPol) + geom_sf(data = unique_points)
+            
+        # map all high pollution polygons
+            g <- ggplot() + geom_sf(data = ces_highPol)
 
+            
+        # CES parameter choices
+            ces_choices <- data.frame(Name = c('CES Percentile', 'Pollution Burden', 'Impaired Water Bodies'), CES.Variable = c('Percentile', 'Poll_pctl', 'IWB_pctl'), stringsAsFactors = FALSE) #' CES Percentile' = 'Percentile'
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -93,6 +160,8 @@ library(rhandsontable)
                     selectInput(inputId = 'WDID.selected', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
                     sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100)),
                     # actionButton('refresh','Update')
+                    selectInput(inputId = 'ces.parameter', 'Select a CES Parameter:', choices = ces_choices$Name, selected = 'Pollution Burden'),
+                    sliderInput(inputId = 'ces.score.range', label = 'Filter by Score of Selected CES Parameter:', min = 0, max = 100, value = c(0,100)),
                 hr(style="border: 1px solid darkgrey"),
                 # Describe the WQI Calculations:
                     tags$b(h4('Water Quality Index (WQI):')),
@@ -123,8 +192,7 @@ library(rhandsontable)
             # Show map and data table
             mainPanel(
                 tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
-                leaflet::leafletOutput('monitoring.map'),
-                textOutput('zoom'),
+                leaflet::leafletOutput('monitoring.map',height = 450),
                 hr(),
                 DT::dataTableOutput('WQI.table'),
                 hr(),
@@ -224,18 +292,56 @@ server <- function(input, output, session) {
                 # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Magnitude = round(F2,0))
                 WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID')
 
-   
+            # Create a sf object from the WQI Scores data
+                WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+                
    
     # Map ------------------------------------------------------------------
-        # Create the color palette for the map
-            leaflet.pal <- leaflet::colorNumeric(
+        # Create the color palette for the WQI scores
+            wqi.leaflet.pal <- leaflet::colorNumeric(
                 palette = colorRamp(c('olivedrab2', 'red3'), interpolate='spline'),
                 domain = WQI.Scores$WQI,
                 reverse = TRUE
             )
-    
+                
+        # Create the color palette for the CES polygons
+            param <- ces_choices[ces_choices$Name == input$ces.parameter,2]
+            # create a numeric variable for the CES percentile that is in the middle of the values of the given 5% range
+                ces.percentile.numeric <- tidyr::separate(as.data.frame(ces_poly_study_area), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5
+                ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(ces.percentile.numeric = ces.percentile.numeric)
+            # get the selected parameter of CES data - if CES percentile is selected, use the numeric field that was created from the factor values in the lines above
+                if (param == 'Percentile') {
+                    ces.pal.domain <- as.data.frame(ces_poly_study_area %>% dplyr::select(ces.percentile.numeric))[,1]
+                } else {
+                    ces.pal.domain <- as.data.frame(ces_poly_study_area %>% dplyr::select(param))[,1]
+                }
+            # create a new column in the ces data frame called fill.variable, with the selected parameter data
+                ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(fill.variable = ces.pal.domain)
+            
+            # create the pallete
+                ces.pal.color <- 'Blues' #'YlOrBr'
+                # if (param == 'Percentile') {
+                #     ces.leaflet.pal <- leaflet::colorFactor(
+                #         palette = ces.pal.color,
+                #         domain = ces_poly_study_area$Percentile
+                #     )
+                # } else {
+                    ces.leaflet.pal <- leaflet::colorNumeric(
+                        palette = ces.pal.color,
+                        domain = ces_poly_study_area$fill.variable
+                    )
+                # }
+                    
+            # for filtering, find the polygons that meet the selected criteria (range of values)
+                ces_poly_study_area_filtered <- ces_poly_study_area %>% dplyr::filter(fill.variable >= input$ces.score.range[1] & fill.variable <= input$ces.score.range[2])
+            # create a list of WDIDs in the polygons that meet the selected criteria
+                # points_ces_filter <- st_intersects(ces_poly_study_area_filtered, WQI.Scores_sf, sparse = TRUE) # lists the monitoring point(s) in each polygon 
+                points_ces_filter <- st_intersects(WQI.Scores_sf, ces_poly_study_area_filtered, sparse = TRUE) # lists the polygon number for each monitoring point; if no polygon number, the point is not in a polygon that meets the criteria
+                tf_points <- as.logical(sapply(points_ces_filter, length)) # gives a logical vector where TRUE means the monitoring point meets the criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
+                WDIDs_ces_filter <- (as.data.frame(WQI.Scores_sf)[tf_points,] %>% select(WDID))[,1] # list of WDIDs in the polygons that satisfy the criteria
+                
         # Create the mapping data (filter for the selected monitoring period and WQI range, and for WDIDs if selected)
-            map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == input$monitoring.period & WQI >= input$score.range[1] & WQI <= input$score.range[2]))
+            map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == input$monitoring.period & WQI >= input$score.range[1] & WQI <= input$score.range[2] & WDID %in% WDIDs_ces_filter))
             map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
             shared.map.data <- crosstalk::SharedData$new(map.data)
             
@@ -281,37 +387,62 @@ server <- function(input, output, session) {
                                           max(map.data$Latitude, na.rm = TRUE), ', ',
                                           max(map.data$Longitude, na.rm = TRUE), ']]); }'))))
 
+                
+                # Add the CalEnvironScreen Polygons
+                    l <- l %>% leaflet::addPolygons(data = ces_poly_study_area, color = "#444444", weight = 1, smoothFactor = 0.5,
+                                                    opacity = 1.0, fillOpacity = 0.5,
+                                                    # fillColor = ~colorNumeric('YlOrBr', Poll_pctl)(Poll_pctl), # view RColorBrewer palettes with: RColorBrewer::display.brewer.all()
+                                                    fillColor = ~ces.leaflet.pal(fill.variable),
+                                                    highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                    popup = ~paste0('<b>', 'Tract: ', '</b>', Tract_1,'<br/>',
+                                                                    '<b>', 'Location: ', '</b>', City,', ', County, ' ', ZIP,'<br/>',
+                                                                    '<b>', 'Population: ', '</b>', Population,'<br/>','<br/>',
+                                                                    '<b>','<u>', 'Scores: ', '</b>','</u>','<br/>',
+                                                                    '<b>', 'CES Percentile: ', '</b>', Percentile,'<br/>',
+                                                                    '<b>', 'Impaired Waterbodies Percentile: ', '</b>', IWB_pctl,'<br/>',
+                                                                    '<b>', 'Pollution Burden Percentile: ', '</b>', Poll_pctl,'<br/>',
+                                                                    '<b>', 'Pesticides Percentile: ', '</b>', Pest_pctl,'<br/>',
+                                                                    '<b>', 'Toxic Releases Percentile: ', '</b>', TR_pctl,'<br/>',
+                                                                    '<b>', 'Cleanups Percentile: ', '</b>', Clean_Pctl,'<br/>',
+                                                                    '<b>', 'Groundwater Threats Percentile: ', '</b>', GW_pctl,'<br/>',
+                                                                    '<b>', 'Hazardous Waste Generators Percentile: ', '</b>', Haz_pctl),
+                                                    group = 'CES Polygons')#,'<br/>'
+                    
+                    
                 # add in the selected WQI data
                     l <- l %>% leaflet::addCircleMarkers(
-                                          stroke = TRUE,
-                                          fill = TRUE,
-                                          group = 'SampleMarkers',
-                                          radius = 2,
-                                          opacity = 1,
-                                          clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
-                                          color = ~leaflet.pal(WQI),
-                                          popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
-                                                          '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                          '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                          '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                          '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                          '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                          '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                          '<br/>',
-                                                          '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
-                                                          '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                          '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                          '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                          '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                          '<b>', 'WQI: ', '</b>', WQI, '<br/>'))
-                
+                        stroke = TRUE,
+                        fill = TRUE,
+                        group = 'WQI Scores',
+                        radius = 2,
+                        opacity = 1,
+                        # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                        color = ~wqi.leaflet.pal(WQI),
+                        popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                        '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                        '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                        '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                        '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                        '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                        '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                        '<br/>',
+                                        '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                        '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                        '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                        '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                        '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                        '<b>', 'WQI: ', '</b>', WQI, '<br/>'))
+                    
                 # add the legend
-                    l <- l %>% leaflet::addLegend("bottomright", pal = leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'map.legend')
+                    l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, title = input$ces.parameter, opacity = 1, layerId = 'ces.legend', bins = 6)
+                    l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'wqi.legend')
                 
                 # Add controls to select the basemap
                     l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
-                                                         overlayGroups = c('SampleMarkers'),
+                                                         overlayGroups = c('WQI Scores', 'CES Polygons'),
                                                          options = layersControlOptions(collapsed = TRUE))
+                    
+                
                     
                 # output the map object
                     l
@@ -376,7 +507,7 @@ server <- function(input, output, session) {
     output$hot <- renderRHandsontable({
         DF <- values[["DF"]]
         if (!is.null(DF))
-            rhandsontable(DF, useTypes = FALSE, stretchH = "all")
+            rhandsontable(DF, useTypes = TRUE, stretchH = "all")
     })    
     
 
