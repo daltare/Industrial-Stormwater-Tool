@@ -28,18 +28,18 @@ library(rmapshaper)
 # 
 # get data from extracted tables ------------------------------------------------------------------------------------------------------------------
     # standards
-        standards <- readr::read_tsv('data/Standards.txt')
+        standards <- suppressMessages(readr::read_tsv('data/Standards.txt'))
         names(standards) <- make.names(names(standards))
     # monitoring data
-        monitoring.data <- readr::read_tsv('data/SMARTS_monitoring_data.txt')
+        monitoring.data <- suppressMessages(readr::read_tsv('data/SMARTS_monitoring_data.txt'))
         names(monitoring.data) <- make.names(names(monitoring.data))
         monitoring.data <- tidyr::separate(data = monitoring.data, col = Date.time.of.sample.collection, into = c('Date.of.sample.collection','Time.of.sample.collection'), sep = ' ')
         monitoring.data <- monitoring.data %>% dplyr::mutate(Date.of.sample.collection = lubridate::mdy(Date.of.sample.collection))
     # facilities
-        facilities <- readr::read_tsv('data/NOIs.txt')
+        facilities <- suppressMessages(readr::read_tsv('data/NOIs.txt'))
         names(facilities) <- make.names(names(facilities))
     # receiving waters
-        receiving.waters <- readr::read_tsv('data/Receiving_Waters.txt')
+        receiving.waters <- suppressMessages(readr::read_tsv('data/Receiving_Waters.txt'))
         names(receiving.waters) <- make.names(names(receiving.waters))
 
 # Data transformations (monitoring data) --------------------------------------------------------------------------------------------------------
@@ -67,17 +67,23 @@ library(rmapshaper)
         WDID.list <- WDID.list$WDID
         WDID.list <- c('All WDIDs', WDID.list)
         
+    # create a sf variable for the monitoring data
+        # monitoring_sf <- sf::st_as_sf(monitoring.data[!is.na(monitoring.data$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+        
+    # # make a sf variable with unique monitoring points (1 per WDID in monitoring data)
+        #     unique_points <- monitoring_sf %>% distinct(WDID, .keep_all = TRUE)                
+        
 # Data transformations (standards) --------------------------------------------------------------------------------------------------------------
     # change water type column name
         standards <- standards %>% dplyr::rename(Standard.water.type = Water.type)
 
         
-# CalEnviroScreen Polygons
+# CalEnviroScreen Polygons ----------------------------------------------------------------------------------------------------------------------
         # These steps show how to access and transform the CES geospatial data, but they only need to be done once:
             # temp_zip <- tempfile()
             # ces_url <- 'https://oehha.ca.gov/media/downloads//ces3shp.zip'  # ALTERNATVIE: ces_url <- 'https://data.ca.gov/sites/default/files/CES3Results_SHP.zip'
             # download.file(url = ces_url, destfile = temp_zip, method = 'curl')
-            # unzip(zipfile = temp_zip, exdir = 'data/CES3Results') #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
+            # unzip(zipfile = temp_zip, exdir = 'data/CES3Results', junkpaths = TRUE) #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
             # unlink(temp_zip)
             # ces <- sf::st_read('data/CES3Results/CES3Results.shp')
             # ces_transform <- st_transform(ces, 4326)
@@ -91,55 +97,79 @@ library(rmapshaper)
             lat_max <- max(monitoring.data$Latitude, na.rm = TRUE)
             lon_min <- min(monitoring.data$Longitude, na.rm = TRUE)
             lon_max <- max(monitoring.data$Longitude, na.rm = TRUE)
-            poly_bounds <- st_polygon(list(rbind(c(lon_min,lat_max),
+            poly_bounds <- sf::st_polygon(list(rbind(c(lon_min,lat_max),
                                                  c(lon_max,lat_max),
                                                  c(lon_max,lat_min),
                                                  c(lon_min,lat_min),
                                                  c(lon_min,lat_max))))
             # tf_poly_bounds <- st_within(ces_poly, poly_bounds, sparse = FALSE)
-            tf_poly_bounds <- st_intersects(ces_poly, poly_bounds, sparse = FALSE)
+            tf_poly_bounds <- sf::st_intersects(ces_poly, poly_bounds, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
             
-            ces_poly_study_area <- ces_poly[tf_poly_bounds,]
+            ces_poly_study_area <- ces_poly[tf_poly_bounds,] # creates a sf variable with just the CES polygons in / around the area where there are monitoring points
             # plot
                 # g <- ggplot() + geom_sf(data = ces_poly_study_area, aes(fill = Poll_pctl))
             
-            
-            
-        # create a sf variable for the monitoring data
-            monitoring_sf <- sf::st_as_sf(monitoring.data[!is.na(monitoring.data$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
-                
-        # make a sf variable with unique monitoring points (1 per WDID in monitoring data)
-            unique_points <- monitoring_sf %>% distinct(WDID, .keep_all = TRUE)                
-        
-        # filter for CES polygons that contain monitoring points
-            ces_monitoring_points <- st_within(unique_points, ces_poly, sparse = TRUE) # lists the polygon number for each monitoring point
-            tf_ces_monitoring_points <- (1:nrow(ces_poly)) %in% ces_monitoring_points # checks to see if each polygon is in the list created above
-            ces_poly_monitoring_points <- ces_poly[tf_ces_monitoring_points,] # filters for the polygons in the list
-        
-        # filter for CES polygons with high pollution load
-            ces_highPol <- ces_poly %>% filter(Poll_pctl >= 80)                
-            ces_study_area_highPol <- ces_poly_study_area %>% filter(Poll_pctl >= 80)
-        
-        # get the monitoring points in the high pollution polygons
-            points_within_hipoll_polygon <- st_within(unique_points, ces_highPol, sparse = TRUE) # lists the polygon number for each monitoring point
-            tf_points <- !is.na(as.logical(points_within_hipoll_polygon)) # creates a true/false list of the same lenth as the number of monitoring points (true = point in selected polygons)
-            
-        # map only polygons in the study area, along with the points
-            g <- ggplot() + geom_sf(data = ces_poly_study_area)
-            g <- g + geom_sf(data = unique_points)
-            
-        # map high pollution polygons in the study area, and monitoring points in those polygons
-            g1 <- ggplot() + geom_sf(data = ces_study_area_highPol) + geom_sf(data = unique_points[tf_points,])
-            
-        # map high pollution polygons in the study area, and all monitoring points
-            g2 <- ggplot() + geom_sf(data = ces_study_area_highPol) + geom_sf(data = unique_points)
-            
-        # map all high pollution polygons
-            g <- ggplot() + geom_sf(data = ces_highPol)
 
-            
+        # # filter for CES polygons that contain monitoring points
+        #     ces_monitoring_points <- st_within(unique_points, ces_poly, sparse = TRUE) # lists the polygon number for each monitoring point
+        #     tf_ces_monitoring_points <- (1:nrow(ces_poly)) %in% ces_monitoring_points # checks to see if each polygon is in the list created above
+        #     ces_poly_monitoring_points <- ces_poly[tf_ces_monitoring_points,] # filters for the polygons in the list
+        # 
+        # # filter for CES polygons with high pollution load
+        #     ces_highPol <- ces_poly %>% filter(Poll_pctl >= 80)                
+        #     ces_study_area_highPol <- ces_poly_study_area %>% filter(Poll_pctl >= 80)
+        # 
+        # # get the monitoring points in the high pollution polygons
+        #     points_within_hipoll_polygon <- st_within(unique_points, ces_highPol, sparse = TRUE) # lists the polygon number for each monitoring point
+        #     tf_points <- !is.na(as.logical(points_within_hipoll_polygon)) # creates a true/false list of the same lenth as the number of monitoring points (true = point in selected polygons)
+        #     
+        # # map only polygons in the study area, along with the points
+        #     g <- ggplot() + geom_sf(data = ces_poly_study_area)
+        #     g <- g + geom_sf(data = unique_points)
+        #     
+        # # map high pollution polygons in the study area, and monitoring points in those polygons
+        #     g1 <- ggplot() + geom_sf(data = ces_study_area_highPol) + geom_sf(data = unique_points[tf_points,])
+        #     
+        # # map high pollution polygons in the study area, and all monitoring points
+        #     g2 <- ggplot() + geom_sf(data = ces_study_area_highPol) + geom_sf(data = unique_points)
+        #     
+        # # map all high pollution polygons
+        #     g <- ggplot() + geom_sf(data = ces_highPol)
+
         # CES parameter choices
             ces_choices <- data.frame(Name = c('CES Percentile', 'Pollution Burden', 'Impaired Water Bodies'), CES.Variable = c('Percentile', 'Poll_pctl', 'IWB_pctl'), stringsAsFactors = FALSE) #' CES Percentile' = 'Percentile'
+            
+# 303d Lines ------------------------------------------------------------------------------------------------------------------------------------
+    # These steps show how to access and transform the CES geospatial data, but they only need to be done once:
+        # temp_zip_impaired <- tempfile()
+        # impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
+        # download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
+        # unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
+        # unlink(temp_zip_impaired)
+        # impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
+        # impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
+        # impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform)
+        # saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
+    # Read the data from the saved RDS file
+        impaired_303d_lines <- read_rds('data/simplified_2012_303d_lines.RDS')
+        tf_impaired_bounds <- sf::st_intersects(impaired_303d_lines, poly_bounds, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
+        impaired_lines_study_area <- impaired_303d_lines[tf_impaired_bounds,] # creates a sf variable with just the impaired waters in / around the area where there are monitoring points
+        
+    # filter for monitoring points within a certain distance of monitoring locations
+        # for testing only:
+            # WQI.Scores <- as_data_frame(monitoring.data %>% dplyr::group_by(WDID, Latitude, Longitude) %>% summarize(number = n()))
+        # WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+        # WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857)
+        # impaired_lines_study_area_mercator <- sf::st_transform(impaired_lines_study_area, 3857)
+        #  z <- units::set_units(2000, m)
+        # WQI_303d_dist_check <- sf::st_is_within_distance(WQI.Scores_sf_mercator, impaired_lines_study_area_mercator, dist = z)
+        # 
+        # tf_points_303_distance <- as.logical(sapply(WQI_303d_dist_check, length)) # gives a logical vector where TRUE means the monitoring point meets the criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
+        # WQI_303d_dist_points <- WQI.Scores_sf[tf_points_303_distance,] # points that satisfy the distance to 303d waters criteria
+        # buffered_streams <- sf::st_buffer(x = impaired_lines_study_area_mercator, dist = z)
+        # 
+        # # map points (red = within distance criteria) + streams + buffers
+        #     g <- ggplot() + geom_sf(data = buffered_streams) + geom_sf(data = WQI.Scores_sf[!tf_points_303_distance,], color = 'black') + geom_sf(data = WQI_303d_dist_points, color = 'red') + geom_sf(data = impaired_lines_study_area)
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -162,6 +192,9 @@ library(rmapshaper)
                     # actionButton('refresh','Update')
                     selectInput(inputId = 'ces.parameter', 'Select a CES Parameter:', choices = ces_choices$Name, selected = 'Pollution Burden'),
                     sliderInput(inputId = 'ces.score.range', label = 'Filter by Score of Selected CES Parameter:', min = 0, max = 100, value = c(0,100)),
+                    textInput(inputId = 'dist.to.303', label = 'Filter for proximity to a 303d listed water body (ft):', placeholder = 'Enter a distance in feet'),
+                    checkboxInput(inputId = 'show.303d.buffer', label = 'Show 303d proximity buffer', value = FALSE),
+                    checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE),
                 hr(style="border: 1px solid darkgrey"),
                 # Describe the WQI Calculations:
                     tags$b(h4('Water Quality Index (WQI):')),
@@ -217,7 +250,7 @@ library(rmapshaper)
         
 # Define server logic required to draw map -------------------------------------
 server <- function(input, output, session) {
-        
+
     ## User Entered Standards --------------------------------------------------
         values <- reactiveValues()
         observe({
@@ -319,7 +352,10 @@ server <- function(input, output, session) {
                 ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(fill.variable = ces.pal.domain)
             
             # create the pallete
-                ces.pal.color <- 'Blues' #'YlOrBr'
+                ces.pal.color <- 'YlOrBr' #'Blues' #'Greys'
+                # ces.pal.color <- colorRamp(c('white', 'wheat4'), interpolate='spline')
+                # ces.pal.color <- heat.colors(n=100)
+                
                 # if (param == 'Percentile') {
                 #     ces.leaflet.pal <- leaflet::colorFactor(
                 #         palette = ces.pal.color,
@@ -328,31 +364,78 @@ server <- function(input, output, session) {
                 # } else {
                     ces.leaflet.pal <- leaflet::colorNumeric(
                         palette = ces.pal.color,
-                        domain = ces_poly_study_area$fill.variable
+                        domain = ces_poly_study_area$fill.variable,
+                        reverse = FALSE
                     )
                 # }
                     
-            # for filtering, find the polygons that meet the selected criteria (range of values)
+                    
+        # Filter WQI points by attribues of CES polygons containing each point
+            # find the polygons that meet the selected criteria (range of values)
                 ces_poly_study_area_filtered <- ces_poly_study_area %>% dplyr::filter(fill.variable >= input$ces.score.range[1] & fill.variable <= input$ces.score.range[2])
+            
             # create a list of WDIDs in the polygons that meet the selected criteria
                 # points_ces_filter <- st_intersects(ces_poly_study_area_filtered, WQI.Scores_sf, sparse = TRUE) # lists the monitoring point(s) in each polygon 
                 points_ces_filter <- st_intersects(WQI.Scores_sf, ces_poly_study_area_filtered, sparse = TRUE) # lists the polygon number for each monitoring point; if no polygon number, the point is not in a polygon that meets the criteria
                 tf_points <- as.logical(sapply(points_ces_filter, length)) # gives a logical vector where TRUE means the monitoring point meets the criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
-                WDIDs_ces_filter <- (as.data.frame(WQI.Scores_sf)[tf_points,] %>% select(WDID))[,1] # list of WDIDs in the polygons that satisfy the criteria
+                WDIDs_ces_filter <- (as.data.frame(WQI.Scores_sf)[tf_points,] %>% dplyr::select(WDID))[,1] # list of WDIDs in the polygons that satisfy the criteria
+
+        # filter for points within the selected maximum distance of 303d waterbodies
+            # check to see if a valid number is entered
+            if (!is.na(as.numeric(input$dist.to.303))) {
+                proximity_ft <- units::set_units(as.numeric(input$dist.to.303), ft)
+                proximity_meters <- units::set_units(proximity_ft, m)
+                # have to convert points and lines to Cartesian coordinate system (x,y rather than lat/lon) to do the distance check
+                    WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857) 
+                    impaired_lines_study_area_mercator <- sf::st_transform(impaired_lines_study_area, 3857)
+                # check for points within the given distance (returns a sparse matrix - i.e., a list the same length as the number of WQI points, that lists the stream segment(s), if any, that meet the criteria for each point)
+                    WQI_303d_dist_check <- sf::st_is_within_distance(WQI.Scores_sf_mercator, impaired_lines_study_area_mercator, dist = proximity_meters)
+                    tf_points_303_distance <- as.logical(sapply(WQI_303d_dist_check, length)) # gives a logical vector where TRUE means the monitoring point has at least one 303d stream segment that meets the proximity criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
+                # create a variable with the points that meet the criteria
+                    WQI_303d_dist_points <- WQI.Scores_sf[tf_points_303_distance,] # points that satisfy the distance to 303d waters criteria
+                    WQI_303d_dist_points_list <- as.data.frame(WQI_303d_dist_points %>% dplyr::select('WDID'))[,1]
+                    # dataset of excluded points
+                        WQI_303d_excluded_points <- WQI.Scores_sf[!tf_points_303_distance,] # points that don't satisfy the distance to 303d waters criteria
+                # create a variable with polygons representing the buffered region around the streams
+                    buffered_streams <- sf::st_buffer(x = impaired_lines_study_area_mercator, dist = proximity_meters)
+                    buffered_streams_geographic <- sf::st_transform(buffered_streams, 4326)
+                # for testing only - this creates a map of the points (red = meets proximity criteria, black = doesn't meet proximity criteria) + streams + buffers
+                #     g <- ggplot() + geom_sf(data = buffered_streams) + geom_sf(data = WQI.Scores_sf[!tf_points_303_distance,], color = 'black', aes(color = 'black')) + geom_sf(data = WQI_303d_dist_points, color = 'red', aes(color = 'red')) + geom_sf(data = impaired_lines_study_area)
                 
-        # Create the mapping data (filter for the selected monitoring period and WQI range, and for WDIDs if selected)
-            map.data <- as.data.frame(WQI.Scores %>% dplyr::filter(Monitoring.Period == input$monitoring.period & WQI >= input$score.range[1] & WQI <= input$score.range[2] & WDID %in% WDIDs_ces_filter))
-            map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
-            shared.map.data <- crosstalk::SharedData$new(map.data)
+            }
+        
+                
+        # Create the mapping data 
+            # create the dataset
+                map.data <- as.data.frame(WQI.Scores)
+            # Filter for the selected monitoring period
+                map.data <- map.data %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
+            # Filter for the selected WQI range
+                map.data <- map.data %>% dplyr::filter(WQI >= input$score.range[1] & WQI <= input$score.range[2])
+            # Filter for points in polygons that meet the CES filter criteria
+                map.data <- map.data %>% dplyr::filter(WDID %in% WDIDs_ces_filter)
+            # Filter for points that meet the 303d proximity criteria
+                if (!is.na(as.numeric(input$dist.to.303))) {
+                    map.data <- map.data %>% dplyr::filter(WDID %in% WQI_303d_dist_points_list)
+                }
+            # Filter for the selected WDIDs (if selected)
+                map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
+            # create shared map data, that links the map and the data table
+                shared.map.data <- crosstalk::SharedData$new(map.data)
             
+            # create a dataset with all excluded points
+                excluded_WDIDs <- !(WQI.Scores$WDID %in% map.data$WDID)
+                excluded.points <- WQI.Scores[excluded_WDIDs,]
+                excluded.points_sf <- sf::st_as_sf(excluded.points, coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+                
         # Create the map
             output$monitoring.map <- leaflet::renderLeaflet({
                 # create the empty map
                     l <- leaflet::leaflet(shared.map.data)
                     
                 # enter the basemap options to allow the user to select
-                    basemap.options <- c('Esri.WorldStreetMap', 'Esri.WorldTopoMap', 'Esri.WorldImagery',
-                                         'Esri.WorldGrayCanvas', 'CartoDB.Positron') #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
+                    basemap.options <- c('Esri.WorldTopoMap', 'CartoDB.Positron', 'Esri.WorldGrayCanvas','Esri.WorldImagery','Esri.WorldStreetMap') 
+                    #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
                     
                 # add the basemaps listed above to the map (for options, see: http://leaflet-extras.github.io/leaflet-providers/preview/)
                     for (provider in basemap.options) {
@@ -389,8 +472,12 @@ server <- function(input, output, session) {
 
                 
                 # Add the CalEnvironScreen Polygons
-                    l <- l %>% leaflet::addPolygons(data = ces_poly_study_area, color = "#444444", weight = 1, smoothFactor = 0.5,
-                                                    opacity = 1.0, fillOpacity = 0.5,
+                    l <- l %>% leaflet::addPolygons(data = ces_poly_study_area, 
+                                                    color = 'grey', # "#444444", 
+                                                    weight = 0.5, 
+                                                    smoothFactor = 1.0,
+                                                    opacity = 0.8, 
+                                                    fillOpacity = 0.5,
                                                     # fillColor = ~colorNumeric('YlOrBr', Poll_pctl)(Poll_pctl), # view RColorBrewer palettes with: RColorBrewer::display.brewer.all()
                                                     fillColor = ~ces.leaflet.pal(fill.variable),
                                                     highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
@@ -408,38 +495,79 @@ server <- function(input, output, session) {
                                                                     '<b>', 'Hazardous Waste Generators Percentile: ', '</b>', Haz_pctl),
                                                     group = 'CES Polygons')#,'<br/>'
                     
+                # Add the 303d lines
+                    l <- l %>% leaflet::addPolylines(data = impaired_lines_study_area, 
+                                                     color = 'blue',
+                                                     weight = 2.0, 
+                                                     opacity = 1.0, 
+                                                     # fillOpacity = 0.5,
+                                                     smoothFactor = 1.0,
+                                                     highlightOptions = highlightOptions(color = "white", weight = 2),
+                                                     popup = ~paste0('<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                     '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
+                                                                     '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                     '<b>', 'ID: ', '</b>', WBID),
+                                                     group = '2012 303d Listed Waters')
                     
-                # add in the selected WQI data
-                    l <- l %>% leaflet::addCircleMarkers(
-                        stroke = TRUE,
-                        fill = TRUE,
-                        group = 'WQI Scores',
-                        radius = 2,
-                        opacity = 1,
-                        # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
-                        color = ~wqi.leaflet.pal(WQI),
-                        popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
-                                        '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                        '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                        '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                        '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                        '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                        '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                        '<br/>',
-                                        '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
-                                        '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                        '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                        '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                        '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                        '<b>', 'WQI: ', '</b>', WQI, '<br/>'))
+                # Add 303d proximity buffer (if selected)
+                    if (input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))) {
+                        l <- l %>% leaflet::addPolygons(data = buffered_streams_geographic,
+                                                        color = 'darkblue', # "#444444",
+                                                        weight = 0.5,
+                                                        smoothFactor = 1.0,
+                                                        opacity = 1.0,
+                                                        fillOpacity = 0.5,
+                                                        fillColor = 'lightblue',
+                                                        highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                        popup = ~paste0('<b>', '<u>', '303d Buffer', '</b>','</u>','<br/>',
+                                                                        '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                        '<b>', 'Water Body Type: ', '</b>', WBTYPE,'<br/>',
+                                                                        '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                        '<b>', 'ID: ', '</b>', WBID),
+                                                        group = '303d Buffers'
+                                                        )
+                    }
+                    
+                # Add the excluded points (by all filters) (if selected)
+                    if (input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303)) & input$show.excluded.points == TRUE) {
+                        l <- l %>% leaflet::addCircleMarkers(data = excluded.points_sf,
+                                                             radius = 4,
+                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                             fill = TRUE, fillOpacity = 1, fillColor = 'grey',
+                                                             group = 'Excluded Points'
+                                                             )
+                    } 
+                    
+                    
+                # Add the selected WQI data
+                    l <- l %>% leaflet::addCircleMarkers(radius = 4,
+                                                         stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                         fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
+                                                         # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                                         popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                                                   '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                   '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                   '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                   '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                   '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                   '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                   '<br/>',
+                                                                   '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                                                   '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                   '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                   '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                   '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                   '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                                                         group = 'WQI Scores')
                     
                 # add the legend
+                    l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
                     l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, title = input$ces.parameter, opacity = 1, layerId = 'ces.legend', bins = 6)
-                    l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'wqi.legend')
+                    l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'wqi.legend', bins = 2)
                 
                 # Add controls to select the basemap
                     l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
-                                                         overlayGroups = c('WQI Scores', 'CES Polygons'),
+                                                         overlayGroups = c('WQI Scores', 'CES Polygons', '2012 303d Listed Waters', '303d Buffers', 'Excluded Points'),
                                                          options = layersControlOptions(collapsed = TRUE))
                     
                 
