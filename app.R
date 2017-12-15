@@ -10,6 +10,7 @@ library(tidyverse)
 library(rhandsontable)
 library(sf)
 library(rmapshaper)
+library(units)
 
 `%>%` <- magrittr::`%>%`
 
@@ -41,7 +42,9 @@ library(rmapshaper)
     # receiving waters
         receiving.waters <- suppressMessages(readr::read_tsv('data/Receiving_Waters.txt'))
         names(receiving.waters) <- make.names(names(receiving.waters))
-
+        # remove duplicates
+            receiving.waters <- receiving.waters %>% dplyr::distinct()
+        
 # Data transformations (monitoring data) --------------------------------------------------------------------------------------------------------
     # drop unreasonable dates !!!!! NOTE: MAY WANT TO REVISIT THESE
         monitoring.data <- monitoring.data %>% dplyr::filter(lubridate::year(Date.of.sample.collection) <= lubridate::year(Sys.Date()) & 
@@ -269,10 +272,14 @@ server <- function(input, output, session) {
             
             # Get the standards to apply in calculations
                 standards.applied <- as.data.frame(DF) %>% select(Parameter, input$standard)
+                    # standards.applied <- as.data.frame(DF) %>% select(Parameter, 'CTR') # to run manually
                 tf <- !is.na(standards.applied %>% select(input$standard))
+                    # tf <- !is.na(standards.applied %>% select('CTR')) # to run manually
                 standards.applied <- standards.applied[tf,]
                 names(standards.applied)[2] <- 'Standard'
                 standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = input$standard)
+                    # standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = 'CTR') # to run manually
+                
             
             # Standards Data Download --------------------------------------------------
                 output$downloadStandards <- downloadHandler(
@@ -320,7 +327,7 @@ server <- function(input, output, session) {
                 WQI.Scores <- WQI.Scores %>% dplyr::mutate(NSE = Sum.Excursion / Total.Samples)
                 WQI.Scores <- WQI.Scores %>% dplyr::mutate(F2 = NSE / (0.01 * NSE + 0.01))
             # Final WQI Scores (!!!! NOTE: THE DATABASE USES 1.412, BUT THE POWERPOINT PRESENTATION USES 1.4142 - USED 1.412 HERE TO REPLICATE DATABASE TOOL RESULTS !!!)
-                WQI.Scores <- WQI.Scores %>% dplyr::mutate(WQI = round((100 - sqrt(F1^2 + F2^2) / 1.412),1))
+                WQI.Scores <- WQI.Scores %>% dplyr::mutate(WQI = pmax(0, round((100 - sqrt(F1^2 + F2^2) / 1.412),1)))
                 # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Frequency = round(F1,0))
                 # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Magnitude = round(F2,0))
                 WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID')
@@ -383,7 +390,7 @@ server <- function(input, output, session) {
         # filter for points within the selected maximum distance of 303d waterbodies
             # check to see if a valid number is entered
             if (!is.na(as.numeric(input$dist.to.303))) {
-                proximity_ft <- units::set_units(as.numeric(input$dist.to.303), ft)
+                proximity_ft <- units::as_units(as.numeric(input$dist.to.303), ft)
                 proximity_meters <- units::set_units(proximity_ft, m)
                 # have to convert points and lines to Cartesian coordinate system (x,y rather than lat/lon) to do the distance check
                     WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857) 
@@ -406,14 +413,16 @@ server <- function(input, output, session) {
         
                 
         # Create the mapping data 
-            # create the dataset
+            # create the dataset 
                 map.data <- as.data.frame(WQI.Scores)
             # Filter for the selected monitoring period
                 map.data <- map.data %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
             # Filter for the selected WQI range
                 map.data <- map.data %>% dplyr::filter(WQI >= input$score.range[1] & WQI <= input$score.range[2])
-            # Filter for points in polygons that meet the CES filter criteria
-                map.data <- map.data %>% dplyr::filter(WDID %in% WDIDs_ces_filter)
+            # Filter for points in polygons that meet the CES filter criteria - only do this if a filter is applied because some points may fall outside of CES polygons (NOTE: May need to find a better way to handle those points that do fall outside of CES polygons)
+                if (input$ces.score.range[1] > 0 | input$ces.score.range[2] < 100) {
+                    map.data <- map.data %>% dplyr::filter(WDID %in% WDIDs_ces_filter)
+                }
             # Filter for points that meet the 303d proximity criteria
                 if (!is.na(as.numeric(input$dist.to.303))) {
                     map.data <- map.data %>% dplyr::filter(WDID %in% WQI_303d_dist_points_list)
@@ -423,10 +432,14 @@ server <- function(input, output, session) {
             # create shared map data, that links the map and the data table
                 shared.map.data <- crosstalk::SharedData$new(map.data)
             
-            # create a dataset with all excluded points
-                excluded_WDIDs <- !(WQI.Scores$WDID %in% map.data$WDID)
-                excluded.points <- WQI.Scores[excluded_WDIDs,]
-                excluded.points_sf <- sf::st_as_sf(excluded.points, coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+            # create a dataset with all excluded points that have a WQI score for the chosen standard
+                # points with a score for the selected monitoring period
+                    WQI.score.mon.period <- as.data.frame(WQI.Scores) %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
+                # find excluded points (points with a WQI score for the monitoring period, but not in the mapped data)
+                    excluded_WDIDs <- !(WQI.score.mon.period$WDID %in% map.data$WDID)
+                    excluded.points <- WQI.score.mon.period[excluded_WDIDs,]
+                    excluded.points <- excluded.points[!is.na(excluded.points$Latitude),] # get rid of points with missing lat/lon (those cause an error)
+                    excluded.points_sf <- sf::st_as_sf(excluded.points, coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
                 
         # Create the map
             output$monitoring.map <- leaflet::renderLeaflet({
@@ -534,6 +547,20 @@ server <- function(input, output, session) {
                                                              radius = 4,
                                                              stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
                                                              fill = TRUE, fillOpacity = 1, fillColor = 'grey',
+                                                             popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                                                             '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                             '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                             '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                             '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                             '<br/>',
+                                                                             '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
                                                              group = 'Excluded Points'
                                                              )
                     } 
@@ -570,7 +597,8 @@ server <- function(input, output, session) {
                                                          overlayGroups = c('WQI Scores', 'CES Polygons', '2012 303d Listed Waters', '303d Buffers', 'Excluded Points'),
                                                          options = layersControlOptions(collapsed = TRUE))
                     
-                
+                # Add the measuring tool
+                    l <- l %>% leaflet::addMeasure(position = 'topleft')
                     
                 # output the map object
                     l
