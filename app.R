@@ -198,6 +198,7 @@ library(units)
                     textInput(inputId = 'dist.to.303', label = 'Filter for proximity to a 303d listed water body (ft):', placeholder = 'Enter a distance in feet'),
                     checkboxInput(inputId = 'show.303d.buffer', label = 'Show 303d proximity buffer', value = FALSE),
                     checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE),
+                    checkboxInput(inputId = 'show.parameters', label = 'Show parameters included in WQI score for each facility', value = FALSE),
                 hr(style="border: 1px solid darkgrey"),
                 # Describe the WQI Calculations:
                     tags$b(h4('Water Quality Index (WQI):')),
@@ -332,6 +333,22 @@ server <- function(input, output, session) {
                 # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Magnitude = round(F2,0))
                 WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID')
 
+        if (input$show.parameters == TRUE) {
+            # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
+                # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
+                    grouped_mon_data <- monitoring.data.WQI %>% group_by(WDID, Parameter, Monitoring.Period) %>% select(WDID, Parameter, Monitoring.Period) %>% distinct()
+                # Create a df of distinct WDIDs and Monitoring Periods
+                    distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% select(WDID, Monitoring.Period) %>% distinct()
+                # To the df of distinct WDIDs and Monitoring Periods, append a character string of the Parameters for each combination of WDID and Monitoring Period
+                    for (i in 1:nrow(distinct_WDIDs_MonPeriods)) {
+                        temp_params <- grouped_mon_data %>% filter(WDID == distinct_WDIDs_MonPeriods$WDID[i] & Monitoring.Period == distinct_WDIDs_MonPeriods$Monitoring.Period[i]) # df filtered for given WDID and Monitoring Period
+                        temp_params <- paste0(temp_params$Parameter, collapse = ', ') # character string of parameters in the above df
+                        distinct_WDIDs_MonPeriods$Parameters.In.Score[i] <- temp_params # append the parameters string to the df of distinct WDIDs and Monitoring Periods
+                    }
+                # join the list of parameters to the WQI.Scores df
+                    WQI.Scores <- WQI.Scores %>% dplyr::left_join(distinct_WDIDs_MonPeriods, by = c('WDID', 'Monitoring.Period'))
+        } # else {WQI.Scores$Parameters.In.Score = ''}
+                
             # Create a sf object from the WQI Scores data
                 WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
                 
@@ -558,6 +575,7 @@ server <- function(input, output, session) {
                                                                              '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
                                                                              '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
                                                                              '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                             '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
                                                                              '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
                                                                              '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
                                                                              '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
@@ -567,25 +585,51 @@ server <- function(input, output, session) {
                     
                     
                 # Add the selected WQI data
-                    l <- l %>% leaflet::addCircleMarkers(radius = 4,
-                                                         stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
-                                                         fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
-                                                         # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
-                                                         popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
-                                                                   '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                                   '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                                   '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                                   '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                                   '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                                   '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                                   '<br/>',
-                                                                   '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
-                                                                   '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                                   '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                                   '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                                   '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                                   '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
-                                                         group = 'WQI Scores')
+                    if (input$show.parameters == TRUE) {
+                        l <- l %>% leaflet::addCircleMarkers(radius = 4,
+                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                             fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
+                                                             # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                                             popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                                                       '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                       '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                       '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                       '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                       '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                       '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                       '<br/>',
+                                                                       '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                                                       '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                       '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                       '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
+                                                                       '<b>', 'Parameters In WQI Score: ', '</b>', Parameters.In.Score, '<br/>',
+                                                                       '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                       '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                       '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                                                             group = 'WQI Scores')
+                    }
+                    if (input$show.parameters == FALSE) {
+                        l <- l %>% leaflet::addCircleMarkers(radius = 4,
+                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                             fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
+                                                             # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                                             popup = ~paste0('<b>', '<u>','Facility Information','</u>','</b>','<br/>',
+                                                                             '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                             '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                             '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                             '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                             '<br/>',
+                                                                             '<b>','<u>', 'Scoring','</u>','</b>','<br/>',
+                                                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                             '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
+                                                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                                                             group = 'WQI Scores')
+                    }
                     
                 # add the legend
                     l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
