@@ -6,3 +6,6 @@ rsconnect/
 data/CES3Results
 data/2012_Impaired_Lines_Final
 Read_Spatial_Data.R
+app_OLD.R
+data/2012_Impaired_Polygons_Final
+data/Regional_Board_Office_Boundaries_ModifiedR6_6A_6B
