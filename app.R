@@ -52,7 +52,7 @@ data.type <- 'SMARTS'
                 monitoring.data <- readr::read_tsv(file = t)
                 unlink(t)
             # get rid of data points with missing latitude and/or longitude data
-                monitoring.data <- monitoring.data[(!is.na(monitoring.data$MONITORING_LATITUDE) & !is.na(monitoring.data$MONITORING_LONGITUDE)),] # !!!! Remove all missing lat/lon points from the start !!!
+                # monitoring.data <- monitoring.data[(!is.na(monitoring.data$MONITORING_LATITUDE) & !is.na(monitoring.data$MONITORING_LONGITUDE)),] # !!!! Remove all missing lat/lon points from the start !!!
         }
         names(monitoring.data) <- make.names(names(monitoring.data))
     # facilities
@@ -243,9 +243,30 @@ data.type <- 'SMARTS'
         # Read the data from the saved RDS file
             impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')
             # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
-        
-
             
+# 303d Pollutant Information (table)
+    # # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
+    #     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', method = 'curl')
+    #     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', sheet = 'Final 303(d) List')
+    #     # Create a column for comments that also includes the pollutant (only for rows where there is a comment)
+    #         impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Comment= dplyr::if_else(!is.na(`COMMENTS INCLUDED ON 303(d) LIST`), paste0(POLLUTANT, ': ', `COMMENTS INCLUDED ON 303(d) LIST`), 'NA'))
+    #         impaired_pollutants$Pollutant_Comment[impaired_pollutants$Pollutant_Comment == 'NA'] <- NA # replace text NAs from formual above with actual NAs
+    #     # Create a list of the unique IDs
+    #         impaired_IDs <- impaired_pollutants %>% dplyr::distinct(WBID)
+    #     # for each ID in the list, append the list of pollutants associated with that ID, and the comments associated with those pollutants (if any)
+    #         for (i in seq(nrow(impaired_IDs))){
+    #             temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i])
+    #             impaired_IDs$Pollutant[i] <- paste0(temp$POLLUTANT, collapse = ' | ')
+    #             temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] & !is.na(Pollutant_Comment))
+    #             impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Comment, collapse = ' | ')
+    #         }
+    #     # save as an RDS file
+    #         saveRDS(object = impaired_IDs, file = 'data/303d_List.RDS')
+        # read the data from the RDS file into an R object
+            impaired_303d_list <- readr::read_rds('data/303d_List.RDS')
+    # join this table to the polygons and lines shapefile datasets, by WBID
+            impaired_303d_polygons <- sf::st_as_sf(impaired_303d_polygons %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
+            impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -430,14 +451,9 @@ server <- function(input, output, session) {
                     monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Excursion = dplyr::if_else(Result.Conv > Standard, (Result.Conv / Standard - 1), 0))
                 # NOTE -- SHOULD WE CHECK WHETHER THE RECEIVING WATER IS FRESHWATER BEFORE THE ABOVE STEPS, AND MAYBE REMOVE SALTWATER??? DON'T THINK THE ACCESS DB DOES THIS
             
-            # add a calculated column for the Lat/Lng - It looks like monitoring location lat/lng could be more accurate, but some are missing
-            # after trying this, it looks like monitoring location lat/lng also has some errors, and it's hard to distinguish without looking on a site-by-site basis
-            # monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Map.Latitude = dplyr::if_else(!is.na(Monitoring.Location.Latitude), Monitoring.Location.Latitude, Latitude),
-            #                                                              Map.Longitude = dplyr::if_else(!is.na(Monitoring.Location.Longitude), Monitoring.Location.Longitude, Longitude))
-        
     # 4. Calculate the WQI scores --------------------------------------------------------------------------------------------------------------------------------------------------
                 # Calculate Exceedance (for F1) and Excursion (for F2)
-                    WQI.Scores <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period, Latitude, Longitude, Standard.Type) %>% dplyr::summarize(Exceedances = sum(Exceedance), Sum.Excursion = sum(Excursion), Total.Samples = n()) # Total.Samples(Exceedance))
+                    WQI.Scores <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period, Standard.Type) %>% dplyr::summarize(Exceedances = sum(Exceedance), Sum.Excursion = sum(Excursion), Total.Samples = n()) # Total.Samples(Exceedance))
                 # Calculate F1 (Exceedance)
                     WQI.Scores <- WQI.Scores %>% dplyr::mutate(F1 = Exceedances / Total.Samples * 100)
                 # Calculate F2 (Excursion)
@@ -450,8 +466,10 @@ server <- function(input, output, session) {
                     if (data.type == 'SMARTS') {
                         facilities <- facilities %>% dplyr::rename(STATUS_CODE_NAME = STATUS, REGION = REGION_BOARD) 
                     }
-                        WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID')
-                    
+                # Join the facilities info to the WQI scores, by WDID   
+                    WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC, FACILITY_LATITUDE, FACILITY_LONGITUDE), by = 'WDID')
+                # rename the lat/lon fields, to make mapping easier
+                    WQI.Scores <- WQI.Scores %>% dplyr::rename(Latitude = FACILITY_LATITUDE, Longitude = FACILITY_LONGITUDE)
     # 5. Get a list of parameters in the WQI score
         if (input$show.parameters == TRUE) {
             # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
@@ -667,7 +685,9 @@ server <- function(input, output, session) {
                                                                  '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
                                                                  '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
                                                                  '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
-                                                                 '<b>', 'ID: ', '</b>', WBID),
+                                                                 '<b>', 'ID: ', '</b>', WBID, '<br/>',
+                                                                 '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
+                                                                 '<b>', 'Listing Comments: ', '</b>', Comments),
                                                  group = '2012 303d Listed Waters')
             # Add the 303d polygons
                 l <- l %>% leaflet::addPolygons(data = impaired_polygons_study_area, 
@@ -682,8 +702,10 @@ server <- function(input, output, session) {
                                                                  '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
                                                                  '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
                                                                  '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
-                                                                 '<b>', 'ID: ', '</b>', WBID),
-                                                 group = '2012 303d Listed Waters')
+                                                                 '<b>', 'ID: ', '</b>', WBID, '<br/>',
+                                                                 '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
+                                                                 '<b>', 'Listing Comments: ', '</b>', Comments),
+                                                group = '2012 303d Listed Waters')
             # Add 303d proximity buffer (if selected)
                 if (input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))) {
                     l <- l %>% leaflet::addPolygons(data = buffered_streams_geographic,
@@ -792,7 +814,7 @@ server <- function(input, output, session) {
                 }
             # add the legend
                 l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
-                l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, title = input$ces.parameter, opacity = 1, layerId = 'ces.legend', bins = 4)
+                l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, title = paste0('CES: ', input$ces.parameter), opacity = 1, layerId = 'ces.legend', bins = 4)
                 l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'wqi.legend', bins = 2)
             # Add controls to select the basemap
                 l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
