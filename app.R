@@ -244,29 +244,73 @@ data.type <- 'SMARTS'
             impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')
             # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
             
-# 303d Pollutant Information (table)
-    # # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
-    #     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', method = 'curl')
-    #     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', sheet = 'Final 303(d) List')
-    #     # Create a column for comments that also includes the pollutant (only for rows where there is a comment)
-    #         impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Comment= dplyr::if_else(!is.na(`COMMENTS INCLUDED ON 303(d) LIST`), paste0(POLLUTANT, ': ', `COMMENTS INCLUDED ON 303(d) LIST`), 'NA'))
-    #         impaired_pollutants$Pollutant_Comment[impaired_pollutants$Pollutant_Comment == 'NA'] <- NA # replace text NAs from formual above with actual NAs
-    #     # Create a list of the unique IDs
-    #         impaired_IDs <- impaired_pollutants %>% dplyr::distinct(WBID)
-    #     # for each ID in the list, append the list of pollutants associated with that ID, and the comments associated with those pollutants (if any)
-    #         for (i in seq(nrow(impaired_IDs))){
-    #             temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i])
-    #             impaired_IDs$Pollutant[i] <- paste0(temp$POLLUTANT, collapse = ' | ')
-    #             temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] & !is.na(Pollutant_Comment))
-    #             impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Comment, collapse = ' | ')
-    #         }
-    #     # save as an RDS file
-    #         saveRDS(object = impaired_IDs, file = 'data/303d_List.RDS')
-        # read the data from the RDS file into an R object
+# 303d Waterbodies Pollutant Information (table)
+    # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
+        # download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', method = 'curl')
+        # impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', sheet = 'Final 303(d) List')
+        # names(impaired_pollutants) <- make.names(names(impaired_pollutants))
+        # # Create a column for comments that also includes the pollutant (only for rows where there is a comment)
+        #     impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Comment= dplyr::if_else(!is.na(COMMENTS.INCLUDED.ON.303.d..LIST), paste0(POLLUTANT, ': ', COMMENTS.INCLUDED.ON.303.d..LIST), 'NA'))
+        #     impaired_pollutants$Pollutant_Comment[impaired_pollutants$Pollutant_Comment == 'NA'] <- NA # replace text NAs from formual above with actual NAs
+        # # Create a list of the unique IDs
+        #     impaired_IDs <- impaired_pollutants %>% dplyr::distinct(WBID)
+        # # for each ID in the list, append the list of pollutants associated with that ID, and the comments associated with those pollutants (if any)
+        #     for (i in seq(nrow(impaired_IDs))){
+        #         temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i])
+        #         impaired_IDs$Pollutant[i] <- paste0(temp$POLLUTANT, collapse = ' | ')
+        #         temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] & !is.na(Pollutant_Comment))
+        #         impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Comment, collapse = ' | ')
+        #     }
+        # # save as an RDS file
+        #     saveRDS(object = impaired_IDs, file = 'data/303d_List.RDS')
+        # # read the data from the RDS file into an R object
             impaired_303d_list <- readr::read_rds('data/303d_List.RDS')
-    # join this table to the polygons and lines shapefile datasets, by WBID
-            impaired_303d_polygons <- sf::st_as_sf(impaired_303d_polygons %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
-            impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
+
+            
+# 303d Pollutant Potential Sources (table 2)
+            # # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
+            #     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', method = 'curl')
+            #     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', sheet = 'Final 303(d) List wsrcs')
+            #     names(impaired_pollutants) <- make.names(names(impaired_pollutants))
+            #     # Create a column for source that also includes the pollutant (only for rows where there is a source given)
+            #         # impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Source= dplyr::if_else(POTENTIAL.SOURCES != 'Source Unknown', paste0(POLLUTANT, ': ', Hmisc::capitalize(tolower(SOURCE.CATEGORY)), ' (', POTENTIAL.SOURCES, ')'), 'NA'))
+            #         impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Source= dplyr::if_else(POTENTIAL.SOURCES != 'Source Unknown', paste0(Hmisc::capitalize(tolower(SOURCE.CATEGORY)), ' (', POTENTIAL.SOURCES, ')'), 'NA'))
+            #         impaired_pollutants$Source[impaired_pollutants$Source == 'NA'] <- NA # replace text NAs from formual above with actual NAs
+            #     # Create a list of the unique IDs
+            #         impaired_IDs_Source <- impaired_pollutants %>% dplyr::distinct(WBID)
+            #         impaired_IDs_Pollutant <- impaired_pollutants %>% dplyr::select(WBID, POLLUTANT) %>% dplyr::distinct()
+            #     # for each ID in the list of ID & pollutant combinations, append the list of sources associated with that combination of ID and pollutant (if any)
+            #         for (i in seq(nrow(impaired_IDs_Pollutant))){
+            #             temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs_Pollutant$WBID[i] & POLLUTANT == impaired_IDs_Pollutant$POLLUTANT[i] & !is.na(Source))
+            #             impaired_IDs_Pollutant$Source[i] <- paste0(temp$Source, collapse = '; ')
+            #             # temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] )
+            #             # impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Source, collapse = ' | ')
+            #         }
+            #         impaired_IDs_Pollutant <- impaired_IDs_Pollutant %>% dplyr::mutate(Pollutant_Source = dplyr::if_else(Source != '', paste0(POLLUTANT, ': ', Source), 'NA'))
+            #         impaired_IDs_Pollutant$Pollutant_Source[impaired_IDs_Pollutant$Pollutant_Source == 'NA'] <- NA
+            #     # for each ID in the list of WDIDs, append the list of sources for all pollutants associated with that ID (if any)
+            #         for (i in seq(nrow(impaired_IDs_Source))){
+            #             temp2 <- impaired_IDs_Pollutant %>% dplyr::filter(WBID == impaired_IDs_Source$WBID[i])
+            #             impaired_IDs_Source$Pollutant[i] <- paste0(temp2$POLLUTANT, collapse = ' | ')
+            #             temp3 <- impaired_IDs_Pollutant %>% dplyr::filter(WBID == impaired_IDs_Source$WBID[i] & !is.na(Pollutant_Source))
+            #             impaired_IDs_Source$Sources[i] <- paste0(temp3$Pollutant_Source, collapse = ' | ')
+            #         }
+            #     # save as an RDS file
+            #         saveRDS(object = impaired_IDs_Source, file = 'data/303d_List_Sources.RDS')
+                # read the data from the RDS file into an R object
+                    impaired_303d_sources <- readr::read_rds('data/303d_List_Sources.RDS')
+                # join the pollution source info to the list of pollutants and comments
+                    impaired_303d_list <- impaired_303d_list %>% dplyr::left_join(impaired_303d_sources, by = c('WBID', 'Pollutant'))
+                # make blanks into NAs
+                    impaired_303d_list$Comments[impaired_303d_list$Comments == ''] <- NA
+                    impaired_303d_list$Sources[impaired_303d_list$Sources == ''] <- NA
+                    
+                    
+# join the 303d information to the polygons and lines shapefile datasets, by WBID
+    impaired_303d_polygons <- sf::st_as_sf(impaired_303d_polygons %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
+    impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!       
+            
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -687,7 +731,9 @@ server <- function(input, output, session) {
                                                                  '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
                                                                  '<b>', 'ID: ', '</b>', WBID, '<br/>',
                                                                  '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
-                                                                 '<b>', 'Listing Comments: ', '</b>', Comments),
+                                                                 '<b>', 'Listing Comments: ', '</b>', Comments,  '<br/>',
+                                                                 '<b>', 'Potential Sources: ', '</b>', Sources),
+                                                 
                                                  group = '2012 303d Listed Waters')
             # Add the 303d polygons
                 l <- l %>% leaflet::addPolygons(data = impaired_polygons_study_area, 
@@ -704,7 +750,8 @@ server <- function(input, output, session) {
                                                                  '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
                                                                  '<b>', 'ID: ', '</b>', WBID, '<br/>',
                                                                  '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
-                                                                 '<b>', 'Listing Comments: ', '</b>', Comments),
+                                                                 '<b>', 'Listing Comments: ', '</b>', Comments, '<br/>',
+                                                                 '<b>', 'Potential Sources: ', '</b>', Sources),
                                                 group = '2012 303d Listed Waters')
             # Add 303d proximity buffer (if selected)
                 if (input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))) {
