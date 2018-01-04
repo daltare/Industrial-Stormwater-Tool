@@ -324,7 +324,7 @@ ui <- fluidPage(
         sidebarPanel(
             withMathJax(), # to create equations
             # Filters
-            # h3('Filters:'),
+            h4('Filters:'),
             selectInput(inputId = 'region.selected', label = 'Select Water Board Region:', choices = c(1:4, '5R', '5S', '6A', '6B', 7:9), selected = '9'),            
             selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL', 'Custom')),
             selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
@@ -340,7 +340,7 @@ ui <- fluidPage(
             checkboxInput(inputId = 'show.parameters', label = 'Show parameters included in WQI score for each facility', value = FALSE),
             hr(style="border: 1px solid darkgrey"),
             # Describe the WQI Calculations:
-            tags$b(h4('Water Quality Index (WQI):')),
+            tags$b(h4('Water Quality Index (WQI) Information:')),
             p('Based on the San Diego Coastkeeper\'s WQI, this is an adapted version of the official Canadian WQI, which was adoped by
               the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
               score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
@@ -361,6 +361,13 @@ ui <- fluidPage(
             # Link to the code, etc...
             # p('For more information, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
             tags$b(h4('Application Information:')),
+            p(tags$b('Data Sources:')),
+            p('Stormwater Monitoring: ', a(href = 'https://smarts.waterboards.ca.gov/smarts/SwSmartsLogin.xhtml', 'SMARTS'), ' (file: Industrial Ad Hoc Reports - Raw Data)'),
+            p('CalEnviroScreen 3.0: ', a(href = 'https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30', 'OEHHA')),
+            p('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml', 'California 2012 Integrated Report')),
+            p(tags$b('More Information:')),
+            p('For quesitons or comments, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
+            p(tags$b('Source Code:')),
             actionButton(inputId = 'github', label = 'Code on GitHub', icon = icon('github', class = 'fa-1x'),
                          onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
             ),
@@ -368,15 +375,17 @@ ui <- fluidPage(
         # Show map and data table
         mainPanel(
             tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
+            h4('WQI Scores:'),
             leaflet::leafletOutput('monitoring.map',height = 450),
             hr(),
+            h5('WQI Scores - Tabular Data:'),
             DT::dataTableOutput('WQI.table'),
-            hr(),
+            hr(style="border: 3px solid darkgrey"),
             h4('Enter / Edit Standards:'),
             rHandsontableOutput("hot"),
             br(),
             actionButton("reset", "Reset Standards",class = 'buttonstyle'),
-            hr(),
+            hr(style="border: 3px solid darkgrey"),
             h4('Download Additional Data:'),
             downloadButton('downloadRawData', 'Sampling Data Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
             downloadButton('downloadStandards', 'Standards Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
@@ -464,7 +473,9 @@ server <- function(input, output, session) {
     # 3. Then filter the 303d lines and polygons for the selected region ----------------------------------------------------------------------------------------------------------------------
         # first filter using the attributes in the 303d shapefile
             impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1))
+            # impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1))
             impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1))
+            # impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1))
         # then filter using the RB boundary polygons (for regions where there is more that 1 office / subregion)
             tf_impaired_bounds_lines <- sf::st_intersects(impaired_lines_region, rb.boundary.selected, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
             tf_impaired_bounds_polys <- sf::st_intersects(impaired_polygons_region, rb.boundary.selected, sparse = FALSE)
@@ -547,8 +558,8 @@ server <- function(input, output, session) {
             param <- ces_choices[ces_choices$Name == input$ces.parameter,2]
             # param <- ces_choices[ces_choices$Name == 'Pollution Burden',2] 
         # create a numeric variable for the CES percentile that is in the middle of the values of the given 5% range
-# !!!!!!!!!!! ERROR HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            ces.percentile.numeric <- tidyr::separate(as.data.frame(ces_poly_study_area), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5
+            # ERROR HERE - because there are NAs in the CES percentile scores 
+            ces.percentile.numeric <- suppressWarnings(tidyr::separate(as.data.frame(ces_poly_study_area), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5) # error here because there are NAs in the CES percentile scores
             ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(ces.percentile.numeric = ces.percentile.numeric)
             
         # get the selected parameter of CES data - if CES percentile is selected, use the numeric field that was created from the factor values in the lines above
@@ -594,24 +605,38 @@ server <- function(input, output, session) {
         # check to see if a valid number is entered
         if (!is.na(as.numeric(input$dist.to.303))) {
             proximity_ft <- units::as_units(as.numeric(input$dist.to.303), ft)
-            proximity_meters <- units::set_units(proximity_ft, m)
+            # proximity_ft <- units::as_units(as.numeric(5000), ft)
+            # convert distance from feet to meters
+                proximity_meters <- units::set_units(proximity_ft, m)
             # have to convert points and lines to Cartesian coordinate system (x,y rather than lat/lon) to do the distance check
-            WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857) 
-            impaired_lines_study_area_mercator <- sf::st_transform(impaired_lines_study_area, 3857)
-            # check for points within the given distance (returns a sparse matrix - i.e., a list the same length as the number of WQI points, that lists the stream segment(s), if any, that meet the criteria for each point)
-            WQI_303d_dist_check <- sf::st_is_within_distance(WQI.Scores_sf_mercator, impaired_lines_study_area_mercator, dist = proximity_meters)
-            tf_points_303_distance <- as.logical(sapply(WQI_303d_dist_check, length)) # gives a logical vector where TRUE means the monitoring point has at least one 303d stream segment that meets the proximity criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
-            # create a variable with the points that meet the criteria
-            WQI_303d_dist_points <- WQI.Scores_sf[tf_points_303_distance,] # points that satisfy the distance to 303d waters criteria
-            WQI_303d_dist_points_list <- as.data.frame(WQI_303d_dist_points %>% dplyr::select('WDID'))[,1]
+                WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857) 
+                impaired_lines_study_area_mercator <- sf::st_transform(impaired_lines_study_area, 3857)
+                impaired_polygons_study_area_mercator <- sf::st_transform(impaired_polygons_study_area, 3857)
+                
+            # check for points within the given distance of impaired lines (returns a sparse matrix - i.e., a list the same length as the number of WQI points, that lists the stream segment(s), if any, that meet the criteria for each point)
+                WQI_303d_dist_check_lines <- sf::st_is_within_distance(WQI.Scores_sf_mercator, impaired_lines_study_area_mercator, dist = proximity_meters)
+                tf_points_303_distance_lines <- as.logical(sapply(WQI_303d_dist_check_lines, length)) # gives a logical vector where TRUE means the monitoring point has at least one 303d stream segment that meets the proximity criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
+            
+            # check for points within the given distance of impaired polygons (returns a sparse matrix - i.e., a list the same length as the number of WQI points, that lists the stream segment(s), if any, that meet the criteria for each point)
+                WQI_303d_dist_check_polygons <- sf::st_is_within_distance(WQI.Scores_sf_mercator, impaired_polygons_study_area_mercator, dist = proximity_meters)
+                tf_points_303_distance_polygons <- as.logical(sapply(WQI_303d_dist_check_polygons, length)) # gives a logical vector where TRUE means the monitoring point has at least one 303d stream segment that meets the proximity criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
+            # combine the line and polygon checks
+                tf_points_303_distance <- tf_points_303_distance_lines | tf_points_303_distance_polygons
+            
+                
+            # create a variable with the points that meet the criteria for proximity to either impaired lines or polygons (or both)
+                WQI_303d_dist_points <- WQI.Scores_sf[tf_points_303_distance,] # points that satisfy the distance to 303d waters criteria
+                WQI_303d_dist_points_list <- (as.data.frame(WQI_303d_dist_points) %>% dplyr::select('WDID'))[,1]
             # dataset of excluded points
-            WQI_303d_excluded_points <- WQI.Scores_sf[!tf_points_303_distance,] # points that don't satisfy the distance to 303d waters criteria
+                WQI_303d_excluded_points <- WQI.Scores_sf[!tf_points_303_distance,] # points that don't satisfy the distance to 303d waters criteria
             # create a variable with polygons representing the buffered region around the streams
-            buffered_streams <- sf::st_buffer(x = impaired_lines_study_area_mercator, dist = proximity_meters)
-            buffered_streams_geographic <- sf::st_transform(buffered_streams, 4326)
+                buffered_streams_lines <- sf::st_buffer(x = impaired_lines_study_area_mercator, dist = proximity_meters)
+                buffered_streams_polygons <- sf::st_buffer(x = impaired_polygons_study_area_mercator, dist = proximity_meters)
+                # join the buffered lines and polygons datasets
+                    buffered_streams <- rbind(buffered_streams_lines, (buffered_streams_polygons %>% dplyr::select(-Shape_Area)))
+                buffered_streams_geographic <- sf::st_transform(buffered_streams, 4326)
             # for testing only - this creates a map of the points (red = meets proximity criteria, black = doesn't meet proximity criteria) + streams + buffers
             #     g <- ggplot() + geom_sf(data = buffered_streams) + geom_sf(data = WQI.Scores_sf[!tf_points_303_distance,], color = 'black', aes(color = 'black')) + geom_sf(data = WQI_303d_dist_points, color = 'red', aes(color = 'red')) + geom_sf(data = impaired_lines_study_area)
-            
         }
         
         
@@ -859,14 +884,16 @@ server <- function(input, output, session) {
                                                                          '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
                                                          group = 'WQI Scores')
                 }
+            
+            # Add controls to select the basemap
+                l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
+                                                     overlayGroups = c('WQI Scores', 'CES Polygons', '303d Listed Waters', 'Regional Board Boundary', '303d Buffers', 'Excluded Points'),
+                                                     options = leaflet::layersControlOptions(collapsed = TRUE))            
             # add the legend
                 l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
                 l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, title = paste0('CES: ', input$ces.parameter), opacity = 1, layerId = 'ces.legend', bins = 4)
                 l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'wqi.legend', bins = 2)
-            # Add controls to select the basemap
-                l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
-                                                     overlayGroups = c('WQI Scores', 'CES Polygons', '303d Listed Waters', 'Regional Board Boundary', '303d Buffers', 'Excluded Points'),
-                                                     options = leaflet::layersControlOptions(collapsed = TRUE))
+
             # Add the measuring tool
                 l <- l %>% leaflet::addMeasure(position = 'topleft')
             # output the map object
