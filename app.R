@@ -196,39 +196,6 @@ data.type <- 'SMARTS'
     # CES parameter choices
         ces_choices <- data.frame(Name = c('CES Percentile', 'Pollution Burden', 'Impaired Water Bodies'), CES.Variable = c('Percentile', 'Poll_pctl', 'IWB_pctl'), stringsAsFactors = FALSE) #' CES Percentile' = 'Percentile'
 
-# 303d Lines ------------------------------------------------------------------------------------------------------------------------------------
-    # These steps show how to access and transform the 303d geospatial line data, but they only need to be done once:
-        # temp_zip_impaired <- tempfile()
-        # impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
-        # download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
-        # unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
-        # unlink(temp_zip_impaired)
-        # impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
-        # impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
-        # impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform)
-        # saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
-        # Read the data from the saved RDS file
-            impaired_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS')
-        # get rid of 303d lines in region 1, because they're very dense and crash the tool
-            impaired_303d_lines <- impaired_303d_lines %>% dplyr::filter(REGION_NUM != 1)
-
-    # filter for monitoring points within a certain distance of impaired waterbodies
-    # for testing only:
-        # WQI.Scores <- as_data_frame(monitoring.data %>% dplyr::group_by(WDID, Latitude, Longitude) %>% summarize(number = n()))
-        # WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
-        # WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857)
-        # impaired_lines_study_area_mercator <- sf::st_transform(impaired_lines_study_area, 3857)
-        #  z <- units::set_units(2000, m)
-        # WQI_303d_dist_check <- sf::st_is_within_distance(WQI.Scores_sf_mercator, impaired_lines_study_area_mercator, dist = z)
-        # 
-        # tf_points_303_distance <- as.logical(sapply(WQI_303d_dist_check, length)) # gives a logical vector where TRUE means the monitoring point meets the criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
-        # WQI_303d_dist_points <- WQI.Scores_sf[tf_points_303_distance,] # points that satisfy the distance to 303d waters criteria
-        # buffered_streams <- sf::st_buffer(x = impaired_lines_study_area_mercator, dist = z)
-        # 
-        # # map points (red = within distance criteria) + streams + buffers
-        #     g <- ggplot() + geom_sf(data = buffered_streams) + geom_sf(data = WQI.Scores_sf[!tf_points_303_distance,], color = 'black') + geom_sf(data = WQI_303d_dist_points, color = 'red') + geom_sf(data = impaired_lines_study_area)
-
-            
 # 303d Polygons ------------------------------------------------------------------------------------------------------------------------------------
     # These steps show how to access and transform the 303d geospatial polygon data, but they only need to be done once:
         # temp_zip_impaired_poly <- tempfile()
@@ -242,9 +209,58 @@ data.type <- 'SMARTS'
         # saveRDS(object = impaired_303d_simple_poly, file = 'data/simplified_2012_303d_polygons.RDS')
         # Read the data from the saved RDS file
             impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')
+        # check
             # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
-            
-# 303d Waterbodies Pollutant Information (table)
+        
+        
+# 303d Lines ------------------------------------------------------------------------------------------------------------------------------------
+    # These steps show how to access and transform the 303d geospatial line data, but they only need to be done once:
+        # temp_zip_impaired <- tempfile()
+        # impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
+        # download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
+        # unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
+        # unlink(temp_zip_impaired)
+        # impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
+        # impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
+        # impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform)
+        # saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
+        # Read the data from the saved RDS file
+            impaired_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS')
+        # get rid of large 303d lines in region 1, because they're very dense and crash the tool (will replace these with simplified polygons)
+            # impaired_303d_lines <- impaired_303d_lines %>% dplyr::filter(REGION_NUM != 1)
+            # get the memory size of each polyline, so that the larger ones can be converted to polygons
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(size = apply(X = impaired_303d_lines, MARGIN = 1, FUN = object.size))
+                # impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(rank = dplyr::min_rank(size))
+            # convert back to sf (if needed)
+                impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines)
+            # get the WBIDs of the larger polylines in R1, so that they can be dropped
+                R1_303d_LargePolylines <- as.data.frame(impaired_303d_lines %>% dplyr::filter(size > 100000 & REGION_NUM == 1) %>% dplyr::select(WBID)) # %>% dplyr::select(-geometry)
+            # drop the size column
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::select(-size)
+            # drop the large R1 polylines
+                # impaired_303d_lines_dropped <- impaired_303d_lines %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID) # just to check
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::filter(!(WBID %in% R1_303d_LargePolylines$WBID))
+                
+        # read the file containing R1 303d polylines that have been converted to polygons 
+                # NOTE: currently this uses a shapefile was created in ArcGIS using its Conversion Tools toolbox (the functions "To Raster -> Polyline to Raster" and "From Raster -> Raster to Polygon" )
+                # NOTE: will try to re-create this file with the raster and rmapshaper packages instead to make everything contained in R (use rmapshaper package to dissolve polygons, if needed
+            # impaired_303d_R1_LineToPoly <- sf::st_read('data/2012_Impaired_Lines_R1_ToPoly/RasToPoly100_dissolve.shp')
+            # impaired_303d_R1_transform <- sf::st_transform(impaired_303d_R1_LineToPoly, 4326)
+            # impaired_303d_R1_simple <- rmapshaper::ms_simplify(impaired_303d_R1_transform, keep = 0.3) # default = 0.05
+            # saveRDS(object = impaired_303d_R1_simple, file = 'data/simplified_2012_303d_lines_R1toPoly.RDS')
+            # Read the data from the saved RDS file
+                impaired_303d_R1_linesToPoly <- readr::read_rds('data/simplified_2012_303d_lines_R1toPoly.RDS')
+            # Extract just those waterbodies that were dropped above (the large polylines, stored in variable R1_303d_LargePolylines)
+                impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID)
+            # drop some columns, to be consistent with the 303d polygons data
+                impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::select(-c(FID_, OBJECTID_1, WBID_1, Shape_Le_1))
+            # convert back to sf (if needed)
+                impaired_303d_R1_linesToPoly <- sf::st_as_sf(impaired_303d_R1_linesToPoly)
+            # join these new R1 polygons to the original polygons file
+                # impaired_303d_polygons <- impaired_303d_polygons %>% dplyr::bind_rows(impaired_303d_R1_linesToPoly)
+                impaired_303d_polygons <- rbind(impaired_303d_polygons, impaired_303d_R1_linesToPoly)
+
+# 303d Waterbodies Pollutant Information (table) ----------------------------------------------------------------------------------------------------
     # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
         # download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', method = 'curl')
         # impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', sheet = 'Final 303(d) List')
@@ -267,7 +283,7 @@ data.type <- 'SMARTS'
             impaired_303d_list <- readr::read_rds('data/303d_List.RDS')
 
             
-# 303d Pollutant Potential Sources (table 2)
+# 303d Pollutant Potential Sources (table 2) --------------------------------------------------------------------------------------------------------
             # # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
             #     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', method = 'curl')
             #     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', sheet = 'Final 303(d) List wsrcs')
@@ -364,7 +380,7 @@ ui <- fluidPage(
             p(tags$b('Data Sources:')),
             p('Stormwater Monitoring: ', a(href = 'https://smarts.waterboards.ca.gov/smarts/SwSmartsLogin.xhtml', 'SMARTS'), ' (file: Industrial Ad Hoc Reports - Raw Data)'),
             p('CalEnviroScreen 3.0: ', a(href = 'https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30', 'OEHHA')),
-            p('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml', 'California 2012 Integrated Report')),
+            p('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml', 'California 2012 Integrated Report'), ' (NOTE: some Region 1 waterbodies are shown with simplified geometry)'),
             p(tags$b('More Information:')),
             p('For quesitons or comments, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
             p(tags$b('Source Code:')),
