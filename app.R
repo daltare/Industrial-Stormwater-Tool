@@ -1,24 +1,24 @@
 # Load Packages (NOTE: most of the functions in the script below are called explicitly with the `package::function()` syntax, but listing the packages here to make it easy to see what packages are being used)
-    # Shiny platform
-        library(shiny) # the Shiny web application framework (https://shiny.rstudio.com) (https://cran.r-project.org/package=shiny)
-    # General data analysis and transformation
-        library(dplyr) # data transformation (http://dplyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (https://cran.r-project.org/package=dplyr)
-        library(magrittr) # just for the ` %>% ` operator, used to make code more readable (http://magrittr.tidyverse.org/) (https://cran.r-project.org/package=magrittr)
-        library(readr) # for reading data into R from various sources (in this case from text files and RDS objects) (https://cran.r-project.org/package=readr)
-        library(tidyr) # for reshaping data (http://tidyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf) (https://cran.r-project.org/package=tidyr)
-        library(tidyverse) # loads all of the tidyverse packages (including dplyr, magrittr, readr, tidyr) (https://www.tidyverse.org/) (https://cran.r-project.org/package=tidyverse)
-    # Interactive objects for data entry and display
-        library(DT) # interactive data tables (https://rstudio.github.io/DT/) (https://cran.r-project.org/package=DT)
-        library(crosstalk) # interaction between html objects (in this case, used to link data table with map) (https://rstudio.github.io/crosstalk/) (https://cran.r-project.org/package=crosstalk)
-        library(rhandsontable) # allows data entry by user, in a table format (https://jrowen.github.io/rhandsontable/) (https://cran.r-project.org/package=rhandsontable)
-    # Mapping and GIS operations
+    # # Shiny platform
+    #     library(shiny) # the Shiny web application framework (https://shiny.rstudio.com) (https://cran.r-project.org/package=shiny)
+    # # General data analysis and transformation
+    #     library(dplyr) # data transformation (http://dplyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (https://cran.r-project.org/package=dplyr)
+    #     library(magrittr) # just for the ` %>% ` operator, used to make code more readable (http://magrittr.tidyverse.org/) (https://cran.r-project.org/package=magrittr)
+    #     library(readr) # for reading data into R from various sources (in this case from text files and RDS objects) (https://cran.r-project.org/package=readr)
+    #     library(tidyr) # for reshaping data (http://tidyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf) (https://cran.r-project.org/package=tidyr)
+    #     library(tidyverse) # loads all of the tidyverse packages (including dplyr, magrittr, readr, tidyr) (https://www.tidyverse.org/) (https://cran.r-project.org/package=tidyverse)
+    # # Interactive objects for data entry and display
+    #     library(DT) # interactive data tables (https://rstudio.github.io/DT/) (https://cran.r-project.org/package=DT)
+    #     library(crosstalk) # interaction between html objects (in this case, used to link data table with map) (https://rstudio.github.io/crosstalk/) (https://cran.r-project.org/package=crosstalk)
+    #     library(rhandsontable) # allows data entry by user, in a table format (https://jrowen.github.io/rhandsontable/) (https://cran.r-project.org/package=rhandsontable)
+    # # Mapping and GIS operations
         library(leaflet) # creates interactive maps (https://rstudio.github.io/leaflet/) (https://cran.r-project.org/package=leaflet)
-        library(htmlwidgets) #  framework for creating HTML widgets - used in this case for adding some custom features to the leaflet map (https://cran.r-project.org/web/packages/htmlwidgets/vignettes/develop_intro.html) (https://cran.r-project.org/package=htmlwidgets)
-        library(sf) # for working with vector-based geospatial data using 'Simple Features' objects (reading, analyzing, etc.) (https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) (https://cran.r-project.org/package=sf)
-        library(rmapshaper) # used in this case for simplifying polylines and polygons - also has some other geospatial analysis functions (https://cran.r-project.org/web/packages/rmapshaper/vignettes/rmapshaper.html) (https://cran.r-project.org/package=rmapshaper)
-        library(raster) # for working with raster-based geospatial data - in this case for simplifying large Region 1 polylines, by converting polylines -> raster, then raster -> polygons (http://www.rspatial.org/spatial/rst/4-rasterdata.html) (https://cran.r-project.org/package=raster)
-        library(units) # for working with measurement units (assigning units, unit conversion, etc.) (https://cran.r-project.org/web/packages/units/vignettes/units.html) (https://cran.r-project.org/package=units)
-        library(rgeos) # interface to Geometry Engine - not used explicitly here (https://cran.r-project.org/package=rgeos)
+    #     library(htmlwidgets) #  framework for creating HTML widgets - used in this case for adding some custom features to the leaflet map (https://cran.r-project.org/web/packages/htmlwidgets/vignettes/develop_intro.html) (https://cran.r-project.org/package=htmlwidgets)
+    #     library(sf) # for working with vector-based geospatial data using 'Simple Features' objects (reading, analyzing, etc.) (https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) (https://cran.r-project.org/package=sf)
+    #     library(rmapshaper) # used in this case for simplifying polylines and polygons - also has some other geospatial analysis functions (https://cran.r-project.org/web/packages/rmapshaper/vignettes/rmapshaper.html) (https://cran.r-project.org/package=rmapshaper)
+    #     library(raster) # for working with raster-based geospatial data - in this case for simplifying large Region 1 polylines, by converting polylines -> raster, then raster -> polygons (http://www.rspatial.org/spatial/rst/4-rasterdata.html) (https://cran.r-project.org/package=raster)
+    #     library(units) # for working with measurement units (assigning units, unit conversion, etc.) (https://cran.r-project.org/web/packages/units/vignettes/units.html) (https://cran.r-project.org/package=units)
+    #     library(rgeos) # interface to Geometry Engine - not used explicitly here (https://cran.r-project.org/package=rgeos)
 
 # Assign the pipe operator (if not loading/attaching packages with the library() function)
     `%>%` <- magrittr::`%>%` # manually assigns the pipe operator (`%>%`) - not really needed if calling library(magrittr)
@@ -207,44 +207,68 @@
     #     g <- ggplot() + geom_sf(data = ces_highPol)
 
 # 303d Polygons ------------------------------------------------------------------------------------------------------------------------------------
-    # These steps show how to access and transform the 303d geospatial polygon data, but they only need to be done once:
-        # temp_zip_impaired_poly <- tempfile()
-        # impaired_poly_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Polys_Final.zip'
-        # download.file(url = impaired_poly_url, destfile = temp_zip_impaired_poly, method = 'curl')
-        # unzip(zipfile = temp_zip_impaired_poly, exdir = 'data/2012_Impaired_Polygons_Final', junkpaths = TRUE)
-        # unlink(temp_zip_impaired)
-        # impaired_303d_poly <- sf::st_read('data/2012_Impaired_Polygons_Final/2012_Impaired_Polys_Final.shp')
-        # impaired_303d_transform_poly <- sf::st_transform(impaired_303d_poly, 4326)
-        # impaired_303d_simple_poly <- rmapshaper::ms_simplify(impaired_303d_transform_poly)
-        # saveRDS(object = impaired_303d_simple_poly, file = 'data/simplified_2012_303d_polygons.RDS')
-    # Read the data from the saved RDS file
-        impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')
-    # check (plot)
-        # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
+    # These steps show how to access and transform the 303d geospatial polygon data, but they only need to be done once, 
+    # and the results have been save in an RDS file (an R data format):
+        # # download the data from the original source (a zip file on the internet), then unzip the file, and save the 
+        # # unzipped file in the 'data' folder
+        #     temp_zip_impaired_poly <- tempfile()
+        #     impaired_poly_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Polys_Final.zip'
+        #     download.file(url = impaired_poly_url, destfile = temp_zip_impaired_poly, method = 'curl')
+        #     unzip(zipfile = temp_zip_impaired_poly, exdir = 'data/2012_Impaired_Polygons_Final', junkpaths = TRUE)
+        #     unlink(temp_zip_impaired)
+        # # Read the shapefile into R
+            # impaired_303d_poly <- sf::st_read('data/2012_Impaired_Polygons_Final/2012_Impaired_Polys_Final.shp')
+        # # transform the data into a coordinate reference system
+            # impaired_303d_transform_poly <- sf::st_transform(impaired_303d_poly, 4326)
+        # save the unsimplified polygons as an RDS file, in case they will be used instead of the simplified polygons
+            # saveRDS(object = impaired_303d_transform_poly, file = 'data/unsimplified_2012_303d_polygons.RDS')
+        # # simplify the polygons (NOTE: the default level is keep = 0.05, but with keep < 0.6 some polygons are deleted altogether)
+        #     impaired_303d_simple_poly <- rmapshaper::ms_simplify(impaired_303d_transform_poly, keep = 0.7)
+        # # save the simplified polygons as an R object
+        #     saveRDS(object = impaired_303d_simple_poly, file = 'data/simplified_2012_303d_polygons.RDS')
+    # Read the data from the saved RDS file - choose from the simplified or unsimplified data
+        # impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')
+        impaired_303d_polygons <- readr::read_rds('data/unsimplified_2012_303d_polygons.RDS')
+        # check (plot)
+            # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
         
 # 303d PolyLines ------------------------------------------------------------------------------------------------------------------------------------
-    # These steps show how to access and transform the 303d geospatial polyline data, but they only need to be done once:
-        # temp_zip_impaired <- tempfile()
-        # impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
-        # download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
-        # unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
-        # unlink(temp_zip_impaired)
-        # impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
-        # impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
-        # impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform)
-        # saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
-    # Read the data from the saved RDS file
-        impaired_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS')
+    # These steps show how to access and transform the 303d geospatial polyline data, but they only need to be done once
+    # The results have been saved to an R data object
+        # download the data from the original source (a zip file on the internet), then unzip the file, and save the
+        # unzipped file in the 'data' folder
+            # temp_zip_impaired <- tempfile()
+            # impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
+            # download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
+            # unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
+            # unlink(temp_zip_impaired)
+        # Read the shapefile into R
+            # impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
+        # transform the data into a coordinate reference system
+            # impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
+            # save the un-simplified 303d polyLines as an R object, in case they will be used instead of a simplified version
+                # saveRDS(object = impaired_303d_transform, file = 'data/unsimplified_2012_303d_lines.RDS')
+        # simplify the polygons
+            # impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform, keep = 0.4) # increase the 'keep' parameter to increase the level of detail retained
+        # save the simplified polygons as a RDS object
+            # saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
+    # Read the data from the saved RDS file - choose from the simplified or unsimplified version
+        # impaired_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS')
+        impaired_303d_lines <- readr::read_rds('data/unsimplified_2012_303d_lines.RDS')
     # get rid of large 303d lines in region 1, because they're very dense and crash the tool (will replace these with simplified polygons)
         # get the memory size of each polyline, so that the larger ones can be converted to polygons
-            impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(size = apply(X = impaired_303d_lines, MARGIN = 1, FUN = object.size))
+            impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSize = apply(X = impaired_303d_lines, MARGIN = 1, FUN = object.size))
+            # set the size to units of bytes
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSize = units::set_units(memSize, b))
+            # convert the size from bytes to megabytes (MB)
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSizeMB = units::set_units(memSize, Mb))
             # impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(rank = dplyr::min_rank(size)) # provide a rank for each waterbody based on the memory size
         # convert back to sf (if needed)
             impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines)
-        # get the WBIDs of the larger polylines in R1, so that they can be dropped
-            R1_303d_LargePolylines <- as.data.frame(impaired_303d_lines %>% dplyr::filter(size > 100000 & REGION_NUM == 1) %>% dplyr::select(WBID)) # %>% dplyr::select(-geometry)
+        # get the WBIDs of the larger polylines in R1, so that they can be dropped (arbitrarily selected 0.1 MB as the limit - could use something different)
+            R1_303d_LargePolylines <- as.data.frame(impaired_303d_lines %>% dplyr::filter(memSizeMB > units::set_units(0.1, Mb) & REGION_NUM == 1) %>% dplyr::select(WBID)) # %>% dplyr::select(-geometry)
         # drop the size column
-            impaired_303d_lines <- impaired_303d_lines %>% dplyr::select(-size)
+            impaired_303d_lines <- impaired_303d_lines %>% dplyr::select(-memSize, -memSizeMB)
         # drop the large R1 polylines
             # impaired_303d_lines_dropped <- impaired_303d_lines %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID) # just to check
             impaired_303d_lines <- impaired_303d_lines %>% dplyr::filter(!(WBID %in% R1_303d_LargePolylines$WBID))
@@ -271,49 +295,67 @@
                 
                 
 # reproduce the workflow to convert R1 lines to polygons, using R instead of ArcGIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            # get the size of each R1 polyline
-                R1_lines_memSizes <- readr::read_rds('data/simplified_2012_303d_lines.RDS') %>% dplyr::filter(REGION_NUM == 1) 
-                R1_lines_memSizes <- R1_lines_memSizes %>% dplyr::mutate(memSize = apply(X = R1_lines_memSizes, MARGIN = 1, FUN = object.size) / 1000000)
-                R1_lines_memSizes <- R1_lines_memSizes %>% dplyr::select(OBJECTID, memSize, WBID, EST_SIZE_A, SIZE_ASSES, WBTYPE, Shape_Leng)
-            # read in the 303d polylines as an sf object, filter for R1 polylines, and convert to object type sp (SpatialLines object - data in this format is needed to work with the raster package)
-                R1_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS') %>% dplyr::filter(REGION_NUM == 1) %>% sf::st_as_sf()
-            # transform to a projected coordinate system
-                R1_303d_lines <- sf::st_transform(R1_303d_lines, 3857) # Transform to projected coordinate system; may also try 3310? 
-                
-            # Convert the Region 1 303d polylines to polygons
-            # step through 1 waterbody at a time --------------------------------
-                if (exists('R1_lines_toPolygon')) {rm(list = 'R1_lines_toPolygon')}
-                for (i in 15:15) { #seq(nrow(R1_303d_lines))) {
-                    R1_303d_lines_sp <- as(R1_303d_lines[i,], 'Spatial') # get the current waterbody, and convert to sp
-                    R1_Raster <- raster::raster(x = R1_303d_lines_sp, resolution = 200) # create an empy raster that bounds the waterbody 
-                    # convert the polylines to raster (rasterize), based on the resolution (i.e., grid size) defined above. Give each cell the value of the 'OBJECTID' field so they can be grouped to the appropriate waterbody.
-                        R1_Raster_rasterize <- raster::rasterize(x = R1_303d_lines_sp, y = R1_Raster, field = 'OBJECTID')
-                    # convert the raster to a polygon
-                        R1_RasterToPolygon <- raster::rasterToPolygons(R1_Raster_rasterize, dissolve = TRUE) # dissolve means that if there is a disconnect in the polygon, it just creates one multi-part polygon
-                    # convert the polygon from object type sp to sf
-                        R1_RasterToPolygon <- sf::st_as_sf(R1_RasterToPolygon)
-                    # append the polygon to the complete dataframe of polygons
-                        if (!exists('R1_lines_toPolygon')) {
-                            R1_lines_toPolygon <- R1_RasterToPolygon} else {
-                                R1_lines_toPolygon[i,] <- R1_RasterToPolygon    
-                            }
-                    # join the polyline data to the new corresponding polygons
-                        R1_lines_toPolygon <- R1_lines_toPolygon %>% dplyr::left_join(R1_303d_lines %>% dplyr::select(-c(geometry)), by = c('layer' = 'OBJECTID')) %>% sf::st_as_sf()
-                    # simplify the polygons
-                        # R1_lines_toPolygon <- rmapshaper::ms_simplify(R1_lines_toPolygon, keep = 0.5)
-                    # save the complete dataframe of polygons to an RDS file after each new polygon is added 
-                        saveRDS(object = R1_lines_toPolygon, file = 'data/Region1_linesToPolygons_Rworkflow.RDS')
-                } 
-                #  End of for loop  -------------------------------------------- #
-                # check (plot)
-                    z <- readr::read_rds('data/Region1_linesToPolygons_Rworkflow.RDS')
-                    g <- ggplot2::ggplot() + ggplot2::geom_sf(data = z)
-                    g
-
-                # save the polygons as an RDS file
-                    saveRDS(object = R1_RasterToPolygon_sf, file = 'data/simplified_2012_303d_lines_R1toPoly_Rworkflow.RDS')
-                            
-                # read data from the saved RDS file
+            # # get the size of each R1 polyline
+            #     # read in the data and select Region 1 data
+            #         R1_lines_memSizes <- readr::read_rds('data/simplified_2012_303d_lines.RDS') %>% dplyr::filter(REGION_NUM == 1) 
+            #     # get the memory size of each waterbody
+            #         R1_lines_memSizes <- R1_lines_memSizes %>% dplyr::mutate(memSize = apply(X = R1_lines_memSizes, MARGIN = 1, FUN = object.size))
+            #     # set the size to units of bytes
+            #         R1_lines_memSizes <- R1_lines_memSizes %>% dplyr::mutate(memSize = units::set_units(memSize, b))
+            #     # convert the size from bytes to megabytes (MB)
+            #         R1_lines_memSizes <- R1_lines_memSizes %>% dplyr::mutate(memSizeMB = units::set_units(memSize, Mb))
+            #     # keep only certain columns
+            #         R1_lines_memSizes <- R1_lines_memSizes %>% dplyr::select(OBJECTID, memSize, memSizeMB, WBID, EST_SIZE_A, SIZE_ASSES, WBTYPE, Shape_Leng)
+            # # read in the 303d polylines as an sf object, filter for R1 polylines, and convert to object type sp (SpatialLines object - data in this format is needed to work with the raster package)
+            #     R1_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS') %>% dplyr::filter(REGION_NUM == 1) %>% sf::st_as_sf()
+            # # transform to a projected coordinate system
+            #     R1_303d_lines <- sf::st_transform(R1_303d_lines, 3857) # Transform to projected coordinate system; may also try 3310? 
+            #     
+            # # Convert the Region 1 303d polylines to polygons
+            # # step through 1 waterbody at a time --------------------------------
+            #     if (exists('R1_lines_toPolygon')) {rm(list = 'R1_lines_toPolygon')}
+            #     for (i in 1:15) { #seq(nrow(R1_303d_lines))) {
+            #         R1_303d_lines_sp <- as(R1_303d_lines[i,], 'Spatial') # get the current waterbody, and convert to sp
+            #         # create an empy raster that bounds the waterbody. NOTE: This is where the resolution (grid size) is set !!!!!
+            #             R1_Raster <- raster::raster(x = R1_303d_lines_sp, resolution = 250) 
+            #         # convert the polylines to raster (rasterize), based on the resolution (i.e., grid size) defined above. Give each cell the value of the 'OBJECTID' field so they can be grouped to the appropriate waterbody.
+            #             R1_Raster_rasterize <- raster::rasterize(x = R1_303d_lines_sp, y = R1_Raster, field = 'OBJECTID')
+            #         # convert the raster to a polygon
+            #             R1_RasterToPolygon <- raster::rasterToPolygons(R1_Raster_rasterize, dissolve = TRUE) # dissolve means that if there is a disconnect in the polygon, it just creates one multi-part polygon
+            #         # convert the polygon from object type sp to sf
+            #             R1_RasterToPolygon <- sf::st_as_sf(R1_RasterToPolygon)
+            #         # simplify the polygon - NOTE: set the simplification level here !!!!!
+            #             R1_RasterToPolygon <- rmapshaper::ms_simplify(R1_RasterToPolygon, keep = 0.4)
+            #         # join the polyline data to the new corresponding polygons
+            #             R1_RasterToPolygon <- R1_RasterToPolygon %>% dplyr::left_join(R1_303d_lines %>% dplyr::select(-c(geometry)), by = c('layer' = 'OBJECTID')) %>% sf::st_as_sf()
+            #         # append the polygon to the complete dataframe of polygons
+            #             if (!exists('R1_lines_toPolygon')) {
+            #                 R1_lines_toPolygon <- R1_RasterToPolygon} else {
+            #                     R1_lines_toPolygon[i,] <- R1_RasterToPolygon    
+            #                 }
+            #         # save the complete dataframe of polygons to an RDS file after each new polygon is added 
+            #             saveRDS(object = R1_lines_toPolygon, file = 'data/Region1_linesToPolygons_Rworkflow.RDS')
+            #     } 
+            #     #  End of for loop  -------------------------------------------- #
+            #     # check (plot)
+            #         z <- readr::read_rds('data/Region1_linesToPolygons_Rworkflow.RDS')
+            #         ggplot2::ggplot() + ggplot2::geom_sf(data = z[12,])
+            # 
+            #     # save the polygons as an RDS file
+            #         # saveRDS(object = R1_RasterToPolygon_sf, file = 'data/simplified_2012_303d_lines_R1toPoly_Rworkflow.RDS')
+            #                 
+            #     # read data from the saved RDS file
+            #         # Read the data from the saved RDS file
+            #             impaired_303d_R1_linesToPoly <- readr::read_rds('data/simplified_2012_303d_lines_R1toPoly.RDS')
+            #         # Extract just those waterbodies that were dropped above (the large polylines, stored in variable R1_303d_LargePolylines)
+            #             impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID)
+            #         # drop some columns, to be consistent with the 303d polygons data
+            #             impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::select(-c(FID_, OBJECTID_1, WBID_1, Shape_Le_1))
+            #         # convert back to sf (if needed)
+            #             impaired_303d_R1_linesToPoly <- sf::st_as_sf(impaired_303d_R1_linesToPoly)
+            #         # join these new R1 polygons to the original polygons file
+            #             # impaired_303d_polygons <- impaired_303d_polygons %>% dplyr::bind_rows(impaired_303d_R1_linesToPoly)
+            #             impaired_303d_polygons <- rbind(impaired_303d_polygons, impaired_303d_R1_linesToPoly)
                     
 # End of R1 lines to polygons script !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -436,7 +478,7 @@ ui <- fluidPage(
             p(tags$b('Data Sources:')),
             p('Stormwater Monitoring: ', a(href = 'https://smarts.waterboards.ca.gov/smarts/SwSmartsLogin.xhtml', 'SMARTS'), ' (file: Industrial Ad Hoc Reports - Raw Data)'),
             p('CalEnviroScreen 3.0: ', a(href = 'https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30', 'OEHHA')),
-            p('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml', 'California 2012 Integrated Report'), ' (NOTE: the geometry of 303d waterbodies has been simplified, especially in Region 1)'),
+            p('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml', 'California 2012 Integrated Report'), ' (NOTE: the geometry of some Region 1 303d waterbodies has been simplified)'),
             p(tags$b('More Information:')),
             p('For quesitons or comments, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
             p(tags$b('Source Code:')),
@@ -454,7 +496,7 @@ ui <- fluidPage(
             DT::dataTableOutput('WQI.table'),
             hr(style="border: 3px solid darkgrey"),
             h4('Enter / Edit Standards:'),
-            rHandsontableOutput("hot"),
+            rhandsontable::rHandsontableOutput("hot"),
             br(),
             actionButton("reset", "Reset Standards",class = 'buttonstyle'),
             hr(style="border: 3px solid darkgrey"),
@@ -483,7 +525,7 @@ server <- function(input, output, session) {
                 DF$Custom <- as.numeric(DF$Custom)
                 
                 if (!is.null(input$hot)) {
-                    DF = hot_to_r(input$hot)
+                    DF = rhandsontable::hot_to_r(input$hot)
                 } else {
                     if (is.null(values[["DF"]]))
                         DF <- DF
@@ -495,7 +537,7 @@ server <- function(input, output, session) {
         # Get the standards to apply in calculations --------------------------------------
             standards.applied <- as.data.frame(DF) %>% dplyr::select(Parameter, input$standard)
             # standards.applied <- as.data.frame(DF) %>% dplyr::select(Parameter, 'CTR') # to run manually
-            tf <- !is.na(standards.applied %>% select(input$standard))
+            tf <- !is.na(standards.applied %>% dplyr::select(input$standard))
             # tf <- !is.na(standards.applied %>% dplyr::select('CTR')) # to run manually
             standards.applied <- standards.applied[tf,]
             names(standards.applied)[2] <- 'Standard'
@@ -544,10 +586,10 @@ server <- function(input, output, session) {
 
     # 3. Then filter the 303d lines and polygons for the selected region ----------------------------------------------------------------------------------------------------------------------
         # first filter using the attributes in the 303d shapefile
-            impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1))
-            # impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1))
-            impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1))
-            # impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1))
+            impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1)) %>% sf::st_as_sf()
+            # impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1)) %>% sf::st_as_sf()
+            impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1)) %>% sf::st_as_sf()
+            # impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1)) %>% sf::st_as_sf()
         # then filter using the RB boundary polygons (for regions where there is more that 1 office / subregion)
             tf_impaired_bounds_lines <- sf::st_intersects(impaired_lines_region, rb.boundary.selected, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
             tf_impaired_bounds_polys <- sf::st_intersects(impaired_polygons_region, rb.boundary.selected, sparse = FALSE)
@@ -601,9 +643,9 @@ server <- function(input, output, session) {
         if (input$show.parameters == TRUE) {
             # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
             # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
-            grouped_mon_data <- monitoring.data.WQI %>% group_by(WDID, Parameter, Monitoring.Period) %>% select(WDID, Parameter, Monitoring.Period) %>% distinct()
+            grouped_mon_data <- monitoring.data.WQI %>% group_by(WDID, Parameter, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% distinct()
             # Create a df of distinct WDIDs and Monitoring Periods
-            distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% select(WDID, Monitoring.Period) %>% distinct()
+            distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% dplyr::select(WDID, Monitoring.Period) %>% distinct()
             # To the df of distinct WDIDs and Monitoring Periods, append a character string of the Parameters for each combination of WDID and Monitoring Period
             for (i in 1:nrow(distinct_WDIDs_MonPeriods)) {
                 temp_params <- grouped_mon_data %>% filter(WDID == distinct_WDIDs_MonPeriods$WDID[i] & Monitoring.Period == distinct_WDIDs_MonPeriods$Monitoring.Period[i]) # df filtered for given WDID and Monitoring Period
@@ -630,7 +672,6 @@ server <- function(input, output, session) {
             param <- ces_choices[ces_choices$Name == input$ces.parameter,2]
             # param <- ces_choices[ces_choices$Name == 'Pollution Burden',2] 
         # create a numeric variable for the CES percentile that is in the middle of the values of the given 5% range
-            # ERROR HERE - because there are NAs in the CES percentile scores 
             ces.percentile.numeric <- suppressWarnings(tidyr::separate(as.data.frame(ces_poly_study_area), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5) # error here because there are NAs in the CES percentile scores
             ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(ces.percentile.numeric = ces.percentile.numeric)
             
@@ -665,7 +706,7 @@ server <- function(input, output, session) {
         
         # Filter WQI points by attribues of CES polygons containing each point
             # find the polygons that meet the selected criteria (range of values)
-                ces_poly_study_area_filtered <- ces_poly_study_area %>% dplyr::filter(fill.variable >= input$ces.score.range[1] & fill.variable <= input$ces.score.range[2])
+                ces_poly_study_area_filtered <- ces_poly_study_area %>% dplyr::filter(fill.variable >= input$ces.score.range[1] & fill.variable <= input$ces.score.range[2]) %>% sf::st_as_sf()
         
         # create a list of WDIDs in the polygons that meet the selected criteria
             # points_ces_filter <- st_intersects(ces_poly_study_area_filtered, WQI.Scores_sf, sparse = TRUE) # lists the monitoring point(s) in each polygon 
@@ -1041,15 +1082,15 @@ server <- function(input, output, session) {
     
     # Reset Standards
     observeEvent(input$reset, {
-        DF <- standards %>% select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
+        DF <- standards %>% dplyr::select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
         DF$Custom <- as.numeric(DF$Custom)
         values[["DF"]] <- DF
     })   
     
-    output$hot <- renderRHandsontable({
+    output$hot <- rhandsontable::renderRHandsontable({
         DF <- values[["DF"]]
         if (!is.null(DF))
-            rhandsontable(DF, useTypes = TRUE, stretchH = "all")
+            rhandsontable::rhandsontable(DF, useTypes = TRUE, stretchH = "all")
     })    
     
     

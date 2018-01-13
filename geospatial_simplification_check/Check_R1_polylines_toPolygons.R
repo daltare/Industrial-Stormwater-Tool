@@ -128,7 +128,7 @@ library(magrittr)
             
 # Run the analysis (examples) ----
     # run the function to create and simplify polygons
-        wb13_res100 <- raster_check(R1_WB_Numb = 13, resolution_level = 100) #, plot_limits_x = c(-13741090, -13735000), c(5068000, 5075000))
+        wb13_res100 <- raster_check(R1_WB_Numb = 13, resolution_level = 100)
     # show a plot of the unsimplified polygon, full extent
         plot_unsimplified(plot_data = wb13_res100)
     # show a plot of a simplified polygon, full extent
@@ -138,4 +138,8 @@ library(magrittr)
     # show a plot of the unsimplified polygon versus a simplified polygon, zoomed in to a selected extent
         plot_zoomed(plot_data = wb13_res100, simple_level = 0.5, plot_limits_x = c(-13740000, -13735000), plot_limits_y <- c(5070000, 5075000))
 
+        
+# to create a new simplification level
+        zNew_Simp_poly <- rmapshaper::ms_simplify(wb13_res100$Polygons$Unsimplified, keep = 0.35)
+        
             
