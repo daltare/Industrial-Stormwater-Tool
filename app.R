@@ -155,7 +155,7 @@
     # These steps show how to access and transform the RB boundary geospatial data, but they only need to be done once:
         # RB_Bounds <- sf::st_read('data/Regional_Board_Office_Boundaries_ModifiedR6_6A_6B/Regional_Board_Offices.shp')
         # RB_Bounds_transform <- sf::st_transform(RB_Bounds, 4326)
-        # RB_Bounds_simple <- rmapshaper::ms_simplify(RB_Bounds_transform)
+        # RB_Bounds_simple <- rmapshaper::ms_simplify(RB_Bounds_transform, keep = 0.5)
         # saveRDS(object = RB_Bounds_simple, file = 'data/simplified_RB_Bounds.RDS')
     # Read the data from the saved RDS file
         RB_Boundaries <- readr::read_rds('data/simplified_RB_Bounds.RDS')
@@ -165,15 +165,20 @@
         
 # CalEnviroScreen Polygons ----------------------------------------------------------------------------------------------------------------------
     # These steps show how to access and transform the CES geospatial data, but they only need to be done once:
-        # temp_zip <- tempfile()
-        # ces_url <- 'https://oehha.ca.gov/media/downloads//ces3shp.zip'  # ALTERNATVIE: ces_url <- 'https://data.ca.gov/sites/default/files/CES3Results_SHP.zip'
-        # download.file(url = ces_url, destfile = temp_zip, method = 'curl')
-        # unzip(zipfile = temp_zip, exdir = 'data/CES3Results', junkpaths = TRUE) #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
-        # unlink(temp_zip)
-        # ces <- sf::st_read('data/CES3Results/CES3Results.shp')
-        # ces_transform <- st_transform(ces, 4326)
-        # ces_simple <- rmapshaper::ms_simplify(ces_transform)
-        # saveRDS(object = ces_simple, file = 'data/simplified_CalEnvironScreen_poly.RDS')
+        # download the data
+            # temp_zip <- tempfile()
+            # ces_url <- 'https://oehha.ca.gov/media/downloads//ces3shp.zip'  # ALTERNATVIE: ces_url <- 'https://data.ca.gov/sites/default/files/CES3Results_SHP.zip'
+            # download.file(url = ces_url, destfile = temp_zip, method = 'curl')
+            # unzip(zipfile = temp_zip, exdir = 'data/CES3Results', junkpaths = TRUE) #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
+            # unlink(temp_zip)
+        # read the shapefile into R
+            # ces <- sf::st_read('data/CES3Results/CES3Results.shp')
+        # transform
+            # ces_transform <- sf::st_transform(ces, 4326)
+        # simplify
+            # ces_simple <- rmapshaper::ms_simplify(ces_transform, keep = 0.5)
+        # save the simplified polygons as an RDS file
+            # saveRDS(object = ces_simple, file = 'data/simplified_CalEnvironScreen_poly.RDS')
     # Read the data from the saved RDS file
         ces_poly <- readr::read_rds('data/simplified_CalEnvironScreen_poly.RDS')
     
