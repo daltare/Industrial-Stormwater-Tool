@@ -1,5 +1,9 @@
 This is a draft of a tool that is intended to analyze statewide stormwater monitoring data reported to the California State Water Resources Control Board, and could potentially be used to target inspections of facilities that discharge stormwater. The application is available at: https://daltare.shinyapps.io/Stormwater_Enforcement_Tool/
 
-Stormwater monitoring data used in this tool is from the [SMARTS](https://smarts.waterboards.ca.gov/smarts/faces/SwSmartsLogin.xhtml) "Industrial Ad Hoc Reports - Raw Data" file (access to this file requires a SMARTS user account; this data is NOT available from the "Public Access" section of SMARTS). To access the file, go to:
- `Data File Downloads` -> `Select Regional Board: State Board` (from dropdown menu) -> `Industrial Ad Hoc Reports - Raw Data`
+Stormwater monitoring data used in this tool is from the [SMARTS](https://smarts.waterboards.ca.gov/smarts/faces/SwSmartsLogin.xhtml) Public Access interface. To access the files used, go to `View SW Data` → `Download NOI Data By Regional Board` → from the dropdown menu select `State Board`. The files used are:
+- `Industrial Ad Hoc Reports - Parameter Data` (Monitoring Data)
+- `Industrial Application Specific Data` (Facility Data)
 
+303(d) impaired water body information is from the [Final 2012 California Integrated Report](https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml) (shapefiles are available under the *Data Download* tab, including [polygons](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Polys_Final.zip) and [polylines](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip), as well as tables with [listing comments](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx) and [potential sources](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls)).
+
+Pollution burden information by census tract is from the California Office of Environmental Health Hazard Assessment's (OEHHA) [CalEnviroScreen 3.0](https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30) (a shapefile is available under the *CalEnviroScreen 3.0 Data and Additional Materials* header, [here](https://oehha.ca.gov/media/downloads//ces3shp.zip)).

@@ -12,3 +12,5 @@ data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls
 LinesToPolygons_R1_ArcGIS.docx
 data/2012_Impaired_Lines_R1_ToPoly
 geospatial_simplification_check/*.png
+geospatial_simplification_check/R1_linesToPolygons
+data/SMARTS_data/xOld
