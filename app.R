@@ -515,8 +515,11 @@ ui <- fluidPage(
         # Show map and data table
         mainPanel(
             tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
-            h4('WQI Scores:'),
-            leaflet::leafletOutput('monitoring.map',height = 450),
+            h4('Water Quality Index (WQI) Scores:'),
+            leaflet::leafletOutput('monitoring.map',height = 500),
+            h6('*WQI = Water Quality Index Score (see panel on left for more information)', 
+               br(), 
+               textOutput('ces.legend.note')),
             hr(),
             h5('WQI Scores - Tabular Data:'),
             DT::dataTableOutput('WQI.table'),
@@ -542,6 +545,9 @@ ui <- fluidPage(
 
 # Define server logic required to draw map -------------------------------------
 server <- function(input, output, session) {
+    
+    output$ces.legend.note <- renderText({paste0('**CES =  CalEnviroScreen 3.0 ', input$ces.parameter, if(input$ces.parameter != 'CES Percentile') {' Percentile'}) })
+    
     
     # 1. Get the standards---------------------------------------------------------------------------------------------------------------------------------------------------------
         # User Entered Standards ---------------------------------------------------------
@@ -1024,15 +1030,17 @@ server <- function(input, output, session) {
                                                          group = 'WQI Scores')
                 }
             
+           
+            # add the legend
+                l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
+                l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, opacity = 1, layerId = 'ces.legend', bins = 4, title = paste0('CES**'))#: ', input$ces.parameter))
+                l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI*", opacity = 1, layerId = 'wqi.legend', bins = 2)
+
             # Add controls to select the basemap
                 l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
                                                      overlayGroups = c('WQI Scores', 'CES Polygons', '303d Listed Waters', 'Regional Board Boundary', '303d Buffers', 'Excluded Points'),
-                                                     options = leaflet::layersControlOptions(collapsed = FALSE))            
-            # add the legend
-                l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
-                l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, title = paste0('CES: ', input$ces.parameter), opacity = 1, layerId = 'ces.legend', bins = 4)
-                l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI", opacity = 1, layerId = 'wqi.legend', bins = 2)
-
+                                                     options = leaflet::layersControlOptions(collapsed = TRUE, autoZIndex = TRUE)) 
+                
             # Add the measuring tool
                 l <- l %>% leaflet::addMeasure(position = 'topleft')
             # output the map object
