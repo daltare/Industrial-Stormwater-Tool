@@ -94,12 +94,14 @@
         # table1 <- readr::read_tsv(file = paste0(download.location, '\\', download.file.name))
         
         
-    # To go to the SMARTS password-protected page:
+    # To go to the SMARTS password-protected page (NOTE: Save your SMARTS username and password to Environment Variables for your account, named as SMARTS_username and SMARTS_password):
+        # SMARTS.username <- Sys.getenv('SMARTS_username')
+        # SMARTS.password <- Sys.getenv('SMARTS_password')
         # url <- "https://smarts.waterboards.ca.gov"
         # remDr$navigate(url)
         # webElem <- remDr$findElement(using = 'id', value = 'loginForm:userId')
-        # webElem$sendKeysToElement(list('daltare'))# , key = 'enter'))
+        # webElem$sendKeysToElement(list(SMARTS.username))# , key = 'enter'))
         # webElem <- remDr$findElement(using = 'id', value = 'loginForm:password')
-        # webElem$sendKeysToElement(list('1L0ngRoad'))
+        # webElem$sendKeysToElement(list(SMARTS.password))
         # webElem <- remDr$findElement(using = 'id', value = 'loginForm:loginButton')
         # webElem$clickElement()
