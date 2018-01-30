@@ -1,4 +1,7 @@
-This is a draft of a tool that is intended to analyze statewide industrial stormwater monitoring data reported to the California State Water Resources Control Board, and assess the monitoring results relative to other indicators of impairment and pollution burden (e.g., 303d impaired water bodies, CalEnviroScreen scores). It could potentially be used to target inspections of facilities that discharge stormwater. The application is available at: https://daltare.shinyapps.io/Stormwater_Enforcement_Tool/
+This is a draft of a tool that is intended to analyze statewide industrial stormwater monitoring data reported to the California State Water Resources Control Board, and assess the monitoring results relative to other indicators of impairment and pollution burden (e.g., 303d impaired water bodies, CalEnviroScreen scores). It could potentially be used to target inspections of facilities that discharge stormwater. 
+
+The application is available at: https://daltare.shinyapps.io/Stormwater_Enforcement_Tool <br>
+(NOTE: if the link above doesn't work, the application is also available here: https://sccwrp.shinyapps.io/Stormwater_Enforcement_Tool-master — thanks to [SCCWRP](http://www.sccwrp.org/Homepage.aspx) for hosting it)
 
 Stormwater monitoring data used in this tool is from the [SMARTS](https://smarts.waterboards.ca.gov/smarts/faces/SwSmartsLogin.xhtml) Public Access interface. To access the files used, go to *View SW Data* → *Download NOI Data By Regional Board* → from the dropdown menu select *State Board*. The files used are:
 - *Industrial Ad Hoc Reports - Parameter Data* (Monitoring Data)
