@@ -10,6 +10,8 @@ Stormwater monitoring data used in this tool is from the [SMARTS](https://smarts
 - *Industrial Ad Hoc Reports - Parameter Data* (Monitoring Data)
 - *Industrial Application Specific Data* (Facility Data)
 
+The tools used to automatically upload the SMARTS data to the data.ca.gov portal at regular (daily) intervals are available here: https://github.com/daltare/SMARTS_DataPortal_Automation
+
 303(d) impaired water body information is from the [Final 2012 California Integrated Report](https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml) (shapefiles are available under the *Data Download* tab, including [polygons](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Polys_Final.zip) and [polylines](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip), as well as tables with [listing comments](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx) and [potential sources](https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls)).
 
 Pollution burden information by census tract is from the California Office of Environmental Health Hazard Assessment's (OEHHA) [CalEnviroScreen 3.0](https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30) (a shapefile is available under the *CalEnviroScreen 3.0 Data and Additional Materials* header, [here](https://oehha.ca.gov/media/downloads//ces3shp.zip)).
