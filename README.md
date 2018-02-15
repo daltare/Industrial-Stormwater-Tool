@@ -7,7 +7,7 @@ If the link above doesn't work, the application is also available on an alternat
 
 ## Data Sources
 #### Stormwater Monitoring and Facility Information
-Results of industrial stormwater effluent monitoring, as well as information about the industrial discharge facilities where that monitoring occurs, is retrieved from the datasets stored on the data.ca.gov portal, here:
+Industrial stormwater effluent monitoring data, as well as information about the industrial discharge facilities where that monitoring occurs, is retrieved from the datasets stored on the data.ca.gov portal, here:
 - [Industrial Stormwater Effluent Monitoring Data](https://data.ca.gov/dataset/stormwater-%E2%80%93-regulatory-and-enforcement-actions-%E2%80%93-smarts/resource/fe4712db-015a-4e92-a13f)
 - [Industrial Stormwater Discharger Facility Information](https://data.ca.gov/dataset/stormwater-%E2%80%93-regulatory-and-enforcement-actions-%E2%80%93-smarts/resource/a5f001af-abbb-4bc7-9196#{})
 
