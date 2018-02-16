@@ -88,7 +88,7 @@ if (data.type == 'SMARTS') {
     if (data.type == 'DataPortal') {
         mon.temp <- tempfile()
         download.file(url = 'https://data.ca.gov/node/2176/download', destfile = mon.temp)
-        monitoring.data <- readr::read_delim(file = mon.temp, delim = '|')
+        monitoring.data <- readr::read_csv(file = mon.temp)
         unlink(mon.temp)
         rm(mon.temp)
     }
@@ -114,7 +114,7 @@ if (data.type == 'SMARTS') {
     if (data.type == 'DataPortal') {
         fac.temp <- tempfile()
         download.file(url = 'https://data.ca.gov/node/2171/download', destfile = fac.temp)
-        facilities <- readr::read_delim(file = fac.temp, delim = '|')
+        facilities <- readr::read_csv(file = fac.temp)
         unlink(fac.temp)
         rm(fac.temp)
     }
