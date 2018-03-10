@@ -1,48 +1,48 @@
 # Load Packages (NOTE: most of the functions in the script below are called explicitly with the `package::function()` syntax, but listing the packages here to make it easy to see what packages are being used)
-# # Shiny platform
-#     library(shiny) # the Shiny web application framework (https://shiny.rstudio.com) (https://cran.r-project.org/package=shiny)
-# # General data analysis and transformation
-#     library(dplyr) # data transformation (http://dplyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (https://cran.r-project.org/package=dplyr)
-#     library(magrittr) # just for the ` %>% ` operator, used to make code more readable (http://magrittr.tidyverse.org/) (https://cran.r-project.org/package=magrittr)
-#     library(readr) # for reading data into R from various sources (in this case from text files and RDS objects) (https://cran.r-project.org/package=readr)
-#     library(tidyr) # for reshaping data (http://tidyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf) (https://cran.r-project.org/package=tidyr)
-#     library(tidyverse) # loads all of the tidyverse packages (including dplyr, magrittr, readr, tidyr) (https://www.tidyverse.org/) (https://cran.r-project.org/package=tidyverse)
-# # Interactive objects for data entry and display
-#     library(DT) # interactive data tables (https://rstudio.github.io/DT/) (https://cran.r-project.org/package=DT)
-#     library(crosstalk) # interaction between html objects (in this case, used to link data table with map) (https://rstudio.github.io/crosstalk/) (https://cran.r-project.org/package=crosstalk)
-#     library(rhandsontable) # allows data entry by user, in a table format (https://jrowen.github.io/rhandsontable/) (https://cran.r-project.org/package=rhandsontable)
-# # Mapping and GIS operations
-library(leaflet) # creates interactive maps (https://rstudio.github.io/leaflet/) (https://cran.r-project.org/package=leaflet)
-#     library(htmlwidgets) #  framework for creating HTML widgets - used in this case for adding some custom features to the leaflet map (https://cran.r-project.org/web/packages/htmlwidgets/vignettes/develop_intro.html) (https://cran.r-project.org/package=htmlwidgets)
-#     library(sf) # for working with vector-based geospatial data using 'Simple Features' objects (reading, analyzing, etc.) (https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) (https://cran.r-project.org/package=sf)
-#     library(rmapshaper) # used in this case for simplifying polylines and polygons - also has some other geospatial analysis functions (https://cran.r-project.org/web/packages/rmapshaper/vignettes/rmapshaper.html) (https://cran.r-project.org/package=rmapshaper)
-#     library(raster) # for working with raster-based geospatial data - in this case for simplifying large Region 1 polylines, by converting polylines -> raster, then raster -> polygons (http://www.rspatial.org/spatial/rst/4-rasterdata.html) (https://cran.r-project.org/package=raster)
-#     library(units) # for working with measurement units (assigning units, unit conversion, etc.) (https://cran.r-project.org/web/packages/units/vignettes/units.html) (https://cran.r-project.org/package=units)
-#     library(rgeos) # interface to Geometry Engine - not used explicitly here (https://cran.r-project.org/package=rgeos)
+    # Shiny platform
+        # library(shiny) # the Shiny web application framework (https://shiny.rstudio.com) (https://cran.r-project.org/package=shiny)
+    # General data analysis and transformation
+        # library(dplyr) # data transformation (http://dplyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (https://cran.r-project.org/package=dplyr)
+        # library(magrittr) # just for the ` %>% ` operator, used to make code more readable (http://magrittr.tidyverse.org/) (https://cran.r-project.org/package=magrittr)
+        # library(readr) # for reading data into R from various sources (in this case from text files and RDS objects) (https://cran.r-project.org/package=readr)
+        # library(tidyr) # for reshaping data (http://tidyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf) (https://cran.r-project.org/package=tidyr)
+        # library(tidyverse) # loads all of the tidyverse packages (including dplyr, magrittr, readr, tidyr) (https://www.tidyverse.org/) (https://cran.r-project.org/package=tidyverse)
+    # Interactive objects for data entry and display
+        # library(DT) # interactive data tables (https://rstudio.github.io/DT/) (https://cran.r-project.org/package=DT)
+        # library(crosstalk) # interaction between html objects (in this case, used to link data table with map) (https://rstudio.github.io/crosstalk/) (https://cran.r-project.org/package=crosstalk)
+        # library(rhandsontable) # allows data entry by user, in a table format (https://jrowen.github.io/rhandsontable/) (https://cran.r-project.org/package=rhandsontable)
+    # Mapping and GIS operations
+        library(leaflet) # creates interactive maps (https://rstudio.github.io/leaflet/) (https://cran.r-project.org/package=leaflet)
+        # library(htmlwidgets) #  framework for creating HTML widgets - used in this case for adding some custom features to the leaflet map (https://cran.r-project.org/web/packages/htmlwidgets/vignettes/develop_intro.html) (https://cran.r-project.org/package=htmlwidgets)
+        # library(sf) # for working with vector-based geospatial data using 'Simple Features' objects (reading, analyzing, etc.) (https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) (https://cran.r-project.org/package=sf)
+        # library(rmapshaper) # used in this case for simplifying polylines and polygons - also has some other geospatial analysis functions (https://cran.r-project.org/web/packages/rmapshaper/vignettes/rmapshaper.html) (https://cran.r-project.org/package=rmapshaper)
+        # library(raster) # for working with raster-based geospatial data - in this case for simplifying large Region 1 polylines, by converting polylines -> raster, then raster -> polygons (http://www.rspatial.org/spatial/rst/4-rasterdata.html) (https://cran.r-project.org/package=raster)
+        # library(units) # for working with measurement units (assigning units, unit conversion, etc.) (https://cran.r-project.org/web/packages/units/vignettes/units.html) (https://cran.r-project.org/package=units)
+        # library(rgeos) # interface to Geometry Engine - not used explicitly here (https://cran.r-project.org/package=rgeos)
 
 # Assign the pipe operator (if not loading/attaching packages with the library() function)
-`%>%` <- magrittr::`%>%` # manually assigns the pipe operator (`%>%`) - not really needed if calling library(magrittr)
+    `%>%` <- magrittr::`%>%` # manually assigns the pipe operator (`%>%`) - not really needed if calling library(magrittr)
 
 
 # Set the data source - this tool is based on an MS Access database tool designed by the San Diego Coastkeepers for Region 9 - this determines whether to use a copy of the inputs to that tool, or to use statewide data from SMARTS
-# NOTE: to set the data source, comment out one of the two following lines; the uncommented line assigns the data source:
-# data.type <- 'SMARTS' # use statewide monitoring data from SMARTS
-# data.type <- 'Database' # get data from text files exported from the Access database tool, to replicate the original Access-based tool (Region 9 data only)
-data.type <- 'DataPortal'
+    # NOTE: to set the data source, comment out one of the following lines; the uncommented line assigns the data source:
+        # data.type <- 'SMARTS' # use statewide monitoring data from SMARTS
+        # data.type <- 'Database' # get data from text files exported from the Access database tool, to replicate the original Access-based tool (Region 9 data only)
+        data.type <- 'DataPortal'
 
 # Set the simplification options for geospatial objects/layers
-# 303d Polylines (not including some large Region 1 303d polylines)
-simplification.303polylines.tf <- FALSE # simplification level: keep = 0.4
-# Max size of Region 1 303d polylines to plot as polylines - convert polylines larger than this to (simplified) polygons)
-simplification.maxR1Polyline.size <- units::set_units(0.1, Mb)
-# source of Region 1 polylines to polygons (R or ArcGIS) - if true, this uses R-generated polygons
-simplification.R1_303dLinesToPoly.R <- TRUE
-# CalEnviroScreen Polygons (not including large Region 1 polylines converted to polygons)
-simplification.303polygons.tf <- FALSE # simplification level: keep = 0.7    
-# CalEnviroScreen Polygons
-simplification.ces.tf <- TRUE # simplification level: keep = 0.5
-# Regional Board Boundary Polygons
-simplification.rbBoundaries.tf <- TRUE # simplification level: keep = 0.5
+    # 303d Polylines (not including some large Region 1 303d polylines)
+        simplification.303polylines.tf <- FALSE # simplification level: keep = 0.4
+    # Max size of Region 1 303d polylines to plot as polylines - convert polylines larger than this to (simplified) polygons)
+        simplification.maxR1Polyline.size <- units::set_units(0.1, Mb)
+    # source of Region 1 polylines to polygons (R or ArcGIS) - if true, this uses R-generated polygons
+        simplification.R1_303dLinesToPoly.R <- TRUE
+    # CalEnviroScreen Polygons (not including large Region 1 polylines converted to polygons)
+        simplification.303polygons.tf <- FALSE # simplification level: keep = 0.7    
+    # CalEnviroScreen Polygons
+        simplification.ces.tf <- TRUE # simplification level: keep = 0.5
+    # Regional Board Boundary Polygons
+        simplification.rbBoundaries.tf <- TRUE # simplification level: keep = 0.5
 # End of simplificaiton options
 
 
@@ -62,398 +62,400 @@ simplification.rbBoundaries.tf <- TRUE # simplification level: keep = 0.5
 # ----------------------------------------------------------------------------------------------------------------------------
 
 # Read data into R from text files ------------------------------------------------------------------------------------------------------------------
-# standards
-standards <- suppressMessages(readr::read_tsv('data/Standards.txt'))
-names(standards) <- make.names(names(standards))
-# monitoring data
-if (data.type == 'Database') {
-    monitoring.data <- suppressMessages(readr::read_tsv('data/SMARTS_monitoring_data.txt'))
-}
-if (data.type == 'SMARTS') { 
-        # fix errors encountered in reading the SMARTS monitoring data file by first finding and replacing any quoted characters in the data
-        monitoring_lines <- readLines('data/SMARTS_data/Industrial_Ad_Hoc_Reports_-_Parameter_Data.txt') # save the data as lines of text
-        problems <- grep(pattern = '\"*\"', x = monitoring_lines) # find the lines where there is a quoted character
-        for (i in seq(length(problems))) { # for each problem line found...
-            monitoring_lines[problems[i]] <- gsub(pattern = '\"*\"', replacement = '', x = monitoring_lines[problems[i]]) # get rid of the quotes, but keep the text between the quotes
+    # standards
+        standards <- suppressMessages(readr::read_tsv('data/Standards.txt'))
+        names(standards) <- make.names(names(standards))
+    # monitoring data
+        if (data.type == 'Database') {
+            monitoring.data <- suppressMessages(readr::read_tsv('data/SMARTS_monitoring_data.txt'))
         }
-        # write the corrected dataset to a temporary file
-        t <- tempfile()
-        writeLines(text = monitoring_lines, con = t, sep = '\n')
-        # read the new dataset into an R dataframe, then close the temporary file
-        monitoring.data <- readr::read_tsv(file = t)
-        unlink(t)
-        # get rid of data points with missing latitude and/or longitude data
-        # monitoring.data <- monitoring.data[(!is.na(monitoring.data$MONITORING_LATITUDE) & !is.na(monitoring.data$MONITORING_LONGITUDE)),] # !!!! Remove all missing lat/lon points from the start !!!
-    }
-    if (data.type == 'DataPortal') {
-        mon.temp <- tempfile()
-        download.file(url = 'https://data.ca.gov/node/2176/download', destfile = mon.temp)
-        monitoring.data <- readr::read_csv(file = mon.temp)
-        unlink(mon.temp)
-        rm(mon.temp)
-    }
-    names(monitoring.data) <- make.names(names(monitoring.data))
-# facilities
-    if (data.type == 'Database') {
-        facilities <- suppressMessages(readr::read_tsv('data/NOIs.txt'))
-    }
-    if (data.type == 'SMARTS') { 
-        # fix errors encountered in reading the SMARTS facilities file by first finding and replacing any quoted characters in the data
-        facilities_lines <- readLines('data/SMARTS_data/Industrial_Application_Specific_Data.txt')
-        problems <- grep(pattern = '\"*\"', x = facilities_lines)
-        for (i in seq(length(problems))) {
-            facilities_lines[problems[i]] <- gsub(pattern = '\"*\"', replacement = '', x = facilities_lines[problems[i]])
+        if (data.type == 'SMARTS') { 
+                # fix errors encountered in reading the SMARTS monitoring data file by first finding and replacing any quoted characters in the data
+                    monitoring_lines <- readLines('data/SMARTS_data/Industrial_Ad_Hoc_Reports_-_Parameter_Data.txt') # save the data as lines of text
+                    problems <- grep(pattern = '\"*\"', x = monitoring_lines) # find the lines where there is a quoted character
+                    for (i in seq(length(problems))) { # for each problem line found...
+                        monitoring_lines[problems[i]] <- gsub(pattern = '\"*\"', replacement = '', x = monitoring_lines[problems[i]]) # get rid of the quotes, but keep the text between the quotes
+                    }
+                # write the corrected dataset to a temporary file
+                    t <- tempfile()
+                    writeLines(text = monitoring_lines, con = t, sep = '\n')
+                # read the new dataset into an R dataframe, then close the temporary file
+                    monitoring.data <- readr::read_tsv(file = t)
+                    unlink(t)
+                # get rid of data points with missing latitude and/or longitude data
+                    # monitoring.data <- monitoring.data[(!is.na(monitoring.data$MONITORING_LATITUDE) & !is.na(monitoring.data$MONITORING_LONGITUDE)),] # !!!! Remove all missing lat/lon points from the start !!!
         }
-        # write the corrected dataset to a temporary file
-        t <- tempfile()
-        writeLines(text = facilities_lines, con = t, sep = '\n')
-        # read the new dataset, then close the temporary file
-        facilities <- suppressMessages(readr::read_tsv(file = t))
-        unlink(t)
-    }
-    if (data.type == 'DataPortal') {
-        fac.temp <- tempfile()
-        download.file(url = 'https://data.ca.gov/node/2171/download', destfile = fac.temp)
-        facilities <- readr::read_csv(file = fac.temp)
-        unlink(fac.temp)
-        rm(fac.temp)
-    }
-    names(facilities) <- make.names(names(facilities))
-# receiving waters
-    receiving.waters <- suppressMessages(readr::read_tsv('data/Receiving_Waters.txt'))
-    names(receiving.waters) <- make.names(names(receiving.waters))
-# remove duplicates
-    receiving.waters <- receiving.waters %>% dplyr::distinct()
+        if (data.type == 'DataPortal') {
+            mon.temp <- tempfile()
+            download.file(url = 'https://data.ca.gov/node/2176/download', destfile = mon.temp)
+            monitoring.data <- readr::read_csv(file = mon.temp)
+            unlink(mon.temp)
+            rm(mon.temp)
+        }
+        names(monitoring.data) <- make.names(names(monitoring.data))
+    # facilities
+        if (data.type == 'Database') {
+            facilities <- suppressMessages(readr::read_tsv('data/NOIs.txt'))
+        }
+        if (data.type == 'SMARTS') { 
+            # fix errors encountered in reading the SMARTS facilities file by first finding and replacing any quoted characters in the data
+                facilities_lines <- readLines('data/SMARTS_data/Industrial_Application_Specific_Data.txt')
+                problems <- grep(pattern = '\"*\"', x = facilities_lines)
+                for (i in seq(length(problems))) {
+                    facilities_lines[problems[i]] <- gsub(pattern = '\"*\"', replacement = '', x = facilities_lines[problems[i]])
+                }
+            # write the corrected dataset to a temporary file
+                t <- tempfile()
+                writeLines(text = facilities_lines, con = t, sep = '\n')
+            # read the new dataset, then close the temporary file
+                facilities <- suppressMessages(readr::read_tsv(file = t))
+                unlink(t)
+        }
+        if (data.type == 'DataPortal') {
+            fac.temp <- tempfile()
+            download.file(url = 'https://data.ca.gov/node/2171/download', destfile = fac.temp)
+            facilities <- readr::read_csv(file = fac.temp)
+            unlink(fac.temp)
+            rm(fac.temp)
+        }
+        names(facilities) <- make.names(names(facilities))
+    # receiving waters
+        receiving.waters <- suppressMessages(readr::read_tsv('data/Receiving_Waters.txt'))
+        names(receiving.waters) <- make.names(names(receiving.waters))
+    # remove duplicates
+        receiving.waters <- receiving.waters %>% dplyr::distinct()
 
 # Data transformations (monitoring data) --------------------------------------------------------------------------------------------------------
-if (data.type == 'Database') {
-    # create a column of sample dates (separate out from the time)
-    monitoring.data <- tidyr::separate(data = monitoring.data, col = Date.time.of.sample.collection, into = c('Sample_date_calc','Sample_time_calc'), sep = ' ')
-    # convert into a date class
-    monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(Sample_date_calc))
-}
-if (data.type == 'SMARTS' | data.type == 'DataPortal') {
-    # Rename columns            
-    monitoring.data <- monitoring.data %>% dplyr::rename(Parameter = PARAMETER, Result = RESULT, Units = UNITS)
-    # convert date field to a date class
-    monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(SAMPLE_DATE))
-    # Rename latitude and longitude columns
-    monitoring.data <- monitoring.data %>% dplyr::rename(Latitude = MONITORING_LATITUDE) %>% dplyr::rename(Longitude = MONITORING_LONGITUDE)
-}
-
-# filter the SMARTS data so that it only includes effluent data
-monitoring.data <- monitoring.data %>% dplyr::filter(MONITORING_LOCATION_TYPE == 'Effluent Monitoring')
-
-# filter for reasonable dates (since the year 2000 or later, but nothing past today's date)
-monitoring.data <- monitoring.data %>% dplyr::filter(Sample_date_calc >= 2000/01/01 & Sample_date_calc <= Sys.time())
-
-# get the WB region from the WDID
-monitoring.data <- monitoring.data %>% dplyr::mutate(Region_calc = substr(x = WDID, start = 1, stop = 2))
-monitoring.data <- monitoring.data %>% dplyr::mutate(Region_calc = gsub(x = Region_calc, pattern = ' ', replacement = ''))
-# regions <- monitoring.data %>% dplyr::distinct(Region_calc)
-# regions.count <- monitoring.data %>% dplyr::group_by(Region_calc) %>% summarise(count = n())
-
-# Create a column for monitoring period
-monitoring.data <- monitoring.data %>% dplyr::mutate(Monitoring.Period = dplyr::if_else(
-    lubridate::month(Sample_date_calc) >= 7, 
-    paste0(lubridate::year(Sample_date_calc), ' - ', lubridate::year(Sample_date_calc) + 1), 
-    paste0(lubridate::year(Sample_date_calc)-1, ' - ', lubridate::year(Sample_date_calc))
-))
-
-# Create a list of the monitoring periods
-periods.list <- monitoring.data %>% dplyr::group_by(Monitoring.Period) %>% dplyr::summarise(count = n()) %>% dplyr::arrange(desc(Monitoring.Period))
-periods.list <- periods.list$Monitoring.Period
-
-# Create a column with ug/L Results converted to mg/L
-monitoring.data <- monitoring.data %>% dplyr::mutate(Result.Conv = dplyr::if_else(Units=='ug/L', Result / 1000, Result))
-monitoring.data <-  monitoring.data %>% dplyr::mutate(Unit.Conv = dplyr::if_else(Units=='ug/L', 'mg/L', Units))
-
-# Create a list of WDIDs
-WDID.list <- monitoring.data %>% dplyr::filter(Parameter %in% standards$Parameter) %>% dplyr::distinct(WDID)
-WDID.list <- WDID.list$WDID
-WDID.list <- c('All WDIDs', WDID.list)
-
-
-# create a sf variable for the monitoring data
-# monitoring_sf <- sf::st_as_sf(monitoring.data[!is.na(monitoring.data$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
-
-# # make a sf variable with unique monitoring points (1 per WDID in monitoring data)
-#     unique_points <- monitoring_sf %>% dplyr::distinct(WDID, .keep_all = TRUE) 
-
+    if (data.type == 'Database') {
+        # create a column of sample dates (separate out from the time)
+            monitoring.data <- tidyr::separate(data = monitoring.data, col = Date.time.of.sample.collection, into = c('Sample_date_calc','Sample_time_calc'), sep = ' ')
+        # convert into a date class
+            monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(Sample_date_calc))
+    }
+    if (data.type == 'SMARTS' | data.type == 'DataPortal') {
+        # Rename columns            
+            monitoring.data <- monitoring.data %>% dplyr::rename(Parameter = PARAMETER, Result = RESULT, Units = UNITS)
+        # convert date field to a date class
+            monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(SAMPLE_DATE))
+        # Rename latitude and longitude columns
+            monitoring.data <- monitoring.data %>% dplyr::rename(Latitude = MONITORING_LATITUDE) %>% dplyr::rename(Longitude = MONITORING_LONGITUDE)
+    }
+    
+    # filter the SMARTS data so that it only includes effluent data
+        monitoring.data <- monitoring.data %>% dplyr::filter(MONITORING_LOCATION_TYPE == 'Effluent Monitoring')
+    
+    # filter for reasonable dates (since the year 2000 or later, but nothing past today's date)
+        monitoring.data <- monitoring.data %>% dplyr::filter(Sample_date_calc >= 2000/01/01 & Sample_date_calc <= Sys.time())
+    
+    # get the WB region from the WDID
+        monitoring.data <- monitoring.data %>% dplyr::mutate(Region_calc = substr(x = WDID, start = 1, stop = 2))
+        monitoring.data <- monitoring.data %>% dplyr::mutate(Region_calc = gsub(x = Region_calc, pattern = ' ', replacement = ''))
+        # regions <- monitoring.data %>% dplyr::distinct(Region_calc)
+        # regions.count <- monitoring.data %>% dplyr::group_by(Region_calc) %>% summarise(count = n())
+    
+    # Create a column for monitoring period
+        monitoring.data <- monitoring.data %>% dplyr::mutate(Monitoring.Period = dplyr::if_else(
+            lubridate::month(Sample_date_calc) >= 7, 
+            paste0(lubridate::year(Sample_date_calc), ' - ', lubridate::year(Sample_date_calc) + 1), 
+            paste0(lubridate::year(Sample_date_calc)-1, ' - ', lubridate::year(Sample_date_calc))
+        ))
+    
+    # Create a list of the monitoring periods
+        periods.list <- monitoring.data %>% dplyr::group_by(Monitoring.Period) %>% dplyr::summarise(count = n()) %>% dplyr::arrange(desc(Monitoring.Period))
+        periods.list <- periods.list$Monitoring.Period
+    
+    # Create a column with ug/L Results converted to mg/L
+        monitoring.data <- monitoring.data %>% dplyr::mutate(Result.Conv = dplyr::if_else(Units=='ug/L', Result / 1000, Result))
+        monitoring.data <-  monitoring.data %>% dplyr::mutate(Unit.Conv = dplyr::if_else(Units=='ug/L', 'mg/L', Units))
+    
+    # Create a list of WDIDs
+        WDID.list <- monitoring.data %>% dplyr::filter(Parameter %in% standards$Parameter) %>% dplyr::distinct(WDID)
+        WDID.list <- WDID.list$WDID
+        WDID.list <- c('All WDIDs', WDID.list)
+    
+    
+    # create a sf variable for the monitoring data
+        # monitoring_sf <- sf::st_as_sf(monitoring.data[!is.na(monitoring.data$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+    
+    # # make a sf variable with unique monitoring points (1 per WDID in monitoring data)
+        #     unique_points <- monitoring_sf %>% dplyr::distinct(WDID, .keep_all = TRUE) 
+    
 
 
 # Data transformations (standards) --------------------------------------------------------------------------------------------------------------
-# change water type column name
-standards <- standards %>% dplyr::rename(Standard.water.type = Water.type) 
+    # change water type column name
+        standards <- standards %>% dplyr::rename(Standard.water.type = Water.type) 
+
 
 # GET GEOSPATIAL LAYERS (Regional Board Boundaries, CalEnviroScreen Polygons, and 2012 303d Impaired Waters) ----
-# Regional Board Office Boundaries --------------------------------------------------------------------------------------------------------------
-# These steps show how to access and transform the RB boundary geospatial data, but they only need to be done once:
-# RB_Bounds <- sf::st_read('data/Regional_Board_Office_Boundaries_ModifiedR6_6A_6B/Regional_Board_Offices.shp')
-# RB_Bounds_transform <- sf::st_transform(RB_Bounds, 4326)
-# save the unsimplified polygons
-# saveRDS(object = RB_Bounds_transform, file = 'data/unsimplified_RB_Bounds.RDS')
-# simplify the polygons and save the simplified data in an RDS file
-# RB_Bounds_simple <- rmapshaper::ms_simplify(RB_Bounds_transform, keep = 0.5)
-# saveRDS(object = RB_Bounds_simple, file = 'data/simplified_RB_Bounds.RDS')
-# Read the data from the saved RDS file
-if (simplification.rbBoundaries.tf == TRUE) {
-    RB_Boundaries <- readr::read_rds('data/simplified_RB_Bounds.RDS') 
-} else {
-    RB_Boundaries <- readr::read_rds('data/unsimplified_RB_Bounds.RDS')
-}
-# check (plot)
-# g <- ggplot2::ggplot() + ggplot2::geom_sf(data = RB_Boundaries)
-
-
-# CalEnviroScreen Polygons ----------------------------------------------------------------------------------------------------------------------
-# These steps show how to access and transform the CES geospatial data, but they only need to be done once:
-# download the data
-# temp_zip <- tempfile()
-# ces_url <- 'https://oehha.ca.gov/media/downloads//ces3shp.zip'  # ALTERNATVIE: ces_url <- 'https://data.ca.gov/sites/default/files/CES3Results_SHP.zip'
-# download.file(url = ces_url, destfile = temp_zip, method = 'curl')
-# unzip(zipfile = temp_zip, exdir = 'data/CES3Results', junkpaths = TRUE) #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
-# unlink(temp_zip)
-# read the shapefile into R
-# ces <- sf::st_read('data/CES3Results/CES3Results.shp')
-# transform
-# ces_transform <- sf::st_transform(ces, 4326)
-# save the unsimplified data as RDS
-# saveRDS(object = ces_transform, file = 'data/unsimplified_CalEnvironScreen_poly.RDS')
-# simplify
-# ces_simple <- rmapshaper::ms_simplify(ces_transform, keep = 0.5)
-# save the simplified polygons as an RDS file
-# saveRDS(object = ces_simple, file = 'data/simplified_CalEnvironScreen_poly.RDS')
-# Read the data from the saved RDS file
-if (simplification.ces.tf == TRUE) {
-    ces_poly <- readr::read_rds('data/simplified_CalEnvironScreen_poly.RDS')
-} else {
-    ces_poly <- readr::read_rds('data/unsimplified_CalEnvironScreen_poly.RDS')
-}
-
-# create a list of the CES parameter choices to plot
-ces_choices <- data.frame(Name = c('CES Percentile', 'Pollution Burden', 'Impaired Water Bodies'), CES.Variable = c('Percentile', 'Poll_pctl', 'IWB_pctl'), stringsAsFactors = FALSE) #' CES Percentile' = 'Percentile'
-
-# 303d Polygons ------------------------------------------------------------------------------------------------------------------------------------
-# These steps show how to access and transform the 303d geospatial polygon data, but they only need to be done once, 
-# and the results have been save in an RDS file (an R data format):
-# # download the data from the original source (a zip file on the internet), then unzip the file, and save the 
-# # unzipped file in the 'data' folder
-#     temp_zip_impaired_poly <- tempfile()
-#     impaired_poly_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Polys_Final.zip'
-#     download.file(url = impaired_poly_url, destfile = temp_zip_impaired_poly, method = 'curl')
-#     unzip(zipfile = temp_zip_impaired_poly, exdir = 'data/2012_Impaired_Polygons_Final', junkpaths = TRUE)
-#     unlink(temp_zip_impaired)
-# # Read the shapefile into R
-# impaired_303d_poly <- sf::st_read('data/2012_Impaired_Polygons_Final/2012_Impaired_Polys_Final.shp')
-# # transform the data into a coordinate reference system
-# impaired_303d_transform_poly <- sf::st_transform(impaired_303d_poly, 4326)
-# save the unsimplified polygons as an RDS file, in case they will be used instead of the simplified polygons
-# saveRDS(object = impaired_303d_transform_poly, file = 'data/unsimplified_2012_303d_polygons.RDS')
-# # simplify the polygons (NOTE: the default level is keep = 0.05, but with keep < 0.6 some polygons are deleted altogether)
-#     impaired_303d_simple_poly <- rmapshaper::ms_simplify(impaired_303d_transform_poly, keep = 0.7)
-# # save the simplified polygons as an R object
-#     saveRDS(object = impaired_303d_simple_poly, file = 'data/simplified_2012_303d_polygons.RDS')
-# Read the data from the saved RDS file - choose from the simplified or unsimplified data
-if (simplification.303polygons.tf == TRUE) {
-    impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')            
-} else {
-    impaired_303d_polygons <- readr::read_rds('data/unsimplified_2012_303d_polygons.RDS')            
-}
-# check (plot)
-# g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
-
-# 303d PolyLines ------------------------------------------------------------------------------------------------------------------------------------
-# These steps show how to access and transform the 303d geospatial polyline data, but they only need to be done once
-# The results have been saved to an R data object
-# download the data from the original source (a zip file on the internet), then unzip the file, and save the
-# unzipped file in the 'data' folder
-# temp_zip_impaired <- tempfile()
-# impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
-# download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
-# unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
-# unlink(temp_zip_impaired)
-# Read the shapefile into R
-# impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
-# transform the data into a coordinate reference system
-# impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
-# save the un-simplified 303d polyLines as an R object, in case they will be used instead of a simplified version
-# saveRDS(object = impaired_303d_transform, file = 'data/unsimplified_2012_303d_lines.RDS')
-# simplify the polygons
-# impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform, keep = 0.4) # increase the 'keep' parameter to increase the level of detail retained
-# save the simplified polygons as a RDS object
-# saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
-# Read the data from the saved RDS file - choose from the simplified or unsimplified version
-if (simplification.303polylines.tf == TRUE) {
-    impaired_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS')
-} else {
-    impaired_303d_lines <- readr::read_rds('data/unsimplified_2012_303d_lines.RDS')            
-}
-
-# Region 1 303d PolyLines (Some are too large to plot, have to convert to simplified polygons) -------------------------------------------------------
-# get rid of large 303d lines in region 1, because they're very dense and crash the tool (will replace these with simplified polygons)
-# get the memory size of each polyline, so that the larger ones can be converted to polygons
-impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSize = apply(X = impaired_303d_lines, MARGIN = 1, FUN = object.size))
-# set the size to units of bytes
-impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSize = units::set_units(memSize, b))
-# convert the size from bytes to megabytes (MB)
-impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSizeMB = units::set_units(memSize, Mb))
-# impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(rank = dplyr::min_rank(size)) # provide a rank for each waterbody based on the memory size
-# convert back to sf (if needed)
-impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines)
-# get the WBIDs of the larger polylines in R1, so that they can be dropped (arbitrarily selected 0.1 MB as the limit - could use something different)
-R1_303d_LargePolylines <- as.data.frame(impaired_303d_lines %>% dplyr::filter(memSizeMB > simplification.maxR1Polyline.size & REGION_NUM == 1) %>% dplyr::select(WBID)) # %>% dplyr::select(-geometry)
-# drop the size column
-impaired_303d_lines <- impaired_303d_lines %>% dplyr::select(-memSize, -memSizeMB)
-# drop the large R1 polylines
-# impaired_303d_lines_dropped <- impaired_303d_lines %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID) # just to check
-impaired_303d_lines <- impaired_303d_lines %>% dplyr::filter(!(WBID %in% R1_303d_LargePolylines$WBID))
-# ---------------------------------------------------------------------------------------------------------------------------------------------- #
-# Convert R1 lines to polygons, using R's raster package -  --------------------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------------------------------------------------------------------------- #
-# # NOTE: These steps show how to transform the Region 1 303d polylines into polygons (to simplify them), but they only need to be done once
-# # The results have been saved to an R data object
-# # read in the 303d polylines as an sf object, filter for R1 polylines, and convert to object type sp (SpatialLines object - data in this format is needed to work with the raster package)
-#     R1_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS') %>% dplyr::filter(REGION_NUM == 1) %>% sf::st_as_sf()
-# # transform to a projected coordinate system
-#     R1_303d_lines <- sf::st_transform(R1_303d_lines, 3857) # Transform to projected coordinate system; may also try 3310?
-#     # Convert the Region 1 303d polylines to polygons - step through 1 waterbody at a time --------------------------------
-#         for (i in seq(nrow(R1_303d_lines))) {
-#             # Make sure the output variable isn't already populated with data
-#                 if (i == 1) {
-#                     if (exists('R1_lines_toPolygon')) {rm(list = 'R1_lines_toPolygon')}
-#                 }
-#             # get the current waterbody, and convert to sp
-#                 R1_303d_lines_sp <- as(R1_303d_lines[i,], 'Spatial') 
-#             # create an empy raster that bounds the waterbody. NOTE: This is where the resolution (grid size) is set !!!!!
-#                 R1_Raster <- raster::raster(x = R1_303d_lines_sp, resolution = 250)
-#             # convert the polylines to raster (rasterize), based on the resolution (i.e., grid size) defined above. Give each cell the value of the 'OBJECTID' field so they can be grouped to the appropriate waterbody.
-#                 R1_Raster_rasterize <- raster::rasterize(x = R1_303d_lines_sp, y = R1_Raster, field = 'OBJECTID')
-#             # convert the raster to a polygon
-#                 R1_RasterToPolygon <- raster::rasterToPolygons(R1_Raster_rasterize, dissolve = TRUE) # dissolve means that if there is a disconnect in the polygon, it just creates one multi-part polygon
-#             # convert the polygon from object type sp to sf
-#                 R1_RasterToPolygon <- sf::st_as_sf(R1_RasterToPolygon)
-#             # simplify the polygon - NOTE: set the simplification level here !!!!!
-#                 R1_RasterToPolygon <- rmapshaper::ms_simplify(R1_RasterToPolygon, keep = 0.4)
-#             # join the polyline data to the new corresponding polygons
-#                 R1_RasterToPolygon <- R1_RasterToPolygon %>% dplyr::left_join(R1_303d_lines %>% dplyr::select(-c(geometry)), by = c('layer' = 'OBJECTID')) %>% sf::st_as_sf()
-#             # append the polygon to the complete dataframe of polygons
-#                 if (!exists('R1_lines_toPolygon')) {
-#                     R1_lines_toPolygon <- R1_RasterToPolygon} else {
-#                         R1_lines_toPolygon[i,] <- R1_RasterToPolygon
-#                     }
-#             # save the complete dataframe of polygons to an RDS file after each new polygon is added (in case it stops working before all polygons are done)
-#                 saveRDS(object = R1_lines_toPolygon, file = paste0('data/Region1_linesToPolygons_Rworkflow_', i, '.RDS'))
-#             # delete the file created in the previous step of this loop
-#                 if (i > 1) {
-#                     file.remove(paste0('data/Region1_linesToPolygons_Rworkflow_', i-1, '.RDS'))
-#                 }
-#             # clear variables
-#                 rm(list = c('R1_RasterToPolygon', 'R1_303d_lines_sp', 'R1_Raster', 'R1_Raster_rasterize'))
-#             # after the last waterbody has been converted, rename the final file, then clear remaining variables
-#                 if (i == max(seq(nrow(R1_303d_lines)))) {
-#                     saveRDS(object = R1_lines_toPolygon, file = 'data/Region1_linesToPolygons_Rworkflow.RDS')
-#                     file.remove(paste0('data/Region1_linesToPolygons_Rworkflow_', i, '.RDS'))
-#                     rm(list = c('R1_lines_toPolygon', 'i'))
-#                     }
-#         } 
-# ---------------------------------------------------------------------------------------------------------------------------------------------- #
-# End of R1 lines to polygons script ----------------------------------------------------------------------------------------------------------- #
-# ---------------------------------------------------------------------------------------------------------------------------------------------- #
-# read data from the saved RDS file
-# Read the data from the saved RDS file - can either use the polygons created with R or created with ArcGIS
-if (simplification.R1_303dLinesToPoly.R == TRUE) {
-    # this uses polygons created with R's raster package, above
-    impaired_303d_R1_linesToPoly <- readr::read_rds('data/Region1_linesToPolygons_Rworkflow.RDS')    
-} else {
-    # this uses a shapefile was created in ArcGIS using its Conversion Tools toolbox (the functions "To Raster -> Polyline to Raster" and "From Raster -> Raster to Polygon" )
-    impaired_303d_R1_linesToPoly <- sf::st_read('data/2012_Impaired_Lines_R1_ToPoly/RasToPoly100_dissolve.shp')
-    # this is some old code that was used to further simplify the ArcGIS-generated polygons - may want to delete
-    # impaired_303d_R1_LineToPoly <- sf::st_read('data/2012_Impaired_Lines_R1_ToPoly/RasToPoly100_dissolve.shp')
-    # impaired_303d_R1_transform <- sf::st_transform(impaired_303d_R1_LineToPoly, 4326)
-    # impaired_303d_R1_simple <- rmapshaper::ms_simplify(impaired_303d_R1_transform, keep = 0.3) # default = 0.05
-    # saveRDS(object = impaired_303d_R1_simple, file = 'data/simplified_2012_303d_lines_R1toPoly.RDS')
-}
-# transform to be consistent with the 303d polygons data
-impaired_303d_R1_linesToPoly <- sf::st_transform(impaired_303d_R1_linesToPoly, 4326)
-# Extract just those waterbodies that were dropped above (the large polylines, stored in variable R1_303d_LargePolylines)
-impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID)
-# rename / add some columns, to be consistent with the 303d polygons data
-impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::rename(OBJECTID = layer)
-impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::mutate(Shape_Area = NA)
-# convert back to sf (if needed)
-impaired_303d_R1_linesToPoly <- sf::st_as_sf(impaired_303d_R1_linesToPoly)
-# join these new R1 polygons to the original polygons file
-# impaired_303d_polygons <- impaired_303d_polygons %>% dplyr::bind_rows(impaired_303d_R1_linesToPoly)
-impaired_303d_polygons <- rbind(impaired_303d_polygons, impaired_303d_R1_linesToPoly)
-
-
-
-# 303d Waterbodies Pollutant Information (table) ----------------------------------------------------------------------------------------------------
-# These steps show how to access and transform the 303d tabular data, but they only need to be done once:
-# download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', method = 'curl')
-# impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', sheet = 'Final 303(d) List')
-# names(impaired_pollutants) <- make.names(names(impaired_pollutants))
-# # Create a column for comments that also includes the pollutant (only for rows where there is a comment)
-#     impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Comment= dplyr::if_else(!is.na(COMMENTS.INCLUDED.ON.303.d..LIST), paste0(POLLUTANT, ': ', COMMENTS.INCLUDED.ON.303.d..LIST), 'NA'))
-#     impaired_pollutants$Pollutant_Comment[impaired_pollutants$Pollutant_Comment == 'NA'] <- NA # replace text NAs from formual above with actual NAs
-# # Create a list of the unique IDs
-#     impaired_IDs <- impaired_pollutants %>% dplyr::distinct(WBID)
-# # for each ID in the list, append the list of pollutants associated with that ID, and the comments associated with those pollutants (if any)
-#     for (i in seq(nrow(impaired_IDs))){
-#         temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i])
-#         impaired_IDs$Pollutant[i] <- paste0(temp$POLLUTANT, collapse = ' | ')
-#         temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] & !is.na(Pollutant_Comment))
-#         impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Comment, collapse = ' | ')
-#     }
-# # save as an RDS file
-#     saveRDS(object = impaired_IDs, file = 'data/303d_List.RDS')
-# read the data from the RDS file into an R object
-impaired_303d_list <- readr::read_rds('data/303d_List.RDS')
-
-
-# 303d Pollutant Potential Sources (table 2) --------------------------------------------------------------------------------------------------------
-# # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
-#     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', method = 'curl')
-#     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', sheet = 'Final 303(d) List wsrcs')
-#     names(impaired_pollutants) <- make.names(names(impaired_pollutants))
-#     # Create a column for source that also includes the pollutant (only for rows where there is a source given)
-#         # impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Source= dplyr::if_else(POTENTIAL.SOURCES != 'Source Unknown', paste0(POLLUTANT, ': ', Hmisc::capitalize(tolower(SOURCE.CATEGORY)), ' (', POTENTIAL.SOURCES, ')'), 'NA'))
-#         impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Source= dplyr::if_else(POTENTIAL.SOURCES != 'Source Unknown', paste0(Hmisc::capitalize(tolower(SOURCE.CATEGORY)), ' (', POTENTIAL.SOURCES, ')'), 'NA'))
-#         impaired_pollutants$Source[impaired_pollutants$Source == 'NA'] <- NA # replace text NAs from formual above with actual NAs
-#     # Create a list of the unique IDs
-#         impaired_IDs_Source <- impaired_pollutants %>% dplyr::distinct(WBID)
-#         impaired_IDs_Pollutant <- impaired_pollutants %>% dplyr::select(WBID, POLLUTANT) %>% dplyr::distinct()
-#     # for each ID in the list of ID & pollutant combinations, append the list of sources associated with that combination of ID and pollutant (if any)
-#         for (i in seq(nrow(impaired_IDs_Pollutant))){
-#             temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs_Pollutant$WBID[i] & POLLUTANT == impaired_IDs_Pollutant$POLLUTANT[i] & !is.na(Source))
-#             impaired_IDs_Pollutant$Source[i] <- paste0(temp$Source, collapse = '; ')
-#             # temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] )
-#             # impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Source, collapse = ' | ')
-#         }
-#         impaired_IDs_Pollutant <- impaired_IDs_Pollutant %>% dplyr::mutate(Pollutant_Source = dplyr::if_else(Source != '', paste0(POLLUTANT, ': ', Source), 'NA'))
-#         impaired_IDs_Pollutant$Pollutant_Source[impaired_IDs_Pollutant$Pollutant_Source == 'NA'] <- NA
-#     # for each ID in the list of WDIDs, append the list of sources for all pollutants associated with that ID (if any)
-#         for (i in seq(nrow(impaired_IDs_Source))){
-#             temp2 <- impaired_IDs_Pollutant %>% dplyr::filter(WBID == impaired_IDs_Source$WBID[i])
-#             impaired_IDs_Source$Pollutant[i] <- paste0(temp2$POLLUTANT, collapse = ' | ')
-#             temp3 <- impaired_IDs_Pollutant %>% dplyr::filter(WBID == impaired_IDs_Source$WBID[i] & !is.na(Pollutant_Source))
-#             impaired_IDs_Source$Sources[i] <- paste0(temp3$Pollutant_Source, collapse = ' | ')
-#         }
-#     # save as an RDS file
-#         saveRDS(object = impaired_IDs_Source, file = 'data/303d_List_Sources.RDS')
-# read the data from the RDS file into an R object
-impaired_303d_sources <- readr::read_rds('data/303d_List_Sources.RDS')
-# join the pollution source info to the list of pollutants and comments
-impaired_303d_list <- impaired_303d_list %>% dplyr::left_join(impaired_303d_sources, by = c('WBID', 'Pollutant'))
-# make blanks into NAs
-impaired_303d_list$Comments[impaired_303d_list$Comments == ''] <- NA
-impaired_303d_list$Sources[impaired_303d_list$Sources == ''] <- NA
-
-
-# join the 303d information to the polygons and lines shapefile datasets, by WBID
-impaired_303d_polygons <- sf::st_as_sf(impaired_303d_polygons %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
-impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
+    # Regional Board Office Boundaries --------------------------------------------------------------------------------------------------------------
+        # These steps show how to access and transform the RB boundary geospatial data, but they only need to be done once:
+            # RB_Bounds <- sf::st_read('data/Regional_Board_Office_Boundaries_ModifiedR6_6A_6B/Regional_Board_Offices.shp')
+            # RB_Bounds_transform <- sf::st_transform(RB_Bounds, 4326)
+            # save the unsimplified polygons
+                # saveRDS(object = RB_Bounds_transform, file = 'data/unsimplified_RB_Bounds.RDS')
+            # simplify the polygons and save the simplified data in an RDS file
+                # RB_Bounds_simple <- rmapshaper::ms_simplify(RB_Bounds_transform, keep = 0.5)
+                # saveRDS(object = RB_Bounds_simple, file = 'data/simplified_RB_Bounds.RDS')
+        # Read the data from the saved RDS file
+            if (simplification.rbBoundaries.tf == TRUE) {
+                RB_Boundaries <- readr::read_rds('data/simplified_RB_Bounds.RDS') 
+            } else {
+                RB_Boundaries <- readr::read_rds('data/unsimplified_RB_Bounds.RDS')
+            }
+        # check (plot)
+            # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = RB_Boundaries)
+    
+    
+    # CalEnviroScreen Polygons ----------------------------------------------------------------------------------------------------------------------
+        # These steps show how to access and transform the CES geospatial data, but they only need to be done once:
+            # download the data
+                # temp_zip <- tempfile()
+                # ces_url <- 'https://oehha.ca.gov/media/downloads//ces3shp.zip'  # ALTERNATVIE: ces_url <- 'https://data.ca.gov/sites/default/files/CES3Results_SHP.zip'
+                # download.file(url = ces_url, destfile = temp_zip, method = 'curl')
+                # unzip(zipfile = temp_zip, exdir = 'data/CES3Results', junkpaths = TRUE) #files = c('CES3Results.shp','CES3Results.shx','CES3Results.prj'),
+                # unlink(temp_zip)
+            # read the shapefile into R
+                # ces <- sf::st_read('data/CES3Results/CES3Results.shp')
+            # transform
+                # ces_transform <- sf::st_transform(ces, 4326)
+                # save the unsimplified data as RDS
+                # saveRDS(object = ces_transform, file = 'data/unsimplified_CalEnvironScreen_poly.RDS')
+            # simplify
+                # ces_simple <- rmapshaper::ms_simplify(ces_transform, keep = 0.5)
+                # save the simplified polygons as an RDS file
+                # saveRDS(object = ces_simple, file = 'data/simplified_CalEnvironScreen_poly.RDS')
+        # Read the data from the saved RDS file
+            if (simplification.ces.tf == TRUE) {
+                ces_poly <- readr::read_rds('data/simplified_CalEnvironScreen_poly.RDS')
+            } else {
+                ces_poly <- readr::read_rds('data/unsimplified_CalEnvironScreen_poly.RDS')
+            }
+        
+        # create a list of the CES parameter choices to plot
+            ces_choices <- data.frame(Name = c('CES Percentile', 'Pollution Burden', 'Impaired Water Bodies'), CES.Variable = c('Percentile', 'Poll_pctl', 'IWB_pctl'), stringsAsFactors = FALSE) #' CES Percentile' = 'Percentile'
+    
+    # 303d Polygons ------------------------------------------------------------------------------------------------------------------------------------
+        # These steps show how to access and transform the 303d geospatial polygon data, but they only need to be done once, 
+        # and the results have been save in an RDS file (an R data format):
+            # # download the data from the original source (a zip file on the internet), then unzip the file, and save the 
+            # # unzipped file in the 'data' folder
+                # temp_zip_impaired_poly <- tempfile()
+                # impaired_poly_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Polys_Final.zip'
+                # download.file(url = impaired_poly_url, destfile = temp_zip_impaired_poly, method = 'curl')
+                # unzip(zipfile = temp_zip_impaired_poly, exdir = 'data/2012_Impaired_Polygons_Final', junkpaths = TRUE)
+                # unlink(temp_zip_impaired)
+            # # Read the shapefile into R
+                # impaired_303d_poly <- sf::st_read('data/2012_Impaired_Polygons_Final/2012_Impaired_Polys_Final.shp')
+            # # transform the data into a coordinate reference system
+                # impaired_303d_transform_poly <- sf::st_transform(impaired_303d_poly, 4326)
+            # save the unsimplified polygons as an RDS file, in case they will be used instead of the simplified polygons
+                # saveRDS(object = impaired_303d_transform_poly, file = 'data/unsimplified_2012_303d_polygons.RDS')
+            # # simplify the polygons (NOTE: the default level is keep = 0.05, but with keep < 0.6 some polygons are deleted altogether)
+                # impaired_303d_simple_poly <- rmapshaper::ms_simplify(impaired_303d_transform_poly, keep = 0.7)
+            # # save the simplified polygons as an R object
+                # saveRDS(object = impaired_303d_simple_poly, file = 'data/simplified_2012_303d_polygons.RDS')
+            # Read the data from the saved RDS file - choose from the simplified or unsimplified data
+                if (simplification.303polygons.tf == TRUE) {
+                    impaired_303d_polygons <- readr::read_rds('data/simplified_2012_303d_polygons.RDS')            
+                } else {
+                    impaired_303d_polygons <- readr::read_rds('data/unsimplified_2012_303d_polygons.RDS')            
+                }
+            # check (plot)
+                # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = dplyr::filter(impaired_303d_polygons, REGION_NUM == 9))
+    
+    # 303d PolyLines ------------------------------------------------------------------------------------------------------------------------------------
+        # These steps show how to access and transform the 303d geospatial polyline data, but they only need to be done once
+        # The results have been saved to an R data object
+            # download the data from the original source (a zip file on the internet), then unzip the file, and save the
+            # unzipped file in the 'data' folder
+                # temp_zip_impaired <- tempfile()
+                # impaired_url <- 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_Impaired_Lines_Final.zip'
+                # download.file(url = impaired_url, destfile = temp_zip_impaired, method = 'curl')
+                # unzip(zipfile = temp_zip_impaired, exdir = 'data/2012_Impaired_Lines_Final', junkpaths = TRUE)
+                # unlink(temp_zip_impaired)
+            # Read the shapefile into R
+                # impaired_303d <- sf::st_read('data/2012_Impaired_Lines_Final/2012_Impaired_Lines_Final.shp')
+            # transform the data into a coordinate reference system
+                # impaired_303d_transform <- sf::st_transform(impaired_303d, 4326)
+            # save the un-simplified 303d polyLines as an R object, in case they will be used instead of a simplified version
+                # saveRDS(object = impaired_303d_transform, file = 'data/unsimplified_2012_303d_lines.RDS')
+            # simplify the polygons
+                # impaired_303d_simple <- rmapshaper::ms_simplify(impaired_303d_transform, keep = 0.4) # increase the 'keep' parameter to increase the level of detail retained
+            # save the simplified polygons as a RDS object
+                # saveRDS(object = impaired_303d_simple, file = 'data/simplified_2012_303d_lines.RDS')
+            # Read the data from the saved RDS file - choose from the simplified or unsimplified version
+                if (simplification.303polylines.tf == TRUE) {
+                    impaired_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS')
+                } else {
+                    impaired_303d_lines <- readr::read_rds('data/unsimplified_2012_303d_lines.RDS')            
+                }
+    
+    # Region 1 303d PolyLines (Some are too large to plot, have to convert to simplified polygons) -------------------------------------------------------
+        # get rid of large 303d lines in region 1, because they're very dense and crash the tool (will replace these with simplified polygons)
+            # get the memory size of each polyline, so that the larger ones can be converted to polygons
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSize = apply(X = impaired_303d_lines, MARGIN = 1, FUN = object.size))
+            # set the size to units of bytes
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSize = units::set_units(memSize, b))
+            # convert the size from bytes to megabytes (MB)
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(memSizeMB = units::set_units(memSize, Mb))
+                # impaired_303d_lines <- impaired_303d_lines %>% dplyr::mutate(rank = dplyr::min_rank(size)) # provide a rank for each waterbody based on the memory size
+            # convert back to sf (if needed)
+                impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines)
+            # get the WBIDs of the larger polylines in R1, so that they can be dropped (arbitrarily selected 0.1 MB as the limit - could use something different)
+                R1_303d_LargePolylines <- as.data.frame(impaired_303d_lines %>% dplyr::filter(memSizeMB > simplification.maxR1Polyline.size & REGION_NUM == 1) %>% dplyr::select(WBID)) # %>% dplyr::select(-geometry)
+            # drop the size column
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::select(-memSize, -memSizeMB)
+            # drop the large R1 polylines
+                # impaired_303d_lines_dropped <- impaired_303d_lines %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID) # just to check
+                impaired_303d_lines <- impaired_303d_lines %>% dplyr::filter(!(WBID %in% R1_303d_LargePolylines$WBID))
+    
+    # ---------------------------------------------------------------------------------------------------------------------------------------------- #
+    # Convert R1 lines to polygons, using R's raster package -  --------------------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------------------------------------------------------------------------------- #
+        # # NOTE: These steps show how to transform the Region 1 303d polylines into polygons (to simplify them), but they only need to be done once
+        # # The results have been saved to an R data object
+        # # read in the 303d polylines as an sf object, filter for R1 polylines, and convert to object type sp (SpatialLines object - data in this format is needed to work with the raster package)
+        #     R1_303d_lines <- readr::read_rds('data/simplified_2012_303d_lines.RDS') %>% dplyr::filter(REGION_NUM == 1) %>% sf::st_as_sf()
+        # # transform to a projected coordinate system
+        #     R1_303d_lines <- sf::st_transform(R1_303d_lines, 3857) # Transform to projected coordinate system; may also try 3310?
+        #     # Convert the Region 1 303d polylines to polygons - step through 1 waterbody at a time --------------------------------
+        #         for (i in seq(nrow(R1_303d_lines))) {
+        #             # Make sure the output variable isn't already populated with data
+        #                 if (i == 1) {
+        #                     if (exists('R1_lines_toPolygon')) {rm(list = 'R1_lines_toPolygon')}
+        #                 }
+        #             # get the current waterbody, and convert to sp
+        #                 R1_303d_lines_sp <- as(R1_303d_lines[i,], 'Spatial') 
+        #             # create an empy raster that bounds the waterbody. NOTE: This is where the resolution (grid size) is set !!!!!
+        #                 R1_Raster <- raster::raster(x = R1_303d_lines_sp, resolution = 250)
+        #             # convert the polylines to raster (rasterize), based on the resolution (i.e., grid size) defined above. Give each cell the value of the 'OBJECTID' field so they can be grouped to the appropriate waterbody.
+        #                 R1_Raster_rasterize <- raster::rasterize(x = R1_303d_lines_sp, y = R1_Raster, field = 'OBJECTID')
+        #             # convert the raster to a polygon
+        #                 R1_RasterToPolygon <- raster::rasterToPolygons(R1_Raster_rasterize, dissolve = TRUE) # dissolve means that if there is a disconnect in the polygon, it just creates one multi-part polygon
+        #             # convert the polygon from object type sp to sf
+        #                 R1_RasterToPolygon <- sf::st_as_sf(R1_RasterToPolygon)
+        #             # simplify the polygon - NOTE: set the simplification level here !!!!!
+        #                 R1_RasterToPolygon <- rmapshaper::ms_simplify(R1_RasterToPolygon, keep = 0.4)
+        #             # join the polyline data to the new corresponding polygons
+        #                 R1_RasterToPolygon <- R1_RasterToPolygon %>% dplyr::left_join(R1_303d_lines %>% dplyr::select(-c(geometry)), by = c('layer' = 'OBJECTID')) %>% sf::st_as_sf()
+        #             # append the polygon to the complete dataframe of polygons
+        #                 if (!exists('R1_lines_toPolygon')) {
+        #                     R1_lines_toPolygon <- R1_RasterToPolygon} else {
+        #                         R1_lines_toPolygon[i,] <- R1_RasterToPolygon
+        #                     }
+        #             # save the complete dataframe of polygons to an RDS file after each new polygon is added (in case it stops working before all polygons are done)
+        #                 saveRDS(object = R1_lines_toPolygon, file = paste0('data/Region1_linesToPolygons_Rworkflow_', i, '.RDS'))
+        #             # delete the file created in the previous step of this loop
+        #                 if (i > 1) {
+        #                     file.remove(paste0('data/Region1_linesToPolygons_Rworkflow_', i-1, '.RDS'))
+        #                 }
+        #             # clear variables
+        #                 rm(list = c('R1_RasterToPolygon', 'R1_303d_lines_sp', 'R1_Raster', 'R1_Raster_rasterize'))
+        #             # after the last waterbody has been converted, rename the final file, then clear remaining variables
+        #                 if (i == max(seq(nrow(R1_303d_lines)))) {
+        #                     saveRDS(object = R1_lines_toPolygon, file = 'data/Region1_linesToPolygons_Rworkflow.RDS')
+        #                     file.remove(paste0('data/Region1_linesToPolygons_Rworkflow_', i, '.RDS'))
+        #                     rm(list = c('R1_lines_toPolygon', 'i'))
+        #                     }
+        #         } 
+    # ---------------------------------------------------------------------------------------------------------------------------------------------- #
+    # End of R1 lines to polygons script ----------------------------------------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------------------------------------------------------------------------------- #
+    # read data from the saved RDS file
+        # Read the data from the saved RDS file - can either use the polygons created with R or created with ArcGIS
+        if (simplification.R1_303dLinesToPoly.R == TRUE) {
+            # this uses polygons created with R's raster package, above
+            impaired_303d_R1_linesToPoly <- readr::read_rds('data/Region1_linesToPolygons_Rworkflow.RDS')    
+        } else {
+            # this uses a shapefile was created in ArcGIS using its Conversion Tools toolbox (the functions "To Raster -> Polyline to Raster" and "From Raster -> Raster to Polygon" )
+            impaired_303d_R1_linesToPoly <- sf::st_read('data/2012_Impaired_Lines_R1_ToPoly/RasToPoly100_dissolve.shp')
+            # this is some old code that was used to further simplify the ArcGIS-generated polygons - may want to delete
+            # impaired_303d_R1_LineToPoly <- sf::st_read('data/2012_Impaired_Lines_R1_ToPoly/RasToPoly100_dissolve.shp')
+            # impaired_303d_R1_transform <- sf::st_transform(impaired_303d_R1_LineToPoly, 4326)
+            # impaired_303d_R1_simple <- rmapshaper::ms_simplify(impaired_303d_R1_transform, keep = 0.3) # default = 0.05
+            # saveRDS(object = impaired_303d_R1_simple, file = 'data/simplified_2012_303d_lines_R1toPoly.RDS')
+        }
+        # transform to be consistent with the 303d polygons data
+            impaired_303d_R1_linesToPoly <- sf::st_transform(impaired_303d_R1_linesToPoly, 4326)
+        # Extract just those waterbodies that were dropped above (the large polylines, stored in variable R1_303d_LargePolylines)
+            impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::filter(WBID %in% R1_303d_LargePolylines$WBID)
+        # rename / add some columns, to be consistent with the 303d polygons data
+            impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::rename(OBJECTID = layer)
+            impaired_303d_R1_linesToPoly <- impaired_303d_R1_linesToPoly %>% dplyr::mutate(Shape_Area = NA)
+        # convert back to sf (if needed)
+            impaired_303d_R1_linesToPoly <- sf::st_as_sf(impaired_303d_R1_linesToPoly)
+        # join these new R1 polygons to the original polygons file
+            # impaired_303d_polygons <- impaired_303d_polygons %>% dplyr::bind_rows(impaired_303d_R1_linesToPoly)
+            impaired_303d_polygons <- rbind(impaired_303d_polygons, impaired_303d_R1_linesToPoly)
+    
+    
+    
+    # 303d Waterbodies Pollutant Information (table) ----------------------------------------------------------------------------------------------------
+        # # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
+        #     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807.xlsx', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', method = 'curl')
+        #     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807.xlsx', sheet = 'Final 303(d) List')
+        #     names(impaired_pollutants) <- make.names(names(impaired_pollutants))
+        # # Create a column for comments that also includes the pollutant (only for rows where there is a comment)
+        #     impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Comment= dplyr::if_else(!is.na(COMMENTS.INCLUDED.ON.303.d..LIST), paste0(POLLUTANT, ': ', COMMENTS.INCLUDED.ON.303.d..LIST), 'NA'))
+        #     impaired_pollutants$Pollutant_Comment[impaired_pollutants$Pollutant_Comment == 'NA'] <- NA # replace text NAs from formual above with actual NAs
+        # # Create a list of the unique IDs
+        #     impaired_IDs <- impaired_pollutants %>% dplyr::distinct(WBID)
+        # # for each ID in the list, append the list of pollutants associated with that ID, and the comments associated with those pollutants (if any)
+        #     for (i in seq(nrow(impaired_IDs))){
+        #         temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i])
+        #         impaired_IDs$Pollutant[i] <- paste0(temp$POLLUTANT, collapse = ' | ')
+        #         temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] & !is.na(Pollutant_Comment))
+        #         impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Comment, collapse = ' | ')
+        #     }
+        # # save as an RDS file
+        #     saveRDS(object = impaired_IDs, file = 'data/303d_List.RDS')
+        # # read the data from the RDS file into an R object
+            impaired_303d_list <- readr::read_rds('data/303d_List.RDS')
+    
+    
+    # 303d Pollutant Potential Sources (table 2) --------------------------------------------------------------------------------------------------------
+    # # These steps show how to access and transform the 303d tabular data, but they only need to be done once:
+    #     download.file(url = 'https://gispublic.waterboards.ca.gov/webmap/303d_2012/files/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', destfile = 'data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', method = 'curl')
+    #     impaired_pollutants <- readxl::read_excel('data/2012_USEPA_approv_303d_List_Final_20150807wsrcs.xls', sheet = 'Final 303(d) List wsrcs')
+    #     names(impaired_pollutants) <- make.names(names(impaired_pollutants))
+    #     # Create a column for source that also includes the pollutant (only for rows where there is a source given)
+    #         # impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Pollutant_Source= dplyr::if_else(POTENTIAL.SOURCES != 'Source Unknown', paste0(POLLUTANT, ': ', Hmisc::capitalize(tolower(SOURCE.CATEGORY)), ' (', POTENTIAL.SOURCES, ')'), 'NA'))
+    #         impaired_pollutants <- impaired_pollutants %>% dplyr::mutate(Source= dplyr::if_else(POTENTIAL.SOURCES != 'Source Unknown', paste0(Hmisc::capitalize(tolower(SOURCE.CATEGORY)), ' (', POTENTIAL.SOURCES, ')'), 'NA'))
+    #         impaired_pollutants$Source[impaired_pollutants$Source == 'NA'] <- NA # replace text NAs from formual above with actual NAs
+    #     # Create a list of the unique IDs
+    #         impaired_IDs_Source <- impaired_pollutants %>% dplyr::distinct(WBID)
+    #         impaired_IDs_Pollutant <- impaired_pollutants %>% dplyr::select(WBID, POLLUTANT) %>% dplyr::distinct()
+    #     # for each ID in the list of ID & pollutant combinations, append the list of sources associated with that combination of ID and pollutant (if any)
+    #         for (i in seq(nrow(impaired_IDs_Pollutant))){
+    #             temp <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs_Pollutant$WBID[i] & POLLUTANT == impaired_IDs_Pollutant$POLLUTANT[i] & !is.na(Source))
+    #             impaired_IDs_Pollutant$Source[i] <- paste0(temp$Source, collapse = '; ')
+    #             # temp2 <- impaired_pollutants %>% dplyr::filter(WBID == impaired_IDs$WBID[i] )
+    #             # impaired_IDs$Comments[i] <- paste0(temp2$Pollutant_Source, collapse = ' | ')
+    #         }
+    #         impaired_IDs_Pollutant <- impaired_IDs_Pollutant %>% dplyr::mutate(Pollutant_Source = dplyr::if_else(Source != '', paste0(POLLUTANT, ': ', Source), 'NA'))
+    #         impaired_IDs_Pollutant$Pollutant_Source[impaired_IDs_Pollutant$Pollutant_Source == 'NA'] <- NA
+    #     # for each ID in the list of WDIDs, append the list of sources for all pollutants associated with that ID (if any)
+    #         for (i in seq(nrow(impaired_IDs_Source))){
+    #             temp2 <- impaired_IDs_Pollutant %>% dplyr::filter(WBID == impaired_IDs_Source$WBID[i])
+    #             impaired_IDs_Source$Pollutant[i] <- paste0(temp2$POLLUTANT, collapse = ' | ')
+    #             temp3 <- impaired_IDs_Pollutant %>% dplyr::filter(WBID == impaired_IDs_Source$WBID[i] & !is.na(Pollutant_Source))
+    #             impaired_IDs_Source$Sources[i] <- paste0(temp3$Pollutant_Source, collapse = ' | ')
+    #         }
+    #     # save as an RDS file
+    #         saveRDS(object = impaired_IDs_Source, file = 'data/303d_List_Sources.RDS')
+    # read the data from the RDS file into an R object
+        impaired_303d_sources <- readr::read_rds('data/303d_List_Sources.RDS')
+    # join the pollution source info to the list of pollutants and comments
+        impaired_303d_list <- impaired_303d_list %>% dplyr::left_join(impaired_303d_sources, by = c('WBID', 'Pollutant'))
+    # make blanks into NAs
+        impaired_303d_list$Comments[impaired_303d_list$Comments == ''] <- NA
+        impaired_303d_list$Sources[impaired_303d_list$Sources == ''] <- NA
+    
+    
+    # join the 303d information to the polygons and lines shapefile datasets, by WBID
+        impaired_303d_polygons <- sf::st_as_sf(impaired_303d_polygons %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
+        impaired_303d_lines <- sf::st_as_sf(impaired_303d_lines %>% dplyr::left_join(impaired_303d_list, by = 'WBID'))
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
@@ -567,196 +569,197 @@ server <- function(input, output, session) {
     output$ces.legend.note <- renderText({paste0('**CES =  CalEnviroScreen 3.0 ', input$ces.parameter, if(input$ces.parameter != 'CES Percentile') {' Percentile'}) })
     
     
-    # 1. Get the standards---------------------------------------------------------------------------------------------------------------------------------------------------------
-    # User Entered Standards ---------------------------------------------------------
-    values <- reactiveValues()
-    observe({
-        DF <- standards %>% dplyr::select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
-        DF$Custom <- as.numeric(DF$Custom)
-        
-        if (!is.null(input$hot)) {
-            DF = rhandsontable::hot_to_r(input$hot)
-        } else {
-            if (is.null(values[["DF"]]))
-                DF <- DF
-            else
-                DF <- values[["DF"]]
-        }
-        values[["DF"]] <- DF
-        
-        # Get the standards to apply in calculations --------------------------------------
-        standards.applied <- as.data.frame(DF) %>% dplyr::select(Parameter, input$standard)
-        # standards.applied <- as.data.frame(DF) %>% dplyr::select(Parameter, 'CTR') # to run manually
-        tf <- !is.na(standards.applied %>% dplyr::select(input$standard))
-        # tf <- !is.na(standards.applied %>% dplyr::select('CTR')) # to run manually
-        standards.applied <- standards.applied[tf,]
-        names(standards.applied)[2] <- 'Standard'
-        standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = input$standard)
-        # standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = 'CTR') # to run manually
-        
-        # Standards Data Download Button --------------------------------------------------
-        output$downloadStandards <- downloadHandler(
-            filename = 'WQI_Standards.csv',
-            content = function(con) {
-                write.csv(as.data.frame(DF), con, row.names = FALSE)
-            },
-            contentType = 'text/csv'
-        )
+    # 0. Get the standards---------------------------------------------------------------------------------------------------------------------------------------------------------
+        # User Entered Standards ---------------------------------------------------------
+        values <- reactiveValues()
+        observe({
+            DF <- standards %>% dplyr::select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
+            DF$Custom <- as.numeric(DF$Custom)
+            
+            if (!is.null(input$hot)) {
+                DF = rhandsontable::hot_to_r(input$hot)
+            } else {
+                if (is.null(values[["DF"]]))
+                    DF <- DF
+                else
+                    DF <- values[["DF"]]
+            }
+            values[["DF"]] <- DF
+            
+            # Get the standards to apply in calculations --------------------------------------
+                standards.applied <- as.data.frame(DF) %>% dplyr::select(Parameter, input$standard)
+                # standards.applied <- as.data.frame(DF) %>% dplyr::select(Parameter, 'CTR') # to run manually
+                tf <- !is.na(standards.applied %>% dplyr::select(input$standard))
+                # tf <- !is.na(standards.applied %>% dplyr::select('CTR')) # to run manually
+                standards.applied <- standards.applied[tf,]
+                names(standards.applied)[2] <- 'Standard'
+                standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = input$standard)
+                # standards.applied <- standards.applied %>% dplyr::mutate(Standard.Type = 'CTR') # to run manually
+            
+            # Standards Data Download Button --------------------------------------------------
+                output$downloadStandards <- downloadHandler(
+                    filename = 'WQI_Standards.csv',
+                    content = function(con) {
+                        write.csv(as.data.frame(DF), con, row.names = FALSE)
+                    },
+                    contentType = 'text/csv'
+                )
         
         # 1. First filter the monitoring data for the selected region (to avoid doing operations on the entire dataset) ----------------------------------------------------------------
-        monitoring.data.WQI <- monitoring.data %>% dplyr::filter(Region_calc == input$region.selected) 
-        # monitoring.data.WQI <- monitoring.data %>% dplyr::filter(Region_calc == 9)
-        
-        # get the sf (geospatial) data for the selected region
-        rb.boundary.selected <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == input$region.selected))
-        # rb.boundary.selected <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == 9))
-        # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = rb.boundary.selected)
+            monitoring.data.WQI <- monitoring.data %>% dplyr::filter(Region_calc == input$region.selected) 
+            # monitoring.data.WQI <- monitoring.data %>% dplyr::filter(Region_calc == 9)
+            
+            # get the sf (geospatial) data for the selected region
+                rb.boundary.selected <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == input$region.selected))
+                # rb.boundary.selected <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == 9))
+                # g <- ggplot2::ggplot() + ggplot2::geom_sf(data = rb.boundary.selected)
         
         
         # 2. Then filter the CES polygons for the selected region ----------------------------------------------------------------------------------------------------------------------
-        # filter using the RB boundary polygons
-        tf_poly_bounds <- sf::st_intersects(ces_poly, rb.boundary.selected, sparse = FALSE) 
-        # create a polygon that bounds the monitoring data, then create sf variable with the CES polygons in the study 
-        # lat_min <- min(monitoring.data.WQI$Latitude[monitoring.data.WQI$Latitude >= 32], na.rm = TRUE)
-        # lat_max <- max(monitoring.data.WQI$Latitude[monitoring.data.WQI$Latitude <= 43], na.rm = TRUE)
-        # lon_min <- min(monitoring.data.WQI$Longitude[monitoring.data.WQI$Longitude >= -125], na.rm = TRUE)
-        # lon_max <- max(monitoring.data.WQI$Longitude[monitoring.data.WQI$Longitude <= -114], na.rm = TRUE)
-        # poly_bounds <- sf::st_polygon(list(rbind(c(lon_min,lat_max),
-        #                                          c(lon_max,lat_max),
-        #                                          c(lon_max,lat_min),
-        #                                          c(lon_min,lat_min),
-        #                                          c(lon_min,lat_max))))
-        # # tf_poly_bounds <- st_within(ces_poly, poly_bounds, sparse = FALSE)
-        # tf_poly_bounds <- sf::st_intersects(ces_poly, poly_bounds, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
-        # 
-        # create a new variable with the selected ces polygons
-        ces_poly_study_area <- ces_poly[tf_poly_bounds,] # creates a sf variable with just the CES polygons in / around the area where there are monitoring points
-        # plot
-        # g <-ggplot2::ggplot() + ggplot2::geom_sf(data = ces_poly_study_area, aes(fill = Poll_pctl))
+            # filter using the RB boundary polygons
+                tf_poly_bounds <- sf::st_intersects(ces_poly, rb.boundary.selected, sparse = FALSE) 
+            # create a polygon that bounds the monitoring data, then create sf variable with the CES polygons in the study 
+                # lat_min <- min(monitoring.data.WQI$Latitude[monitoring.data.WQI$Latitude >= 32], na.rm = TRUE)
+                # lat_max <- max(monitoring.data.WQI$Latitude[monitoring.data.WQI$Latitude <= 43], na.rm = TRUE)
+                # lon_min <- min(monitoring.data.WQI$Longitude[monitoring.data.WQI$Longitude >= -125], na.rm = TRUE)
+                # lon_max <- max(monitoring.data.WQI$Longitude[monitoring.data.WQI$Longitude <= -114], na.rm = TRUE)
+                # poly_bounds <- sf::st_polygon(list(rbind(c(lon_min,lat_max),
+                #                                          c(lon_max,lat_max),
+                #                                          c(lon_max,lat_min),
+                #                                          c(lon_min,lat_min),
+                #                                          c(lon_min,lat_max))))
+                # # tf_poly_bounds <- st_within(ces_poly, poly_bounds, sparse = FALSE)
+                # tf_poly_bounds <- sf::st_intersects(ces_poly, poly_bounds, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
+                # 
+            # create a new variable with the selected ces polygons
+                ces_poly_study_area <- ces_poly[tf_poly_bounds,] # creates a sf variable with just the CES polygons in / around the area where there are monitoring points
+            # plot
+                # g <-ggplot2::ggplot() + ggplot2::geom_sf(data = ces_poly_study_area, aes(fill = Poll_pctl))
         
         # 3. Then filter the 303d lines and polygons for the selected region ----------------------------------------------------------------------------------------------------------------------
-        # first filter using the attributes in the 303d shapefile
-        impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1)) %>% sf::st_as_sf()
-        # impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1)) %>% sf::st_as_sf()
-        impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1)) %>% sf::st_as_sf()
-        # impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1)) %>% sf::st_as_sf()
-        # then filter using the RB boundary polygons (for regions where there is more that 1 office / subregion)
-        tf_impaired_bounds_lines <- sf::st_intersects(impaired_lines_region, rb.boundary.selected, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
-        tf_impaired_bounds_polys <- sf::st_intersects(impaired_polygons_region, rb.boundary.selected, sparse = FALSE)
-        # old method using a polygon that bounds the study area
-        # tf_impaired_bounds <- sf::st_intersects(impaired_303d_lines, poly_bounds, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
-        # create a new variable with the selected 303d lines
-        impaired_lines_study_area <- impaired_lines_region[tf_impaired_bounds_lines,] # creates a sf variable with just the impaired waters in / around the area where there are monitoring points
-        impaired_polygons_study_area <- impaired_polygons_region[tf_impaired_bounds_polys,]
+            # first filter using the attributes in the 303d shapefile
+                impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1)) %>% sf::st_as_sf()
+                # impaired_lines_region <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1)) %>% sf::st_as_sf()
+                impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected, start = 1, stop = 1)) %>% sf::st_as_sf()
+                # impaired_polygons_region <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = 9, start = 1, stop = 1)) %>% sf::st_as_sf()
+            # then filter using the RB boundary polygons (for regions where there is more that 1 office / subregion)
+                tf_impaired_bounds_lines <- sf::st_intersects(impaired_lines_region, rb.boundary.selected, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
+                tf_impaired_bounds_polys <- sf::st_intersects(impaired_polygons_region, rb.boundary.selected, sparse = FALSE)
+                # old method using a polygon that bounds the study area
+                    # tf_impaired_bounds <- sf::st_intersects(impaired_303d_lines, poly_bounds, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
+            # create a new variable with the selected 303d lines
+                impaired_lines_study_area <- impaired_lines_region[tf_impaired_bounds_lines,] # creates a sf variable with just the impaired waters in / around the area where there are monitoring points
+                impaired_polygons_study_area <- impaired_polygons_region[tf_impaired_bounds_polys,]
         
         # 4. Prepare the monitoring data to be used in the WQI score --------------------------------------------------------------------------------------------------------------------
-        # get rid of commas in the parameter names in the monitoring data
-        if (data.type == 'SMARTS' | data.type == 'DataPortal') {
-            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Parameter = gsub(x = Parameter, pattern = ',', replacement = ''))
-        }            
-        # Filter for the relevant parameters, and compare the results to standards
-        monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::filter(Parameter %in% standards.applied$Parameter)
-        # monitoring.data.WQI <- monitoring.data.WQI[(!is.na(monitoring.data.WQI$Latitude) & !is.na(monitoring.data.WQI$Longitude)),] # Remove missing lat/lon points !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # add the standards to the table
-        monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(standards.applied, by = 'Parameter') 
-        # add facility information to the table
-        # monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID') 
-        monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(facilities %>% dplyr::select(WDID, RECEIVING_WATER_NAME), by = 'WDID')
-        # add the receiving water type - NOTE: THIS IS NOT BEING USED FOR ANYTHING RIGHT NOW
-        monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(receiving.waters, by = c('RECEIVING_WATER_NAME' = 'Receiving.Water'))
-        # For F1, compute exceedance for each sample, by comparing the result to the standard for each sample (Note: in R, TRUE = 1, FALSE = 0)
-        monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Exceedance = dplyr::if_else(Result.Conv > Standard, TRUE, FALSE))
-        # For F2, compute excursion for each sample
-        monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Excursion = dplyr::if_else(Result.Conv > Standard, (Result.Conv / Standard - 1), 0))
-        # NOTE -- SHOULD WE CHECK WHETHER THE RECEIVING WATER IS FRESHWATER BEFORE THE ABOVE STEPS, AND MAYBE REMOVE SALTWATER??? DON'T THINK THE ACCESS DB DOES THIS
+            # get rid of commas in the parameter names in the monitoring data
+            if (data.type == 'SMARTS' | data.type == 'DataPortal') {
+                monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Parameter = gsub(x = Parameter, pattern = ',', replacement = ''))
+            }            
+            # Filter for the relevant parameters, and compare the results to standards
+            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::filter(Parameter %in% standards.applied$Parameter)
+            # monitoring.data.WQI <- monitoring.data.WQI[(!is.na(monitoring.data.WQI$Latitude) & !is.na(monitoring.data.WQI$Longitude)),] # Remove missing lat/lon points !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            # add the standards to the table
+            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(standards.applied, by = 'Parameter') 
+            # add facility information to the table
+            # monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC), by = 'WDID') 
+            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(facilities %>% dplyr::select(WDID, RECEIVING_WATER_NAME), by = 'WDID')
+            # add the receiving water type - NOTE: THIS IS NOT BEING USED FOR ANYTHING RIGHT NOW
+            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::left_join(receiving.waters, by = c('RECEIVING_WATER_NAME' = 'Receiving.Water'))
+            # For F1, compute exceedance for each sample, by comparing the result to the standard for each sample (Note: in R, TRUE = 1, FALSE = 0)
+            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Exceedance = dplyr::if_else(Result.Conv > Standard, TRUE, FALSE))
+            # For F2, compute excursion for each sample
+            monitoring.data.WQI <- monitoring.data.WQI %>% dplyr::mutate(Excursion = dplyr::if_else(Result.Conv > Standard, (Result.Conv / Standard - 1), 0))
+            # NOTE -- SHOULD WE CHECK WHETHER THE RECEIVING WATER IS FRESHWATER BEFORE THE ABOVE STEPS, AND MAYBE REMOVE SALTWATER??? DON'T THINK THE ACCESS DB DOES THIS
         
-        # 4. Calculate the WQI scores --------------------------------------------------------------------------------------------------------------------------------------------------
-        # Calculate Exceedance (for F1) and Excursion (for F2)
-        WQI.Scores <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period, Standard.Type) %>% dplyr::summarize(Exceedances = sum(Exceedance), Sum.Excursion = sum(Excursion), Total.Samples = n()) # Total.Samples(Exceedance))
-        # Calculate F1 (Exceedance)
-        WQI.Scores <- WQI.Scores %>% dplyr::mutate(F1 = Exceedances / Total.Samples * 100)
-        # Calculate F2 (Excursion)
-        WQI.Scores <- WQI.Scores %>% dplyr::mutate(NSE = Sum.Excursion / Total.Samples)
-        WQI.Scores <- WQI.Scores %>% dplyr::mutate(F2 = NSE / (0.01 * NSE + 0.01))
-        # Final WQI Scores (!!!! NOTE: THE DATABASE USES 1.412, BUT THE POWERPOINT PRESENTATION USES 1.4142 - USED 1.412 HERE TO REPLICATE DATABASE TOOL RESULTS !!!)
-        WQI.Scores <- WQI.Scores %>% dplyr::mutate(WQI = pmax(0, round((100 - sqrt(F1^2 + F2^2) / 1.412),1)))
-        # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Frequency = round(F1,0))
-        # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Magnitude = round(F2,0))
-        if (data.type == 'SMARTS' | data.type == 'DataPortal') {
-            facilities <- facilities %>% dplyr::rename(STATUS_CODE_NAME = STATUS, REGION = REGION_BOARD) 
-        }
-        # Join the facilities info to the WQI scores, by WDID   
-        WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC, FACILITY_LATITUDE, FACILITY_LONGITUDE), by = 'WDID')
-        # rename the lat/lon fields, to make mapping easier
-        WQI.Scores <- WQI.Scores %>% dplyr::rename(Latitude = FACILITY_LATITUDE, Longitude = FACILITY_LONGITUDE)
-        # 5. Get a list of parameters in the WQI score
-        if (input$show.parameters == TRUE) {
-            # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
-            # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
-            grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Parameter, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% dplyr::distinct()
-            # Create a df of distinct WDIDs and Monitoring Periods
-            distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% dplyr::select(WDID, Monitoring.Period) %>% dplyr::distinct()
-            # To the df of distinct WDIDs and Monitoring Periods, append a character string of the Parameters for each combination of WDID and Monitoring Period
-            for (i in 1:nrow(distinct_WDIDs_MonPeriods)) {
-                temp_params <- grouped_mon_data %>% dplyr::filter(WDID == distinct_WDIDs_MonPeriods$WDID[i] & Monitoring.Period == distinct_WDIDs_MonPeriods$Monitoring.Period[i]) # df filtered for given WDID and Monitoring Period
-                temp_params <- paste0(temp_params$Parameter, collapse = ', ') # character string of parameters in the above df
-                distinct_WDIDs_MonPeriods$Parameters.In.Score[i] <- temp_params # append the parameters string to the df of distinct WDIDs and Monitoring Periods
-            }
-            # join the list of parameters to the WQI.Scores df
-            WQI.Scores <- WQI.Scores %>% dplyr::left_join(distinct_WDIDs_MonPeriods, by = c('WDID', 'Monitoring.Period'))
-        } # else {WQI.Scores$Parameters.In.Score = ''}
+        # 5. Calculate the WQI scores --------------------------------------------------------------------------------------------------------------------------------------------------
+            # Calculate Exceedance (for F1) and Excursion (for F2)
+                WQI.Scores <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period, Standard.Type) %>% dplyr::summarize(Exceedances = sum(Exceedance), Sum.Excursion = sum(Excursion), Total.Samples = n()) # Total.Samples(Exceedance))
+                # Calculate F1 (Exceedance)
+                    WQI.Scores <- WQI.Scores %>% dplyr::mutate(F1 = Exceedances / Total.Samples * 100)
+                # Calculate F2 (Excursion)
+                    WQI.Scores <- WQI.Scores %>% dplyr::mutate(NSE = Sum.Excursion / Total.Samples)
+                    WQI.Scores <- WQI.Scores %>% dplyr::mutate(F2 = NSE / (0.01 * NSE + 0.01))
+            # Final WQI Scores (!!!! NOTE: THE DATABASE USES 1.412, BUT THE POWERPOINT PRESENTATION USES 1.4142 - USED 1.412 HERE TO REPLICATE DATABASE TOOL RESULTS !!!)
+                WQI.Scores <- WQI.Scores %>% dplyr::mutate(WQI = pmax(0, round((100 - sqrt(F1^2 + F2^2) / 1.412),1)))
+                # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Frequency = round(F1,0))
+                # WQI.Scores <-  WQI.Scores %>% dplyr::mutate(Magnitude = round(F2,0))
+                if (data.type == 'SMARTS' | data.type == 'DataPortal') {
+                    facilities <- facilities %>% dplyr::rename(STATUS_CODE_NAME = STATUS, REGION = REGION_BOARD) 
+                }
+            # Join the facilities info to the WQI scores, by WDID   
+                WQI.Scores <- WQI.Scores %>% dplyr::left_join(facilities %>% dplyr::select(WDID, STATUS_CODE_NAME, REGION, FACILITY_NAME, FACILITY_ADDRESS, FACILITY_CITY, FACILITY_STATE, FACILITY_ZIP, FACILITY_COUNTY, RECEIVING_WATER_NAME, PRIMARY_SIC, FACILITY_LATITUDE, FACILITY_LONGITUDE), by = 'WDID')
+            # rename the lat/lon fields, to make mapping easier
+                WQI.Scores <- WQI.Scores %>% dplyr::rename(Latitude = FACILITY_LATITUDE, Longitude = FACILITY_LONGITUDE)
         
-        # 6. Create a sf object from the WQI Scores data
-        WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+        # 6. Get a list of parameters in the WQI score
+            if (input$show.parameters == TRUE) {
+                # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
+                    # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
+                        grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Parameter, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% dplyr::distinct()
+                    # Create a df of distinct WDIDs and Monitoring Periods
+                        distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% dplyr::select(WDID, Monitoring.Period) %>% dplyr::distinct()
+                # To the df of distinct WDIDs and Monitoring Periods, append a character string of the Parameters for each combination of WDID and Monitoring Period
+                    for (i in 1:nrow(distinct_WDIDs_MonPeriods)) {
+                        temp_params <- grouped_mon_data %>% dplyr::filter(WDID == distinct_WDIDs_MonPeriods$WDID[i] & Monitoring.Period == distinct_WDIDs_MonPeriods$Monitoring.Period[i]) # df filtered for given WDID and Monitoring Period
+                        temp_params <- paste0(temp_params$Parameter, collapse = ', ') # character string of parameters in the above df
+                        distinct_WDIDs_MonPeriods$Parameters.In.Score[i] <- temp_params # append the parameters string to the df of distinct WDIDs and Monitoring Periods
+                    }
+                # join the list of parameters to the WQI.Scores df
+                    WQI.Scores <- WQI.Scores %>% dplyr::left_join(distinct_WDIDs_MonPeriods, by = c('WDID', 'Monitoring.Period'))
+            } # else {WQI.Scores$Parameters.In.Score = ''}
+        
+        # 7. Create a sf object from the WQI Scores data
+            WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
         
         
-        # 7. Apply filters and create the map ----------------------------------------------------------------------------------------------------------------------------------
-        # Create the color palette for the WQI scores
-        wqi.leaflet.pal <- leaflet::colorNumeric(
-            palette = colorRamp(c('olivedrab2', 'red3'), interpolate='spline'),
-            domain = WQI.Scores$WQI,
-            reverse = TRUE
-        )
+        # 8. Apply filters and create the map ----------------------------------------------------------------------------------------------------------------------------------
+            # Create the color palette for the WQI scores
+                wqi.leaflet.pal <- leaflet::colorNumeric(
+                    palette = colorRamp(c('olivedrab2', 'red3'), interpolate='spline'),
+                    domain = WQI.Scores$WQI,
+                    reverse = TRUE
+                )
         
-        # Create the color palette for the CES polygons
-        param <- ces_choices[ces_choices$Name == input$ces.parameter,2]
-        # param <- ces_choices[ces_choices$Name == 'Pollution Burden',2] 
-        # create a numeric variable for the CES percentile that is in the middle of the values of the given 5% range
-        ces.percentile.numeric <- suppressWarnings(tidyr::separate(as.data.frame(ces_poly_study_area), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5) # error here because there are NAs in the CES percentile scores
-        ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(ces.percentile.numeric = ces.percentile.numeric)
+            # Create the color palette for the CES polygons
+                param <- ces_choices[ces_choices$Name == input$ces.parameter,2]
+                # param <- ces_choices[ces_choices$Name == 'Pollution Burden',2] 
+            # create a numeric variable for the CES percentile that is in the middle of the values of the given 5% range
+                ces.percentile.numeric <- suppressWarnings(tidyr::separate(as.data.frame(ces_poly_study_area), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5) # error here because there are NAs in the CES percentile scores
+                ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(ces.percentile.numeric = ces.percentile.numeric)
         
-        # get the selected parameter of CES data - if CES percentile is selected, use the numeric field that was created from the factor values in the lines above
-        if (param == 'Percentile') {
-            ces.pal.domain <- as.data.frame(ces_poly_study_area %>% dplyr::select(ces.percentile.numeric))[,1]
-        } else {
-            ces.pal.domain <- as.data.frame(ces_poly_study_area %>% dplyr::select(param))[,1]
-        }
-        # create a new column in the ces data frame called fill.variable, with the selected parameter data
-        ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(fill.variable = ces.pal.domain)
+            # get the selected parameter of CES data - if CES percentile is selected, use the numeric field that was created from the factor values in the lines above
+                if (param == 'Percentile') {
+                    ces.pal.domain <- as.data.frame(ces_poly_study_area %>% dplyr::select(ces.percentile.numeric))[,1]
+                } else {
+                    ces.pal.domain <- as.data.frame(ces_poly_study_area %>% dplyr::select(param))[,1]
+                }
+            # create a new column in the ces data frame called fill.variable, with the selected parameter data
+                ces_poly_study_area <- ces_poly_study_area %>% dplyr::mutate(fill.variable = ces.pal.domain)
         
-        # create the pallete
-        ces.pal.color <- 'YlOrBr' #'Blues' #'Greys'
-        # ces.pal.color <- colorRamp(c('white', 'wheat4'), interpolate='spline')
-        # ces.pal.color <- heat.colors(n=100)
-        
-        # if (param == 'Percentile') {
-        #     ces.leaflet.pal <- leaflet::colorFactor(
-        #         palette = ces.pal.color,
-        #         domain = ces_poly_study_area$Percentile
-        #     )
-        # } else {
-        ces.leaflet.pal <- leaflet::colorNumeric(
-            palette = ces.pal.color,
-            domain = ces_poly_study_area$fill.variable,
-            reverse = FALSE
-        )
-        # }
+            # create the pallete
+                ces.pal.color <- 'YlOrBr' #'Blues' #'Greys'
+                # ces.pal.color <- colorRamp(c('white', 'wheat4'), interpolate='spline')
+                # ces.pal.color <- heat.colors(n=100)
+            
+                # if (param == 'Percentile') {
+                #     ces.leaflet.pal <- leaflet::colorFactor(
+                #         palette = ces.pal.color,
+                #         domain = ces_poly_study_area$Percentile
+                #     )
+                # } else {
+                ces.leaflet.pal <- leaflet::colorNumeric(
+                    palette = ces.pal.color,
+                    domain = ces_poly_study_area$fill.variable,
+                    reverse = FALSE
+                )
+                # }
         
         ces_poly_study_area <- sf::st_as_sf(ces_poly_study_area)
         
         # Filter WQI points by attribues of CES polygons containing each point
-        # find the polygons that meet the selected criteria (range of values)
-        ces_poly_study_area_filtered <- ces_poly_study_area %>% dplyr::filter(fill.variable >= input$ces.score.range[1] & fill.variable <= input$ces.score.range[2]) %>% sf::st_as_sf()
+            # find the polygons that meet the selected criteria (range of values)
+                ces_poly_study_area_filtered <- ces_poly_study_area %>% dplyr::filter(fill.variable >= input$ces.score.range[1] & fill.variable <= input$ces.score.range[2]) %>% sf::st_as_sf()
         
         # create a list of WDIDs in the polygons that meet the selected criteria
         # points_ces_filter <- st_intersects(ces_poly_study_area_filtered, WQI.Scores_sf, sparse = TRUE) # lists the monitoring point(s) in each polygon 
@@ -804,349 +807,349 @@ server <- function(input, output, session) {
         
         
         # Create the mapping data 
-        # create the dataset 
-        map.data <- as.data.frame(WQI.Scores)
-        # filter for the selected region
-        # map.data <- map.data %>% dplyr::filter(Region_calc == input$region.selected)
-        # Filter for the selected monitoring period
-        map.data <- map.data %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
-        # map.data <- map.data %>% dplyr::filter(Monitoring.Period == '2015 - 2016')
-        # Filter for the selected WQI range
-        map.data <- map.data %>% dplyr::filter(WQI >= input$score.range[1] & WQI <= input$score.range[2])
-        # Filter for points in polygons that meet the CES filter criteria - only do this if a filter is applied because some points may fall outside of CES polygons (NOTE: May need to find a better way to handle those points that do fall outside of CES polygons)
-        if (input$ces.score.range[1] > 0 | input$ces.score.range[2] < 100) {
-            map.data <- map.data %>% dplyr::filter(WDID %in% WDIDs_ces_filter)
-        }
-        # Filter for points that meet the 303d proximity criteria
-        if (!is.na(as.numeric(input$dist.to.303))) {
-            map.data <- map.data %>% dplyr::filter(WDID %in% WQI_303d_dist_points_list)
-        }
-        # Filter for the selected WDIDs (if selected)
-        map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
-        # create shared map data, that links the map and the data table
-        shared.map.data <- crosstalk::SharedData$new(map.data)
+            # create the dataset 
+                map.data <- as.data.frame(WQI.Scores)
+            # filter for the selected region
+                # map.data <- map.data %>% dplyr::filter(Region_calc == input$region.selected)
+            # Filter for the selected monitoring period
+                map.data <- map.data %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
+                # map.data <- map.data %>% dplyr::filter(Monitoring.Period == '2015 - 2016')
+            # Filter for the selected WQI range
+                map.data <- map.data %>% dplyr::filter(WQI >= input$score.range[1] & WQI <= input$score.range[2])
+            # Filter for points in polygons that meet the CES filter criteria - only do this if a filter is applied because some points may fall outside of CES polygons (NOTE: May need to find a better way to handle those points that do fall outside of CES polygons)
+                if (input$ces.score.range[1] > 0 | input$ces.score.range[2] < 100) {
+                    map.data <- map.data %>% dplyr::filter(WDID %in% WDIDs_ces_filter)
+                }
+            # Filter for points that meet the 303d proximity criteria
+                if (!is.na(as.numeric(input$dist.to.303))) {
+                    map.data <- map.data %>% dplyr::filter(WDID %in% WQI_303d_dist_points_list)
+                }
+            # Filter for the selected WDIDs (if selected)
+                map.data <- tryCatch(expr = if(input$WDID.selected != 'All WDIDs') {map.data <- map.data %>% dplyr::filter(WDID %in% input$WDID.selected)} else {map.data}, error = function(e) {map.data})
+            # create shared map data, that links the map and the data table
+                shared.map.data <- crosstalk::SharedData$new(map.data)
         
         # create a dataset with all excluded points that have a WQI score for the chosen standard
-        # points with a score for the selected monitoring period
-        WQI.score.mon.period <- as.data.frame(WQI.Scores) %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
-        # find excluded points (points with a WQI score for the monitoring period, but not in the mapped data)
-        excluded_WDIDs <- !(WQI.score.mon.period$WDID %in% map.data$WDID)
-        excluded.points <- WQI.score.mon.period[excluded_WDIDs,]
-        excluded.points <- excluded.points[!is.na(excluded.points$Latitude),] # get rid of points with missing lat/lon (those cause an error)
-        excluded.points_sf <- sf::st_as_sf(excluded.points, coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
+            # points with a score for the selected monitoring period
+                WQI.score.mon.period <- as.data.frame(WQI.Scores) %>% dplyr::filter(Monitoring.Period == input$monitoring.period)
+            # find excluded points (points with a WQI score for the monitoring period, but not in the mapped data)
+                excluded_WDIDs <- !(WQI.score.mon.period$WDID %in% map.data$WDID)
+                excluded.points <- WQI.score.mon.period[excluded_WDIDs,]
+                excluded.points <- excluded.points[!is.na(excluded.points$Latitude),] # get rid of points with missing lat/lon (those cause an error)
+                excluded.points_sf <- sf::st_as_sf(excluded.points, coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
         
         # Create the map
-        output$monitoring.map <- leaflet::renderLeaflet({
-            # create the empty map
-            l <- leaflet::leaflet(shared.map.data)
-            # enter the basemap options to allow the user to select
-            basemap.options <- c('Esri.WorldTopoMap', 'CartoDB.Positron', 'Esri.WorldGrayCanvas','Esri.WorldImagery','Esri.WorldStreetMap') 
-            #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
-            # add the basemaps listed above to the map (for options, see: http://leaflet-extras.github.io/leaflet-providers/preview/)
-            for (provider in basemap.options) {
-                l <- l %>% leaflet::addProviderTiles(provider, group = provider)
-            }
-            # add the min-map window
-            l <- l %>% leaflet::addMiniMap(tiles = basemap.options[[1]], toggleDisplay = TRUE, position = "bottomleft")
-            # code to make the basemap/min-map selector work (copied from: https://rstudio.github.io/leaflet/morefeatures.html)
-            l <- l %>% htmlwidgets::onRender("
-                                             function(el, x) {
-                                             var myMap = this;
-                                             myMap.on('baselayerchange',
-                                             function (e) {
-                                             myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
-                                             })
-                                             }")
-            # get the bounds of the regional board
-            bounds <- attributes(sf::st_geometry(rb.boundary.selected))$bbox
-            # Set the bounds of the map dynamically - initial view is based on the full extent of the WQI score points for the selected region, after that the map is based on the most recent bounds when a new option (standard, period, etc) is selected
-            isolate(if (is.null(input$monitoring.map_bounds)) {
-                l <- l %>% leaflet::fitBounds(lng1 = bounds[[1]], lat1 = bounds[[2]], lng2 = bounds[[3]], lat2 = bounds[[4]])
-                # l <- l %>% leaflet::fitBounds(lng1 = min(monitoring.data.WQI$Longitude, na.rm = TRUE), lat1 = min(monitoring.data.WQI$Latitude, na.rm = TRUE), lng2 = max(monitoring.data.WQI$Longitude, na.rm = TRUE), lat2 = max(monitoring.data.WQI$Latitude, na.rm = TRUE))
-            } else { # maintain the current view
-                l <- l %>% leaflet::setView(lng = mean(c(input$monitoring.map_bounds$west, input$monitoring.map_bounds$east)), lat = mean(c(input$monitoring.map_bounds$north, input$monitoring.map_bounds$south)), zoom = input$monitoring.map_zoom)                                
-            })
-            # create a button to re-center the map
-            l <- l %>% leaflet::addEasyButton(leaflet::easyButton(
-                icon="fa-globe", title="Center Map on Regional Board Boundary",
-                # fit to WQI data points
-                # onClick=leaflet::JS(paste0('function(btn, map){ map.fitBounds([[',
-                #                   min(map.data$Latitude, na.rm = TRUE), ', ',
-                #                   min(map.data$Longitude, na.rm = TRUE), '],[',
-                #                   max(map.data$Latitude, na.rm = TRUE), ', ',
-                #                   max(map.data$Longitude, na.rm = TRUE), ']]); }'))))
-                # fit to RB boundary
-                onClick=leaflet::JS(paste0('function(btn, map){ map.fitBounds([[',
-                                           round(bounds[[2]],4), ', ',
-                                           round(bounds[[1]],4), '],[',
-                                           round(bounds[[4]],4), ', ',
-                                           round(bounds[[3]],4), ']]); }'))))
-            # Add the CalEnvironScreen Polygons
-            l <- l %>% leaflet::addPolygons(data = ces_poly_study_area, 
-                                            color = 'grey', # "#444444", 
-                                            weight = 0.5, 
-                                            smoothFactor = 1.0,
-                                            opacity = 0.8, 
-                                            fillOpacity = 0.5,
-                                            # fillColor = ~colorNumeric('YlOrBr', Poll_pctl)(Poll_pctl), # view RColorBrewer palettes with: RColorBrewer::display.brewer.all()
-                                            fillColor = ~ces.leaflet.pal(fill.variable),
-                                            highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
-                                            popup = ~paste0('<b>', '<u>','CalEnviroScreen 3.0 Tract', '</u>','</b>','<br/>',
-                                                            '<b>', 'Tract: ', '</b>', Tract_1,'<br/>',
-                                                            '<b>', 'Location: ', '</b>', City,', ', County, ' ', ZIP,'<br/>',
-                                                            '<b>', 'Population: ', '</b>', Population,'<br/>','<br/>',
-                                                            '<b>', 'Scores: ', '</b>','<br/>',
-                                                            '<b>', 'CES Percentile: ', '</b>', Percentile,'<br/>',
-                                                            '<b>', 'Impaired Waterbodies Percentile: ', '</b>', IWB_pctl,'<br/>',
-                                                            '<b>', 'Pollution Burden Percentile: ', '</b>', Poll_pctl,'<br/>',
-                                                            '<b>', 'Pesticides Percentile: ', '</b>', Pest_pctl,'<br/>',
-                                                            '<b>', 'Toxic Releases Percentile: ', '</b>', TR_pctl,'<br/>',
-                                                            '<b>', 'Cleanups Percentile: ', '</b>', Clean_Pctl,'<br/>',
-                                                            '<b>', 'Groundwater Threats Percentile: ', '</b>', GW_pctl,'<br/>',
-                                                            '<b>', 'Hazardous Waste Generators Percentile: ', '</b>', Haz_pctl),
-                                            group = 'CES Polygons')#,'<br/>'
-            # Add the 303d lines
-            l <- l %>% leaflet::addPolylines(data = impaired_lines_study_area, 
-                                             color = 'blue',
-                                             weight = 2.0, 
-                                             opacity = 1.0, 
-                                             # fillOpacity = 0.5,
-                                             smoothFactor = 1.0,
-                                             highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),
-                                             popup = ~paste0('<b>', '<u>','303d Listed Waterbody (2012)','</u>', '</b>','<br/>',
-                                                             '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
-                                                             '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
-                                                             '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
-                                                             '<b>', 'ID: ', '</b>', WBID, '<br/>',
-                                                             '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
-                                                             '<b>', 'Listing Comments: ', '</b>', Comments,  '<br/>',
-                                                             '<b>', 'Potential Sources: ', '</b>', Sources),
-                                             
-                                             group = '303d Listed Waters')
-            # Add the 303d polygons
-            l <- l %>% leaflet::addPolygons(data = impaired_polygons_study_area, 
-                                            color = 'darkblue',
-                                            weight = 0.5, 
-                                            opacity = 0.8,
-                                            fillColor = 'blue',
-                                            fillOpacity = 0.5,
-                                            smoothFactor = 1.0,
-                                            highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),
-                                            popup = ~paste0('<b>', '<u>','303d Listed Waterbody (2012)', '</u>','</b>','<br/>',
-                                                            '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
-                                                            '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
-                                                            '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
-                                                            '<b>', 'ID: ', '</b>', WBID, '<br/>',
-                                                            '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
-                                                            '<b>', 'Listing Comments: ', '</b>', Comments, '<br/>',
-                                                            '<b>', 'Potential Sources: ', '</b>', Sources),
-                                            group = '303d Listed Waters')
-            # Add 303d proximity buffer (if selected)
-            if (input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))) {
-                l <- l %>% leaflet::addPolygons(data = buffered_streams_geographic,
-                                                color = 'darkblue', # "#444444",
-                                                weight = 0.5,
-                                                smoothFactor = 1.0,
-                                                opacity = 1.0,
-                                                fillOpacity = 0.5,
-                                                fillColor = 'lightblue',
-                                                highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
-                                                popup = ~paste0('<b>', '<u>', '303d Buffer', '</b>','</u>','<br/>',
-                                                                '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
-                                                                '<b>', 'Water Body Type: ', '</b>', WBTYPE,'<br/>',
-                                                                '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
-                                                                '<b>', 'ID: ', '</b>', WBID),
-                                                group = '303d Buffers'
-                )
-            }
-            # Add the regional board boundary
-            l <- l %>% leaflet::addPolygons(data = rb.boundary.selected,
-                                            color = 'black', # "#444444",
-                                            weight = 2.0,
-                                            smoothFactor = 1.0,
-                                            opacity = 1.0,
-                                            fill = FALSE,
-                                            # fillOpacity = 0.5,
-                                            # fillColor = 'lightblue',
-                                            highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
-                                            popup = ~paste0('<b>', '<u>', 'Regional Board Boundary', '</u>', '</b>','<br/>',
-                                                            '<b>', 'Region Number: ', '</b>', RB_OFF, '<br/>',
-                                                            '<b>', 'Region Name: ', '</b>', RB_NAME),
-                                            group = 'Regional Board Boundary'
-            )
-            # Add the excluded points (by all filters) (if selected)
-            if (input$show.excluded.points == TRUE) { # & input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))
-                l <- l %>% leaflet::addCircleMarkers(data = excluded.points_sf,
-                                                     radius = 4,
-                                                     stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
-                                                     fill = TRUE, fillOpacity = 1, fillColor = 'grey',
-                                                     popup = ~paste0('<b>', '<u>','Excluded Discharger WQI Score', '</u>','</b>','<br/>',
-                                                                     '<b>', 'Facility Information:','</b>','<br/>',
-                                                                     '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                                     '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                                     '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                                     '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                                     '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                                     '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                                     '<br/>',
-                                                                     '<b>', 'Scoring:','</b>','<br/>',
-                                                                     '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                                     '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                                     '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
-                                                                     '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                                     '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                                     '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
-                                                     group = 'Excluded Points'
-                )
-            } 
-            # Add the selected WQI data
-            if (input$show.parameters == TRUE) {
-                l <- l %>% leaflet::addCircleMarkers(radius = 4,
-                                                     stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
-                                                     fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
-                                                     # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
-                                                     popup = ~paste0('<b>', '<u>', 'Discharger WQI Score', '</u>','</b>','<br/>',
-                                                                     '<b>', 'Facility Information:','</b>','<br/>',
-                                                                     '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                                     '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                                     '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                                     '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                                     '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                                     '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                                     '<br/>',
-                                                                     '<b>','Scoring:','</b>','<br/>',
-                                                                     '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                                     '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                                     '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
-                                                                     '<b>', 'Parameters In WQI Score: ', '</b>', Parameters.In.Score, '<br/>',
-                                                                     '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                                     '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                                     '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
-                                                     group = 'WQI Scores')
-            }
-            if (input$show.parameters == FALSE) {
-                l <- l %>% leaflet::addCircleMarkers(radius = 4,
-                                                     stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
-                                                     fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
-                                                     # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
-                                                     popup = ~paste0('<b>', '<u>', 'Discharger WQI Score', '</u>', '</b>','<br/>',
-                                                                     '<b>', 'Facility Information:','</b>','<br/>',
-                                                                     '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                                     '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                                     '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                                     '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                                     '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                                     '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                                     '<br/>',
-                                                                     '<b>', 'Scoring:','</b>','<br/>',
-                                                                     '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                                     '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                                     '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
-                                                                     '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                                     '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                                     '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
-                                                     group = 'WQI Scores')
-            }
-            
+            output$monitoring.map <- leaflet::renderLeaflet({
+                # create the empty map
+                    l <- leaflet::leaflet(shared.map.data)
+                # enter the basemap options to allow the user to select
+                    basemap.options <- c('Esri.WorldTopoMap', 'CartoDB.Positron', 'Esri.WorldGrayCanvas','Esri.WorldImagery','Esri.WorldStreetMap') 
+                    #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
+                # add the basemaps listed above to the map (for options, see: http://leaflet-extras.github.io/leaflet-providers/preview/)
+                    for (provider in basemap.options) {
+                        l <- l %>% leaflet::addProviderTiles(provider, group = provider)
+                    }
+                # add the min-map window
+                    l <- l %>% leaflet::addMiniMap(tiles = basemap.options[[1]], toggleDisplay = TRUE, position = "bottomleft")
+                # code to make the basemap/min-map selector work (copied from: https://rstudio.github.io/leaflet/morefeatures.html)
+                    l <- l %>% htmlwidgets::onRender("
+                                                     function(el, x) {
+                                                     var myMap = this;
+                                                     myMap.on('baselayerchange',
+                                                     function (e) {
+                                                     myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                                                     })
+                                                     }")
+                # get the bounds of the regional board
+                    bounds <- attributes(sf::st_geometry(rb.boundary.selected))$bbox
+                # Set the bounds of the map dynamically - initial view is based on the full extent of the WQI score points for the selected region, after that the map is based on the most recent bounds when a new option (standard, period, etc) is selected
+                    isolate(if (is.null(input$monitoring.map_bounds)) {
+                        l <- l %>% leaflet::fitBounds(lng1 = bounds[[1]], lat1 = bounds[[2]], lng2 = bounds[[3]], lat2 = bounds[[4]])
+                        # l <- l %>% leaflet::fitBounds(lng1 = min(monitoring.data.WQI$Longitude, na.rm = TRUE), lat1 = min(monitoring.data.WQI$Latitude, na.rm = TRUE), lng2 = max(monitoring.data.WQI$Longitude, na.rm = TRUE), lat2 = max(monitoring.data.WQI$Latitude, na.rm = TRUE))
+                    } else { # maintain the current view
+                        l <- l %>% leaflet::setView(lng = mean(c(input$monitoring.map_bounds$west, input$monitoring.map_bounds$east)), lat = mean(c(input$monitoring.map_bounds$north, input$monitoring.map_bounds$south)), zoom = input$monitoring.map_zoom)                                
+                    })
+                # create a button to re-center the map
+                    l <- l %>% leaflet::addEasyButton(leaflet::easyButton(
+                        icon="fa-globe", title="Center Map on Regional Board Boundary",
+                        # fit to WQI data points
+                        # onClick=leaflet::JS(paste0('function(btn, map){ map.fitBounds([[',
+                        #                   min(map.data$Latitude, na.rm = TRUE), ', ',
+                        #                   min(map.data$Longitude, na.rm = TRUE), '],[',
+                        #                   max(map.data$Latitude, na.rm = TRUE), ', ',
+                        #                   max(map.data$Longitude, na.rm = TRUE), ']]); }'))))
+                        # fit to RB boundary
+                        onClick=leaflet::JS(paste0('function(btn, map){ map.fitBounds([[',
+                                                   round(bounds[[2]],4), ', ',
+                                                   round(bounds[[1]],4), '],[',
+                                                   round(bounds[[4]],4), ', ',
+                                                   round(bounds[[3]],4), ']]); }'))))
+                # Add the CalEnvironScreen Polygons
+                    l <- l %>% leaflet::addPolygons(data = ces_poly_study_area, 
+                                                    color = 'grey', # "#444444", 
+                                                    weight = 0.5, 
+                                                    smoothFactor = 1.0,
+                                                    opacity = 0.8, 
+                                                    fillOpacity = 0.5,
+                                                    # fillColor = ~colorNumeric('YlOrBr', Poll_pctl)(Poll_pctl), # view RColorBrewer palettes with: RColorBrewer::display.brewer.all()
+                                                    fillColor = ~ces.leaflet.pal(fill.variable),
+                                                    highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                    popup = ~paste0('<b>', '<u>','CalEnviroScreen 3.0 Tract', '</u>','</b>','<br/>',
+                                                                    '<b>', 'Tract: ', '</b>', Tract_1,'<br/>',
+                                                                    '<b>', 'Location: ', '</b>', City,', ', County, ' ', ZIP,'<br/>',
+                                                                    '<b>', 'Population: ', '</b>', Population,'<br/>','<br/>',
+                                                                    '<b>', 'Scores: ', '</b>','<br/>',
+                                                                    '<b>', 'CES Percentile: ', '</b>', Percentile,'<br/>',
+                                                                    '<b>', 'Impaired Waterbodies Percentile: ', '</b>', IWB_pctl,'<br/>',
+                                                                    '<b>', 'Pollution Burden Percentile: ', '</b>', Poll_pctl,'<br/>',
+                                                                    '<b>', 'Pesticides Percentile: ', '</b>', Pest_pctl,'<br/>',
+                                                                    '<b>', 'Toxic Releases Percentile: ', '</b>', TR_pctl,'<br/>',
+                                                                    '<b>', 'Cleanups Percentile: ', '</b>', Clean_Pctl,'<br/>',
+                                                                    '<b>', 'Groundwater Threats Percentile: ', '</b>', GW_pctl,'<br/>',
+                                                                    '<b>', 'Hazardous Waste Generators Percentile: ', '</b>', Haz_pctl),
+                                                    group = 'CES Polygons')#,'<br/>'
+                # Add the 303d lines
+                    l <- l %>% leaflet::addPolylines(data = impaired_lines_study_area, 
+                                                     color = 'blue',
+                                                     weight = 2.0, 
+                                                     opacity = 1.0, 
+                                                     # fillOpacity = 0.5,
+                                                     smoothFactor = 1.0,
+                                                     highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),
+                                                     popup = ~paste0('<b>', '<u>','303d Listed Waterbody (2012)','</u>', '</b>','<br/>',
+                                                                     '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                     '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
+                                                                     '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                     '<b>', 'ID: ', '</b>', WBID, '<br/>',
+                                                                     '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
+                                                                     '<b>', 'Listing Comments: ', '</b>', Comments,  '<br/>',
+                                                                     '<b>', 'Potential Sources: ', '</b>', Sources),
+                                                     
+                                                     group = '303d Listed Waters')
+                # Add the 303d polygons
+                    l <- l %>% leaflet::addPolygons(data = impaired_polygons_study_area, 
+                                                    color = 'darkblue',
+                                                    weight = 0.5, 
+                                                    opacity = 0.8,
+                                                    fillColor = 'blue',
+                                                    fillOpacity = 0.5,
+                                                    smoothFactor = 1.0,
+                                                    highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),
+                                                    popup = ~paste0('<b>', '<u>','303d Listed Waterbody (2012)', '</u>','</b>','<br/>',
+                                                                    '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                    '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
+                                                                    '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                    '<b>', 'ID: ', '</b>', WBID, '<br/>',
+                                                                    '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
+                                                                    '<b>', 'Listing Comments: ', '</b>', Comments, '<br/>',
+                                                                    '<b>', 'Potential Sources: ', '</b>', Sources),
+                                                    group = '303d Listed Waters')
+                # Add 303d proximity buffer (if selected)
+                    if (input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))) {
+                        l <- l %>% leaflet::addPolygons(data = buffered_streams_geographic,
+                                                        color = 'darkblue', # "#444444",
+                                                        weight = 0.5,
+                                                        smoothFactor = 1.0,
+                                                        opacity = 1.0,
+                                                        fillOpacity = 0.5,
+                                                        fillColor = 'lightblue',
+                                                        highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                        popup = ~paste0('<b>', '<u>', '303d Buffer', '</b>','</u>','<br/>',
+                                                                        '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                        '<b>', 'Water Body Type: ', '</b>', WBTYPE,'<br/>',
+                                                                        '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                        '<b>', 'ID: ', '</b>', WBID),
+                                                        group = '303d Buffers'
+                        )
+                    }
+                # Add the regional board boundary
+                    l <- l %>% leaflet::addPolygons(data = rb.boundary.selected,
+                                                    color = 'black', # "#444444",
+                                                    weight = 2.0,
+                                                    smoothFactor = 1.0,
+                                                    opacity = 1.0,
+                                                    fill = FALSE,
+                                                    # fillOpacity = 0.5,
+                                                    # fillColor = 'lightblue',
+                                                    highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                    popup = ~paste0('<b>', '<u>', 'Regional Board Boundary', '</u>', '</b>','<br/>',
+                                                                    '<b>', 'Region Number: ', '</b>', RB_OFF, '<br/>',
+                                                                    '<b>', 'Region Name: ', '</b>', RB_NAME),
+                                                    group = 'Regional Board Boundary'
+                    )
+                # Add the excluded points (by all filters) (if selected)
+                    if (input$show.excluded.points == TRUE) { # & input$show.303d.buffer == TRUE & !is.na(as.numeric(input$dist.to.303))
+                        l <- l %>% leaflet::addCircleMarkers(data = excluded.points_sf,
+                                                             radius = 4,
+                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                             fill = TRUE, fillOpacity = 1, fillColor = 'grey',
+                                                             popup = ~paste0('<b>', '<u>','Excluded Discharger WQI Score', '</u>','</b>','<br/>',
+                                                                             '<b>', 'Facility Information:','</b>','<br/>',
+                                                                             '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                             '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                             '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                             '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                             '<br/>',
+                                                                             '<b>', 'Scoring:','</b>','<br/>',
+                                                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                             '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
+                                                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                                                             group = 'Excluded Points'
+                        )
+                    } 
+                # Add the selected WQI data
+                    if (input$show.parameters == TRUE) {
+                        l <- l %>% leaflet::addCircleMarkers(radius = 4,
+                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                             fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
+                                                             # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                                             popup = ~paste0('<b>', '<u>', 'Discharger WQI Score', '</u>','</b>','<br/>',
+                                                                             '<b>', 'Facility Information:','</b>','<br/>',
+                                                                             '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                             '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                             '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                             '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                             '<br/>',
+                                                                             '<b>','Scoring:','</b>','<br/>',
+                                                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                             '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
+                                                                             '<b>', 'Parameters In WQI Score: ', '</b>', Parameters.In.Score, '<br/>',
+                                                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                                                             group = 'WQI Scores')
+                    }
+                    if (input$show.parameters == FALSE) {
+                        l <- l %>% leaflet::addCircleMarkers(radius = 4,
+                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                             fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
+                                                             # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                                             popup = ~paste0('<b>', '<u>', 'Discharger WQI Score', '</u>', '</b>','<br/>',
+                                                                             '<b>', 'Facility Information:','</b>','<br/>',
+                                                                             '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                             '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                                                                             '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                             '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                                                                             '<br/>',
+                                                                             '<b>', 'Scoring:','</b>','<br/>',
+                                                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                                                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                                                                             '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
+                                                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                                                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                                                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                                                             group = 'WQI Scores')
+                    }
+                
             
             # add the legend
-            l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
-            l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, opacity = 1, layerId = 'ces.legend', bins = 4, title = paste0('CES**'))#: ', input$ces.parameter))
-            l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI*", opacity = 1, layerId = 'wqi.legend', bins = 2)
+                l <- l %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
+                l <- l %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area$fill.variable, opacity = 1, layerId = 'ces.legend', bins = 4, title = paste0('CES**'))#: ', input$ces.parameter))
+                l <- l %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI*", opacity = 1, layerId = 'wqi.legend', bins = 2)
             
             # Add controls to select the basemap
-            l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
-                                                 overlayGroups = c('WQI Scores', 'CES Polygons', '303d Listed Waters', 'Regional Board Boundary', '303d Buffers', 'Excluded Points'),
-                                                 options = leaflet::layersControlOptions(collapsed = TRUE, autoZIndex = TRUE)) 
+                l <- l %>% leaflet::addLayersControl(baseGroups = basemap.options,
+                                                     overlayGroups = c('WQI Scores', 'CES Polygons', '303d Listed Waters', 'Regional Board Boundary', '303d Buffers', 'Excluded Points'),
+                                                     options = leaflet::layersControlOptions(collapsed = TRUE, autoZIndex = TRUE)) 
             
             # Add the measuring tool
-            l <- l %>% leaflet::addMeasure(position = 'topleft')
+                l <- l %>% leaflet::addMeasure(position = 'topleft')
             # output the map object
-            l
+                l
         })
         
         # Data Table -----------------------------------------------------------
-        output$WQI.table <- DT::renderDataTable(
-            shared.map.data, 
-            extensions = c('Buttons', 'Scroller'),
-            options = list(dom = 'Bfrtip', 
-                           buttons = list('colvis', list(
-                               extend = 'collection',
-                               buttons = list(list(extend='csv', filename = 'WQI_Scores'),
-                                              list(extend='excel', filename= 'WQI_Scores')),
-                               text = 'Download Data' )),
-                           scrollX = TRUE,
-                           scrollY = 250, 
-                           scroller = TRUE, 
-                           deferRender = TRUE),
-            class = 'cell-border stripe',
-            server = FALSE,
-            rownames = FALSE
-        )
+            output$WQI.table <- DT::renderDataTable(
+                shared.map.data, 
+                extensions = c('Buttons', 'Scroller'),
+                options = list(dom = 'Bfrtip', 
+                               buttons = list('colvis', list(
+                                   extend = 'collection',
+                                   buttons = list(list(extend='csv', filename = 'WQI_Scores'),
+                                                  list(extend='excel', filename= 'WQI_Scores')),
+                                   text = 'Download Data' )),
+                               scrollX = TRUE,
+                               scrollY = 250, 
+                               scroller = TRUE, 
+                               deferRender = TRUE),
+                class = 'cell-border stripe',
+                server = FALSE,
+                rownames = FALSE
+            )
         
         
         # Monitoring Data Download -------------------------------------------------
-        output$downloadRawData <- downloadHandler(
-            filename = 'WQI_Monitoring_Data.csv', 
-            content = function(con) {
-                write.csv(monitoring.data.WQI, con, row.names = FALSE)
-            },
-            contentType = 'text/csv'
-        )
+            output$downloadRawData <- downloadHandler(
+                filename = 'WQI_Monitoring_Data.csv', 
+                content = function(con) {
+                    write.csv(monitoring.data.WQI, con, row.names = FALSE)
+                },
+                contentType = 'text/csv'
+            )
         
         # # Standards Data Download ------------------------------------------------
-        #     output$downloadStandards <- downloadHandler(
-        #         filename = 'WQI_Standards.csv', 
-        #         content = function(con) {
-        #             write.csv(standards, con, row.names = FALSE)
-        #         },
-        #         contentType = 'text/csv'
-        #     )
+            #     output$downloadStandards <- downloadHandler(
+            #         filename = 'WQI_Standards.csv', 
+            #         content = function(con) {
+            #             write.csv(standards, con, row.names = FALSE)
+            #         },
+            #         contentType = 'text/csv'
+            #     )
         
         # Facilities Data Download -------------------------------------------------
-        output$downloadFacilities <- downloadHandler(
-            filename = 'WQI_Facilities.csv', 
-            content = function(con) {
-                write.csv(facilities, con, row.names = FALSE)
-            },
-            contentType = 'text/csv'
-        )    
+            output$downloadFacilities <- downloadHandler(
+                filename = 'WQI_Facilities.csv', 
+                content = function(con) {
+                    write.csv(facilities, con, row.names = FALSE)
+                },
+                contentType = 'text/csv'
+            )    
 })
     
     # Center map on change in region selection
-    observeEvent(input$region.selected, {
-        # fit to monitoring data for selected region
-        # filtered.data <- monitoring.data %>% dplyr::filter(Region_calc == input$region.selected)
-        # if (data.type == 'SMARTS') {
-        #     filtered.data <- filtered.data %>% dplyr::mutate(Parameter = gsub(x = Parameter, pattern = ',', replacement = ''))
-        # }
-        # filtered.data <- filtered.data %>% dplyr::filter(Parameter %in% standards$Parameter)
-        # filtered.data <- filtered.data[(!is.na(filtered.data$Latitude) & !is.na(filtered.data$Longitude)), ]
-        # filtered.data <- filtered.data %>% dplyr::group_by(WDID, Latitude, Longitude) %>% dplyr::distinct(WDID)
-        # fit to RB boundary - get RB bounds
-        rb.boundary.selected <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == input$region.selected))
-        bounds <- attributes(sf::st_geometry(rb.boundary.selected))$bbox
-        # update map to appropriate bounds
-        leaflet::leafletProxy(mapId = 'monitoring.map') %>% 
-            # leaflet::fitBounds(lng1 = min(filtered.data$Longitude, na.rm = TRUE), lat1 = min(filtered.data$Latitude, na.rm = TRUE), lng2 = max(filtered.data$Longitude, na.rm = TRUE), lat2 = max(filtered.data$Latitude, na.rm = TRUE))
-            leaflet::fitBounds(lng1 = bounds[[1]], lat1 = bounds[[2]], lng2 = bounds[[3]], lat2 = bounds[[4]])
-    })
+        observeEvent(input$region.selected, {
+            # fit to monitoring data for selected region
+            # filtered.data <- monitoring.data %>% dplyr::filter(Region_calc == input$region.selected)
+            # if (data.type == 'SMARTS') {
+            #     filtered.data <- filtered.data %>% dplyr::mutate(Parameter = gsub(x = Parameter, pattern = ',', replacement = ''))
+            # }
+            # filtered.data <- filtered.data %>% dplyr::filter(Parameter %in% standards$Parameter)
+            # filtered.data <- filtered.data[(!is.na(filtered.data$Latitude) & !is.na(filtered.data$Longitude)), ]
+            # filtered.data <- filtered.data %>% dplyr::group_by(WDID, Latitude, Longitude) %>% dplyr::distinct(WDID)
+            # fit to RB boundary - get RB bounds
+            rb.boundary.selected <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == input$region.selected))
+            bounds <- attributes(sf::st_geometry(rb.boundary.selected))$bbox
+            # update map to appropriate bounds
+            leaflet::leafletProxy(mapId = 'monitoring.map') %>% 
+                # leaflet::fitBounds(lng1 = min(filtered.data$Longitude, na.rm = TRUE), lat1 = min(filtered.data$Latitude, na.rm = TRUE), lng2 = max(filtered.data$Longitude, na.rm = TRUE), lat2 = max(filtered.data$Latitude, na.rm = TRUE))
+                leaflet::fitBounds(lng1 = bounds[[1]], lat1 = bounds[[2]], lng2 = bounds[[3]], lat2 = bounds[[4]])
+        })
     
     # Reset Standards
-    observeEvent(input$reset, {
-        DF <- standards %>% dplyr::select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
-        DF$Custom <- as.numeric(DF$Custom)
-        values[["DF"]] <- DF
-    })   
+        observeEvent(input$reset, {
+            DF <- standards %>% dplyr::select(-Standard.water.type) %>%  tidyr::spread(Standard.Type, Standard) %>% dplyr::mutate(Custom = '')
+            DF$Custom <- as.numeric(DF$Custom)
+            values[["DF"]] <- DF
+        })   
     
-    output$hot <- rhandsontable::renderRHandsontable({
-        DF <- values[["DF"]]
-        if (!is.null(DF))
-            rhandsontable::rhandsontable(DF, useTypes = TRUE, stretchH = "all")
-    })    
+        output$hot <- rhandsontable::renderRHandsontable({
+            DF <- values[["DF"]]
+            if (!is.null(DF))
+                rhandsontable::rhandsontable(DF, useTypes = TRUE, stretchH = "all")
+        })    
     
     
     }
 
 # Run the application 
-shinyApp(ui = ui, server = server)
+    shinyApp(ui = ui, server = server)
