@@ -461,107 +461,113 @@
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Define UI --------------------------------------------------------------------
-ui <- fluidPage(
-    # Application title
-    titlePanel("Stormwater Enforcement Tool"),
-    
-    sidebarLayout(
-        # Sidebar with inputs     
-        sidebarPanel(
-            withMathJax(), # to create equations
-            # Filters
-            h4('Filters:'),
-            selectInput(inputId = 'region.selected', label = 'Select Water Board Region:', choices = c(1:4, '5R', '5S', '6A', '6B', 7:9), selected = '9'),            
-            selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('CTR', 'MSGP - Benchmark', 'NAL', 'Custom')),
-            selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
-            # htmlOutput('monitoring.period.selector'),
-            selectInput(inputId = 'WDID.selected', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
-            sliderInput(inputId = 'score.range', label = 'Select WQI Score Range:', min = 0, max = 100, value = c(0,100)),
-            # actionButton('refresh','Update')
-            selectInput(inputId = 'ces.parameter', 'Select a CES Parameter:', choices = ces_choices$Name, selected = 'Pollution Burden'),
-            sliderInput(inputId = 'ces.score.range', label = 'Filter by Score of Selected CES Parameter:', min = 0, max = 100, value = c(0,100)),
-            textInput(inputId = 'dist.to.303', label = 'Filter for proximity to a 303d listed water body (ft):', placeholder = 'Enter a distance in feet'),
-            checkboxInput(inputId = 'show.303d.buffer', label = 'Show 303d proximity buffer', value = FALSE),
-            checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE),
-            checkboxInput(inputId = 'show.parameters', label = 'Show parameters included in WQI score for each facility', value = FALSE),
-            hr(style="border: 1px solid darkgrey"),
-            # Describe the WQI Calculations:
-            tags$b(h4('Water Quality Index (WQI) Information:')),
-            p('Based on the San Diego Coastkeeper\'s WQI, this is an adapted version of the official Canadian WQI, which was adoped by
-              the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
-              score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
-              of those exceedances, as follows:'),
-            # h5('Frequency:'),
-            tags$li('Frequency:'),
-            tags$ul(helpText('\\(F1=\\frac{\\text{Number of Samples Exceeding Standard}}{\\text{Total Number of Samples}}\\times{100}\\)')),
-            # h5('Magnitude:'),
-            tags$li('Magnitude:'),
-            tags$ul(helpText('\\(Excursion_i=\\frac{\\text{Value of Sample Exceeding Standard}_i}{\\text{Standard Value}}-1\\)')),
-            tags$ul(helpText('\\(NSE=\\frac{\\sum{Excursion}}{\\text{Total Number of Samples}}\\)')),
-            tags$ul(helpText('\\(F2=\\frac{NSE}{0.01(NSE)+0.01}\\)')),
-            # h5('WQI:'),
-            tags$li('WQI:'),
-            # tags$ul(helpText('\\(\\text{WQI=}100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
-            tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.412}\\)')),
-            hr(style="border: 1px solid darkgrey"),
-            # Link to the code, etc...
-            # p('For more information, contact: ', a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')),
-            tags$b(h4('Application Information:')),
-            p(tags$b('Data Sources:')),
-            tags$ul(
-                tags$li('Stormwater Monitoring: ', a(href = 'https://smarts.waterboards.ca.gov', 'SMARTS Public Access'),
-                        '(Go To: ', tags$em('View SW Data'), '→', tags$em('Download NOI Data By Regional Board'),
-                        '→ select: ', tags$em('State Board'), '→ select:',
-                        tags$ul(
-                            tags$li('Monitoring data file:', tags$em('Industrial Ad Hoc Reports - Parameter Data')),
-                            tags$li('Facility information file:', tags$em('Industrial Application Specific Data'),')')
-                        )
-                ),
-                tags$li('CalEnviroScreen 3.0: ', a(href = 'https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30', 'OEHHA')),
-                tags$li('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml',
-                                                       'California 2012 Integrated Report'),
-                        ' (NOTE: representation of some waterbodies in Region 1 has been simplified)')
-            ),
-            p(tags$b('More Information:')),
-            tags$ul(#tags$li(
-                'For quesitons or comments, contact: ', 
-                a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')#)
-            ),
-            p(tags$b('Source Code:')),
-            actionButton(inputId = 'github', label = 'Code on GitHub', icon = icon('github', class = 'fa-1x'),
-                         onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
-            ),
+ui <- navbarPage("Stormwater Enforcement Tool",
+                 tabPanel('Home',
+                          p('Welcome screen - instructions, ask for feedback (including GitHub)')
+                          ),
+                 tabPanel('WQI Scores',
+                          sidebarLayout(
+                              sidebarPanel( # Sidebar with inputs 
+                                  h4('Filters:'), # Filters
+                                  selectInput(inputId = 'region.selected', label = 'Select Water Board Region:', choices = c(1:4, '5R', '5S', '6A', '6B', 7:9), selected = '9'),
+                                  selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('California Toxics Rule (CTR)' = 'CTR', 'Multi-Sector General Permit (MSGP) - Benchmark' = 'MSGP - Benchmark', 'Numeric Action Level (NAL)' = 'NAL', 'Custom')),
+                                  selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
+                                  # htmlOutput('monitoring.period.selector'),
+                                  selectInput(inputId = 'WDID.selected', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
+                                  sliderInput(inputId = 'score.range', label = 'Select Water Quality Index (WQI) Score Range:', min = 0, max = 100, value = c(0,100)),
+                                  # actionButton('refresh','Update')
+                                  selectInput(inputId = 'ces.parameter', 'Select CalEnviroScreen (CES) Parameter:', choices = ces_choices$Name, selected = 'Pollution Burden'),
+                                  sliderInput(inputId = 'ces.score.range', label = 'Filter by Score of Selected CES Parameter:', min = 0, max = 100, value = c(0,100)),
+                                  textInput(inputId = 'dist.to.303', label = 'Filter for proximity to a 303d listed water body (ft):', placeholder = 'Enter a distance in feet'),
+                                  checkboxInput(inputId = 'show.303d.buffer', label = 'Show 303d proximity buffer', value = FALSE),
+                                  checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE),
+                                  checkboxInput(inputId = 'show.parameters', label = 'Show parameters included in WQI score for each facility', value = FALSE)#,
+                                  # hr(style="border: 1px solid darkgrey"),
+                              ),
+                              mainPanel( # Show map and data table
+                                  h4('Water Quality Index (WQI) Scores:'),
+                                  leaflet::leafletOutput('monitoring.map',height = 500),
+                                  h6('*WQI = Water Quality Index Score (see panel on left for more information)', 
+                                     br(), 
+                                     textOutput('ces.legend.note')),
+                                  hr(),
+                                  h5('WQI Scores - Tabular Data:'),
+                                  DT::dataTableOutput('WQI.table')# ,
+                                  # hr(style="border: 3px solid darkgrey"),
+                              )
+                          )
+                          ),
+                 tabPanel('Standards',
+                          h4('Enter / Edit Standards:'),
+                          rhandsontable::rHandsontableOutput("hot"),
+                          br(),
+                          tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
+                          actionButton("reset", "Reset Standards",class = 'buttonstyle')#,
+                          # hr(style="border: 3px solid darkgrey"),
+                          ),
+                 tabPanel('Download Additional Data',
+                          h4('Download Additional Data:'),
+                          downloadButton('downloadRawData', 'Sampling Data Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
+                          downloadButton('downloadStandards', 'Standards Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
+                          downloadButton('downloadFacilities', 'All Facility Information', class = "buttonstyle") # ,
+                          # br(),br()
+                          ),
+                 navbarMenu('More Information',
+                          tabPanel('WQI Information',
+                                   withMathJax(), # to create equations
+                                   # Describe the WQI Calculations:
+                                   tags$b(h4('Water Quality Index (WQI) Information:')),
+                                   p('Based on the San Diego Coastkeeper\'s WQI, this is an adapted version of the official Canadian WQI, which was adoped by
+                                     the United Nations Environment Program Global Environmental Monitoring System in 2007 for evaluating global water quality. The WQI 
+                                     score for an individual site is based on the number of tests exceeding basin plan water quality thresholds, and the magnitude 
+                                     of those exceedances, as follows:'),
+                                   # h5('Frequency:'),
+                                   tags$li('Frequency:'),
+                                   tags$ul(helpText('\\(F1=\\frac{\\text{Number of Samples Exceeding Standard}}{\\text{Total Number of Samples}}\\times{100}\\)')),
+                                   # h5('Magnitude:'),
+                                   tags$li('Magnitude:'),
+                                   tags$ul(helpText('\\(Excursion_i=\\frac{\\text{Value of Sample Exceeding Standard}_i}{\\text{Standard Value}}-1\\)')),
+                                   tags$ul(helpText('\\(NSE=\\frac{\\sum{Excursion}}{\\text{Total Number of Samples}}\\)')),
+                                   tags$ul(helpText('\\(F2=\\frac{NSE}{0.01(NSE)+0.01}\\)')),
+                                   # h5('WQI:'),
+                                   tags$li('WQI:'),
+                                   # tags$ul(helpText('\\(\\text{WQI=}100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
+                                   tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.412}\\)')),
+                                   hr(style="border: 1px solid darkgrey") # ,
+                                   ),
+                          tabPanel('Data Sources',
+                                   tags$b(h4('Data Sources:')),
+                                   tags$ul(
+                                       tags$li('Stormwater Monitoring: ', a(href = 'https://smarts.waterboards.ca.gov', 'SMARTS Public Access'),
+                                               '(Go To: ', tags$em('View SW Data'), '→', tags$em('Download NOI Data By Regional Board'),
+                                               '→ select: ', tags$em('State Board'), '→ select:',
+                                               tags$ul(
+                                                   tags$li('Monitoring data file:', tags$em('Industrial Ad Hoc Reports - Parameter Data')),
+                                                   tags$li('Facility information file:', tags$em('Industrial Application Specific Data'),')')
+                                               )
+                                       ),
+                                       tags$li('CalEnviroScreen 3.0: ', a(href = 'https://oehha.ca.gov/calenviroscreen/report/calenviroscreen-30', 'OEHHA')),
+                                       tags$li('303d Listed Waterbodies: ', a(href = 'https://www.waterboards.ca.gov/water_issues/programs/tmdl/integrated2012.shtml',
+                                                                              'California 2012 Integrated Report'),
+                                               ' (NOTE: representation of some waterbodies in Region 1 has been simplified)')
+                                       )
+                                   ),
+                          tabPanel('Application Information', # Link to the code, etc...
+                                   tags$b(h4('Application Information:')),
+                                   tags$ul(#tags$li(
+                                       'For quesitons or comments, contact: ', 
+                                       a(href = 'mailto:david.altare@waterboards.ca.gov', 'david.altare@waterboards.ca.gov')#)
+                                   ),
+                                   p(tags$b('Source Code:')),
+                                   actionButton(inputId = 'github', label = 'Code on GitHub', icon = icon('github', class = 'fa-1x'),
+                                                class = 'buttonstyle',
+                                                onclick ="window.open('https://github.com/daltare/Stormwater_Enforcement_Tool')")
+                          )
+                 )
+)
+
         
-        # Show map and data table
-        mainPanel(
-            tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
-            h4('Water Quality Index (WQI) Scores:'),
-            leaflet::leafletOutput('monitoring.map',height = 500),
-            h6('*WQI = Water Quality Index Score (see panel on left for more information)', 
-               br(), 
-               textOutput('ces.legend.note')),
-            hr(),
-            h5('WQI Scores - Tabular Data:'),
-            DT::dataTableOutput('WQI.table'),
-            hr(style="border: 3px solid darkgrey"),
-            h4('Enter / Edit Standards:'),
-            rhandsontable::rHandsontableOutput("hot"),
-            br(),
-            actionButton("reset", "Reset Standards",class = 'buttonstyle'),
-            hr(style="border: 3px solid darkgrey"),
-            h4('Download Additional Data:'),
-            downloadButton('downloadRawData', 'Sampling Data Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
-            downloadButton('downloadStandards', 'Standards Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;'), # br(), br(),
-            downloadButton('downloadFacilities', 'All Facility Information', class = "buttonstyle"),
-            br(),br()
-        )
-        )
-    )
-
-
-
-
-
+        
 
 # Define server logic required to draw map -------------------------------------
 server <- function(input, output, session) {
