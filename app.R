@@ -461,7 +461,7 @@
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #       
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Define UI --------------------------------------------------------------------
-ui <- navbarPage(title=div("Industrial Stormwater Assessment Tool"), # theme = shinythemes::shinytheme('flatly'),
+ui <- navbarPage(title = "Industrial Stormwater Assessment Tool", # theme = shinythemes::shinytheme('flatly'),
                  tabPanel('Home',
                           # this piece of code creates a way to link to other tabPanel pages - it's from: https://stackoverflow.com/questions/36412407/shiny-add-link-to-another-tabpanel-in-another-tabpanel
                               tags$head(tags$script(HTML('
