@@ -463,46 +463,87 @@
 # Define UI --------------------------------------------------------------------
 ui <- navbarPage(title=div("Industrial Stormwater Assessment Tool"), # theme = shinythemes::shinytheme('flatly'),
                  tabPanel('Home',
-                          h4('Background:'),
-                          p('This draft version of the Industrial Stormwater Assessment Tool is intended to summarize statewide industrial stormwater quality monitoring data reported to the ',
-                            tags$a(href = 'https://www.waterboards.ca.gov/','California State Water Resources Control Board'), ' , and assess the monitoring results relative to other indicators of impairment and 
-                            pollution burden, including 2012 303(d) impaired water bodies and CalEnviroScreen 3.0 (CES) scores. It computes a ', tags$b('Water Quality Index (WQI)'), 
+                          # this piece of code creates a way to link to other tabPanel pages - it's from: https://stackoverflow.com/questions/36412407/shiny-add-link-to-another-tabpanel-in-another-tabpanel
+                              tags$head(tags$script(HTML('
+                                    var fakeClick = function(tabName) {
+                                                       var dropdownList = document.getElementsByTagName("a");
+                                                       for (var i = 0; i < dropdownList.length; i++) {
+                                                       var link = dropdownList[i];
+                                                       if(link.getAttribute("data-value") == tabName) {
+                                                       link.click();
+                                                       };
+                                                       }
+                                                       };
+                               '))), # end of the code to link to other tabPanel pages
+                          # this defines some link style text
+                            tags$head(tags$style(".linkstyle{color: steelblue;}")), # color: cadetblue; text-decoration: underline; font-weight: bold;}")), color: #286090
+                          h3('Background:'),
+                          p('This draft version of the Industrial Stormwater Assessment Tool is intended to summarize statewide industrial stormwater quality 
+                            monitoring data reported to the ',
+                            tags$a(href = 'https://www.waterboards.ca.gov/','California State Water Resources Control Board,'), 'and assess the monitoring results 
+                            relative to other indicators of impairment and pollution burden, including 2012 303(d) impaired water bodies and CalEnviroScreen 3.0 
+                            (CES) scores. It computes a ', 
+                            tags$b('Water Quality Index (WQI)'), 
                             ' score for each facility in a selected Water Board Region for a selected time period, and displays the computed scores on a map and 
-                            in tabular format (on the ', tags$b(tags$em('WQI Scores')), ' tab). The WQI scores are based on a user-selected standard, which defines threshold levels 
-                            for a subset of the analytes which may be sampled for at any given site (sampling data for analytes not included in the selected 
-                            standard are not considered in the WQI score). The default standards are based on common metrics used to assess and regulate stormwater 
-                            discharges, but the standards can be modified by the user, or an entirely customized standard can be defined. For more information, 
-                            see the sections below and/or the', tags$b(tags$em('More Information')), ' tab.'),
+                            in tabular format (on the ', 
+                            tags$em('WQI Scores', class = 'linkstyle', onclick = "fakeClick('WQI Scores')"), 
+                            ' tab). The WQI scores are based on a user-selected standard, which defines threshold levels for a subset of the parameters which may be 
+                            sampled for at any given site (sampling data for parameters not included in the selected standard are not considered in the WQI score). 
+                            The default standards are based on common metrics used to assess and regulate stormwater discharges, but the standards can be modified by 
+                            the user, or an entirely customized standard can be defined. For more information about how the WQI scores are determined, see the ', 
+                            tags$em('WQI Calculations', class = 'linkstyle', onclick = "fakeClick('WQI Calculations')"), 
+                            ' page.'),
+                          #br(),
                           hr(), #style="border: 1px solid darkgrey"),
-                          h4('Instructions:'),
-                          p('In general, users can view and interact with the data through the ', tags$b(tags$em('WQI Scores')), ' and ', tags$b(tags$em('Standards')), 'tabs. The contents 
-                            and functionality of each tab is described below:'), 
+                          #br(),
+                          h3('Instructions:'),
+                          p('In general, you will view and interact with the data through the ', 
+                            tags$em('WQI Scores', class = 'linkstyle', onclick = "fakeClick('WQI Scores')"), 
+                            ' and ', 
+                            tags$em('Standards', class = 'linkstyle', onclick = "fakeClick('Standards')"), 
+                            'tabs. The contents of each tab is described below:'), 
                           tags$ul(
-                              tags$li(tags$u(tags$b('WQI Scores:')),'The panel on the left side of this tab contains filters which can be used to customize the WQI scores 
-                                      calcualted and displayed in the map, and in the corresponding data table below the map. Use the filters to select a Water Board Region, 
-                                      Year, and Standard to apply in computing the WQI scores. Users can also filter for sites whose computed WQI scores fall within a given 
-                                      range, sites which fall within CES tracts with a given range of scores for a selected parameter, and/or sites that are within a given 
-                                      proximity to 303(d) waterbodies. Within the map, users can select the background map and toggle layers on or off, through the menu in 
-                                      the upper right corner of the map. Users can also view and download the a tabular summary of the WQI scores in the table below the map.'),
-                              tags$li(tags$u(tags$b('Standards:')), 'This tab contains a table that defines the analytes and associated thresholds used to calculate the WQI 
-                                      scores (the standard to apply is selected in the ', tags$b(tags$em('WQI Scores')), ' tab). The table contains three different sets of 
-                                      pre-defined water quality standards commonly applied to assess stormwater discharges, as well as an additional column for a new 
-                                      user-defined standard. Each standard includes default thresholds for a subset of common water quality analytes. Users can edit the 
-                                      default threshold values, add new analytes (right click on the table to add new rows), or enter a completely new standard using the 
-                                      Custom column. Users can also reset to the default values or download the table as a csv file using the buttons below the table.'),
-                              tags$li(tags$u(tags$b('Download Additional Data:')), 'Contains links to download the complete set of sampling data and facility information 
-                                      considered in computing the WQI scores.'),
-                              tags$li(tags$u(tags$b('More Information:')), 'This tab contains pages with additional information about how the WQI scores are calculated, 
-                                      links to data sources, and information about how to access the source code and provide feedback on the application.')),
+                              tags$li(tags$u(tags$b('WQI Calculations:', class = 'linkstyle', onclick = "fakeClick('WQI Calculations')")),
+                                      'The panel on the left side of this tab contains a menu with inputs that can be used to customize the WQI scores calcualted and 
+                                      displayed in the map, and in the corresponding data table below the map. Use the inputs in the menu to select a Water Board Region, 
+                                      Year, and Standard to apply in computing the WQI scores. You can also filter for sites whose computed WQI scores fall 
+                                      within a given range, sites which fall within CES tracts with a given range of scores for a selected CES parameter, 
+                                      and/or sites that are within a given proximity to 303(d) waterbodies. Within the map, you can select the background 
+                                      map and toggle layers on or off, through the menu in the upper right corner of the map. You can also view and download 
+                                      the a tabular summary of the WQI scores in the table below the map.'),
+                              tags$li(tags$u(tags$b('Standards:', class = 'linkstyle', onclick = "fakeClick('Standards')")), 
+                                      'Contains a table that defines the water quality parameters and associated thresholds used to calculate the WQI 
+                                      scores (the standard to apply is selected in the ', 
+                                      tags$em('WQI Scores', class = 'linkstyle', onclick = "fakeClick('WQI Scores')"), 
+                                      ' tab). The table contains three different sets of pre-defined water quality standards commonly applied to assess stormwater 
+                                      discharges, as well as an additional column for a new user-defined standard. Each standard includes default thresholds for a 
+                                      subset of common water quality parameters. You can edit the default threshold values, add new parameters (right click on 
+                                      the table to add new rows), or enter a completely new standard. You can also download the table as a csv file using the button 
+                                      below the table.'),
+                              tags$li(tags$u(tags$b('Additional Data:', class = 'linkstyle', onclick = "fakeClick('Additional Data')")), 
+                                      'Contains links to download the complete set of sampling data and facility information considered in computing the WQI scores.'),
+                              tags$li(tags$u(tags$b('More Information:', class = 'linkstyle')), 
+                                      tags$ul(
+                                          tags$li(tags$u(tags$b('WQI Calculations:', class = 'linkstyle', onclick = "fakeClick('WQI Calculations')")),
+                                                  'Additional information about how the WQI scores are calculated.'), 
+                                          tags$li(tags$u(tags$b('Data Sources:', class = 'linkstyle', onclick = "fakeClick('Data Sources')")),
+                                                  'Links to data sources used in this tool.'), 
+                                          tags$li(tags$u(tags$b('Application Information:', class = 'linkstyle', onclick = "fakeClick('Application Information')")),
+                                                  'Access to the source code for this tool, and information about how to provide feedback or ask questions.')
+                                          )
+                              )
+                          ),
                           hr(), #style="border: 1px solid darkgrey"),
-                          tags$a(href = 'https://github.com/CAWaterBoardDataCenter', tags$img(src = 'data_center_logo_withText_crop_resize.png', width = '400px', height = '97px', style = "border:1px solid lightgrey"))
+                          tags$a(href = 'https://github.com/CAWaterBoardDataCenter', 
+                                 tags$img(src = 'data_center_logo_withText_crop_resize.png', width = '400px', height = '97px')) # , style = "border:1px solid ghostwhite"))
                           ),
                  tabPanel('WQI Scores',
                           sidebarLayout(
                               sidebarPanel( # Sidebar with inputs 
-                                  h4('Filters:'), # Filters
+                                  # h4('Filters:'), # Filters
                                   selectInput(inputId = 'region.selected', label = 'Select Water Board Region:', choices = c(1:4, '5R', '5S', '6A', '6B', 7:9), selected = '9'),
-                                  selectInput(inputId = 'standard',label = 'Select Standard:', choices = c('California Toxics Rule (CTR)' = 'CTR', 'Multi-Sector General Permit (MSGP) - Benchmark' = 'MSGP - Benchmark', 'Numeric Action Level (NAL)' = 'NAL', 'Custom')),
+                                  selectInput(inputId = 'standard',label = 'Select Standard:', 
+                                              choices = c('California Toxics Rule (CTR)' = 'CTR', 'Multi-Sector General Permit (MSGP) - Benchmark' = 'MSGP - Benchmark', 'Numeric Action Level (NAL)' = 'NAL', 'Custom')),
                                   selectInput(inputId = 'monitoring.period', label = 'Select Monitoring Period:', choices = periods.list, selected = '2016 - 2017'),
                                   # htmlOutput('monitoring.period.selector'),
                                   selectInput(inputId = 'WDID.selected', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
@@ -531,22 +572,28 @@ ui <- navbarPage(title=div("Industrial Stormwater Assessment Tool"), # theme = s
                           ),
                  tabPanel('Standards',
                           h3('Enter / Edit Standards:'),
+                          p('This table defines the parameters and associated thresholds used to calculate the WQI scores (the standard to apply is selected in the ',
+                            tags$u('WQI Scores', class = 'linkstyle', onclick = "fakeClick('WQI Scores')"), 
+                            ' tab). You can edit the values in the table, add new parameters by right clicking anywhere in the table to add a new row, or enter a 
+                            completely new standard using the Custom column. You can also use the buttons below the table to reset to the default values, or download the 
+                            table as a csv file.'),
                           rhandsontable::rHandsontableOutput("hot"),
                           br(),
                           tags$head(tags$style(".buttonstyle{background-color:#f2f2f2;} .buttonstyle{color: black;}")), # define button style (background color and font color)
                           actionButton("reset", "Reset Standards",class = 'buttonstyle'),
                           downloadButton('downloadStandards', 'Standards Used in WQI Calculations', class = "buttonstyle"), HTML('&emsp;')
                           ),
-                 tabPanel('Download Additional Data',
+                 tabPanel('Additional Data',
                           h3('Download Additional Data:'),
+                          br(),
                           h4('Sampling Data:'),
                           p('The button below downloads all water quality monitoring data all for industrial stormwater discharges in the source dataset as a csv file, 
-                            including data for analytes and/or time periods not considered in the WQI calculations:'),
+                            including data for parameters and/or time periods not considered in the WQI calculations:'),
                           downloadButton('downloadRawData', 'All Sampling Data', class = "buttonstyle"), HTML('&emsp;'),
                           br(), br(), br(),
                           h4('Facility Information:'),
                           p('The button below downloads facility information for all industrial stormwater dischargers in the source dataset as a csv file, including those facilities not 
-                            assigned a WQI score (which occurs if a given facility does not have any monitoring data for analytes in the selected standard during the selected
+                            assigned a WQI score (which occurs if a given facility does not have any monitoring data for parameters in the selected standard during the selected
                             time period):'),
                           downloadButton('downloadFacilities', 'All Facility Information', class = "buttonstyle")
                           ),
@@ -570,8 +617,8 @@ ui <- navbarPage(title=div("Industrial Stormwater Assessment Tool"), # theme = s
                                    # h5('WQI:'),
                                    tags$li(tags$b('WQI:')),
                                    # tags$ul(helpText('\\(\\text{WQI=}100-\\frac{\\sqrt{F1^2+F2^2}}{1.4142}\\)')),
-                                   tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.412}\\)')),
-                                   hr(style="border: 1px solid darkgrey") # ,
+                                   tags$ul(helpText('\\(WQI=100-\\frac{\\sqrt{F1^2+F2^2}}{1.412}\\)'))#,
+                                   # hr(style="border: 1px solid darkgrey") # ,
                                    ),
                           tabPanel('Data Sources',
                                    h3('Data Sources:'),
@@ -579,9 +626,10 @@ ui <- navbarPage(title=div("Industrial Stormwater Assessment Tool"), # theme = s
                                    tags$li(tags$b('Industrial Stormwater Data: '), 'This tool assesses industrial stormwater discharge monitoring data reported to the 
                                            California State Water Resources Control Boards\'', 
                                            a(href = 'https://smarts.waterboards.ca.gov', 'Storm Water Multiple Application and Report Tracking System (SMARTS)'), 
-                                           'database. This tool accesses that data via the ', 
+                                           'database. Selected data from the SMARTS database is available via the ',
                                            a(href = 'https://data.ca.gov/', 'California Open Data Portal'), 
-                                           ', where selected data from the SMARTS database is refreshed daily. This tool accesses the following datasets:'),
+                                           ', where the data is refreshed daily to multiple different datasets. Each time the tool is opened, it accesses the most recent 
+                                           version of the relevant SMARTS datasets on the open data portal, including:'),
                                    tags$ul(
                                    tags$li(tags$a(href = 'https://data.ca.gov/dataset/stormwater-%E2%80%93-regulatory-and-enforcement-actions-%E2%80%93-smarts/resource/fe4712db-015a-4e92-a13f', 'Monitoring Data')),
                                    tags$li(tags$a(href = 'https://data.ca.gov/dataset/stormwater-%E2%80%93-regulatory-and-enforcement-actions-%E2%80%93-smarts/resource/a5f001af-abbb-4bc7-9196', 'Facility information'))
