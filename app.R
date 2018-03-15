@@ -503,7 +503,7 @@ ui <- navbarPage(title=div("Industrial Stormwater Assessment Tool"), # theme = s
                             tags$em('Standards', class = 'linkstyle', onclick = "fakeClick('Standards')"), 
                             'tabs. The contents of each tab is described below:'), 
                           tags$ul(
-                              tags$li(tags$u(tags$b('WQI Calculations:', class = 'linkstyle', onclick = "fakeClick('WQI Calculations')")),
+                              tags$li(tags$u(tags$b('WQI Scores:', class = 'linkstyle', onclick = "fakeClick('WQI Scores')")),
                                       'The panel on the left side of this tab contains a menu with inputs that can be used to customize the WQI scores calcualted and 
                                       displayed in the map, and in the corresponding data table below the map. Use the inputs in the menu to select a Water Board Region, 
                                       Year, and Standard to apply in computing the WQI scores. You can also filter for sites whose computed WQI scores fall 
