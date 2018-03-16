@@ -1,4 +1,4 @@
-This is a draft of a tool that is intended to analyze statewide industrial stormwater monitoring data reported to the California State Water Resources Control Board, and assess the monitoring results relative to other indicators of impairment and pollution burden (e.g., 303d impaired water bodies, CalEnviroScreen scores). It could potentially be used to target inspections of facilities that discharge stormwater. 
+This is draft tool is intended to analyze statewide water quality monitoring data from industrial stormwater discharge facilities that is reported to the [California State Water Resources Control Board](https://www.waterboards.ca.gov/) (the tool draws from the data stored in the Waterboard's [SMARTS](https://smarts.waterboards.ca.gov/smarts/faces/SwSmartsLogin.xhtml) database). It also assesses the monitoring data relative to other indicators of impairment and pollution burden (e.g., 303d impaired water bodies, CalEnviroScreen scores) in areas near each facility.
 
 ## Application Location
 The application is available at: https://daltare.shinyapps.io/Stormwater_Enforcement_Tool
