@@ -553,8 +553,8 @@ ui <- navbarPage(title = "Industrial Stormwater Assessment Tool", # theme = shin
                                   sliderInput(inputId = 'ces.score.range', label = 'Filter by Score of Selected CES Parameter:', min = 0, max = 100, value = c(0,100)),
                                   textInput(inputId = 'dist.to.303', label = 'Filter for proximity to a 303d listed water body (ft):', placeholder = 'Enter a distance in feet'),
                                   checkboxInput(inputId = 'show.303d.buffer', label = 'Show 303d proximity buffer', value = FALSE),
-                                  checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE),
-                                  checkboxInput(inputId = 'show.parameters', label = 'Show parameters included in WQI score for each facility', value = FALSE)#,
+                                  checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE)#,
+                                  # checkboxInput(inputId = 'show.parameters', label = 'Show parameters included in WQI score for each facility', value = FALSE)#,
                                   # hr(style="border: 1px solid darkgrey"),
                               ),
                               mainPanel( # Show map and data table
@@ -797,21 +797,24 @@ server <- function(input, output, session) {
                 WQI.Scores <- WQI.Scores %>% dplyr::rename(Latitude = FACILITY_LATITUDE, Longitude = FACILITY_LONGITUDE)
         
         # 6. Get a list of parameters in the WQI score
-            if (input$show.parameters == TRUE) {
-                # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
-                    # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
-                        grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Parameter, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% dplyr::distinct()
-                    # Create a df of distinct WDIDs and Monitoring Periods
-                        distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% dplyr::select(WDID, Monitoring.Period) %>% dplyr::distinct()
-                # To the df of distinct WDIDs and Monitoring Periods, append a character string of the Parameters for each combination of WDID and Monitoring Period
-                    for (i in 1:nrow(distinct_WDIDs_MonPeriods)) {
-                        temp_params <- grouped_mon_data %>% dplyr::filter(WDID == distinct_WDIDs_MonPeriods$WDID[i] & Monitoring.Period == distinct_WDIDs_MonPeriods$Monitoring.Period[i]) # df filtered for given WDID and Monitoring Period
-                        temp_params <- paste0(temp_params$Parameter, collapse = ', ') # character string of parameters in the above df
-                        distinct_WDIDs_MonPeriods$Parameters.In.Score[i] <- temp_params # append the parameters string to the df of distinct WDIDs and Monitoring Periods
-                    }
-                # join the list of parameters to the WQI.Scores df
+            # if (input$show.parameters == TRUE) {
+                # Create a dataframe of the parameters for each WDID and monitoring period
+                    grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% distinct()
+                    distinct_WDIDs_MonPeriods <- grouped_mon_data %>% summarize(Parameters.In.Score = paste0(Parameter, collapse = ' | '))
+                # # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
+                #     # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
+                #         grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Parameter, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% dplyr::distinct()
+                #     # Create a df of distinct WDIDs and Monitoring Periods
+                #         distinct_WDIDs_MonPeriods <- as.data.frame(grouped_mon_data) %>% dplyr::select(WDID, Monitoring.Period) %>% dplyr::distinct()
+                # # To the df of distinct WDIDs and Monitoring Periods, append a character string of the Parameters for each combination of WDID and Monitoring Period
+                #     for (i in 1:nrow(distinct_WDIDs_MonPeriods)) {
+                #         temp_params <- grouped_mon_data %>% dplyr::filter(WDID == distinct_WDIDs_MonPeriods$WDID[i] & Monitoring.Period == distinct_WDIDs_MonPeriods$Monitoring.Period[i]) # df filtered for given WDID and Monitoring Period
+                #         temp_params <- paste0(temp_params$Parameter, collapse = ', ') # character string of parameters in the above df
+                #         distinct_WDIDs_MonPeriods$Parameters.In.Score[i] <- temp_params # append the parameters string to the df of distinct WDIDs and Monitoring Periods
+                #     }
+                # # join the list of parameters to the WQI.Scores df
                     WQI.Scores <- WQI.Scores %>% dplyr::left_join(distinct_WDIDs_MonPeriods, by = c('WDID', 'Monitoring.Period'))
-            } # else {WQI.Scores$Parameters.In.Score = ''}
+            # } # else {WQI.Scores$Parameters.In.Score = ''}
         
         # 7. Create a sf object from the WQI Scores data
             WQI.Scores_sf <- sf::st_as_sf(WQI.Scores[!is.na(WQI.Scores$Latitude),], coords = c('Longitude', 'Latitude'), crs = 4326, agr = 'constant')
@@ -1107,7 +1110,7 @@ server <- function(input, output, session) {
                         )
                     } 
                 # Add the selected WQI data
-                    if (input$show.parameters == TRUE) {
+                    # if (input$show.parameters == TRUE) {
                         l <- l %>% leaflet::addCircleMarkers(radius = 4,
                                                              stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
                                                              fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
@@ -1130,30 +1133,30 @@ server <- function(input, output, session) {
                                                                              '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
                                                                              '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
                                                              group = 'WQI Scores')
-                    }
-                    if (input$show.parameters == FALSE) {
-                        l <- l %>% leaflet::addCircleMarkers(radius = 4,
-                                                             stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
-                                                             fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
-                                                             # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
-                                                             popup = ~paste0('<b>', '<u>', 'Discharger WQI Score', '</u>', '</b>','<br/>',
-                                                                             '<b>', 'Facility Information:','</b>','<br/>',
-                                                                             '<b>', 'WDID: ', '</b>', WDID,'<br/>',
-                                                                             '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
-                                                                             '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
-                                                                             '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
-                                                                             '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
-                                                                             '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
-                                                                             '<br/>',
-                                                                             '<b>', 'Scoring:','</b>','<br/>',
-                                                                             '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
-                                                                             '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
-                                                                             '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
-                                                                             '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
-                                                                             '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
-                                                                             '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
-                                                             group = 'WQI Scores')
-                    }
+                    # }
+                    # if (input$show.parameters == FALSE) {
+                    #     l <- l %>% leaflet::addCircleMarkers(radius = 4,
+                    #                                          stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                    #                                          fill = TRUE, fillOpacity = 1, fillColor = ~wqi.leaflet.pal(WQI),
+                    #                                          # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                    #                                          popup = ~paste0('<b>', '<u>', 'Discharger WQI Score', '</u>', '</b>','<br/>',
+                    #                                                          '<b>', 'Facility Information:','</b>','<br/>',
+                    #                                                          '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                    #                                                          '<b>', 'Facility Name: ', '</b>', FACILITY_NAME,'<br/>',
+                    #                                                          '<b>', 'SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                    #                                                          '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                    #                                                          '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                    #                                                          '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>',
+                    #                                                          '<br/>',
+                    #                                                          '<b>', 'Scoring:','</b>','<br/>',
+                    #                                                          '<b>', 'Monitoring Period: ', '</b>', Monitoring.Period,'<br/>',
+                    #                                                          '<b>', 'Standard: ', '</b>', Standard.Type,'<br/>',
+                    #                                                          '<b>', 'Total Samples: ', '</b>', Total.Samples,'<br/>',
+                    #                                                          '<b>', 'Exceedence Frequency: ', '</b>', round(F1,0),'<br/>',
+                    #                                                          '<b>', 'Exceedence Magnitude: ', '</b>', round(F2,0),'<br/>',
+                    #                                                          '<b>', 'WQI: ', '</b>', WQI, '<br/>'),
+                    #                                          group = 'WQI Scores')
+                    # }
                 
             
             # add the legend
