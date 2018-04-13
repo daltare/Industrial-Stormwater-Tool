@@ -799,8 +799,8 @@ server <- function(input, output, session) {
         # 6. Get a list of parameters in the WQI score
             # if (input$show.parameters == TRUE) {
                 # Create a dataframe of the parameters for each WDID and monitoring period
-                    grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% distinct()
-                    distinct_WDIDs_MonPeriods <- grouped_mon_data %>% summarize(Parameters.In.Score = paste0(Parameter, collapse = ' | '))
+                    grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% dplyr::distinct()
+                    distinct_WDIDs_MonPeriods <- grouped_mon_data %>% dplyr::summarize(Parameters.In.Score = paste0(Parameter, collapse = ' | '))
                 # # Create a column of data that lists the different parameters that were included in the WQI calculations for each WDID and monitoring period
                 #     # Create a df of distinct combinations of WDIDs, Monitoring Periods, and Parameters
                 #         grouped_mon_data <- monitoring.data.WQI %>% dplyr::group_by(WDID, Parameter, Monitoring.Period) %>% dplyr::select(WDID, Parameter, Monitoring.Period) %>% dplyr::distinct()
