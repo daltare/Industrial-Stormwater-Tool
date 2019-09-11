@@ -86,11 +86,14 @@
                     # monitoring.data <- monitoring.data[(!is.na(monitoring.data$MONITORING_LATITUDE) & !is.na(monitoring.data$MONITORING_LONGITUDE)),] # !!!! Remove all missing lat/lon points from the start !!!
         }
         if (data.type == 'DataPortal') {
-            mon.temp <- tempfile()
-            download.file(url = 'https://data.ca.gov/node/2176/download', destfile = mon.temp)
-            monitoring.data <- readr::read_csv(file = mon.temp)
-            unlink(mon.temp)
-            rm(mon.temp)
+            # mon.temp <- tempfile()
+            # download.file(url = 'https://data.ca.gov/node/2176/download', destfile = mon.temp)
+            # monitoring.data <- readr::read_csv(file = mon.temp)
+            # unlink(mon.temp)
+            # rm(mon.temp)
+            monitoring_data_id <- '7871e8fe-576d-4940-acdf-eca0b399c1aa'
+            ckan_resource_MonData <- ckanr::resource_show(url = 'https://data.ca.gov', id = monitoring_data_id, as = 'table') # resource
+            monitoring.data <- readr::read_csv(file = ckan_resource_MonData$url, guess_max = 50000)
         }
         names(monitoring.data) <- make.names(names(monitoring.data))
     # facilities
@@ -112,11 +115,14 @@
                 unlink(t)
         }
         if (data.type == 'DataPortal') {
-            fac.temp <- tempfile()
-            download.file(url = 'https://data.ca.gov/node/2171/download', destfile = fac.temp)
-            facilities <- readr::read_csv(file = fac.temp)
-            unlink(fac.temp)
-            rm(fac.temp)
+            # fac.temp <- tempfile()
+            # download.file(url = 'https://data.ca.gov/node/2171/download', destfile = fac.temp)
+            # facilities <- readr::read_csv(file = fac.temp)
+            # unlink(fac.temp)
+            # rm(fac.temp)
+            facility_data_id <- '33e69394-83ec-4872-b644-b9f494de1824'
+            ckan_resource_FacData <- ckanr::resource_show(url = 'https://data.ca.gov', id = facility_data_id, as = 'table') # resource
+            facilities <- readr::read_csv(file = ckan_resource_FacData$url, guess_max = 50000)
         }
         names(facilities) <- make.names(names(facilities))
     # receiving waters
@@ -877,10 +883,10 @@ server <- function(input, output, session) {
         # filter for points within the selected maximum distance of 303d waterbodies
         # check to see if a valid number is entered
         if (!is.na(as.numeric(input$dist.to.303))) {
-            proximity_ft <- units::as_units(as.numeric(input$dist.to.303), ft)
+            proximity_ft <- units::as_units(as.numeric(input$dist.to.303), 'ft')
             # proximity_ft <- units::as_units(as.numeric(5000), ft)
             # convert distance from feet to meters
-            proximity_meters <- units::set_units(proximity_ft, m)
+            proximity_meters <- units::set_units(proximity_ft, 'm')
             # have to convert points and lines to Cartesian coordinate system (x,y rather than lat/lon) to do the distance check
             WQI.Scores_sf_mercator <- sf::st_transform(WQI.Scores_sf, 3857) 
             impaired_lines_study_area_mercator <- sf::st_transform(impaired_lines_study_area, 3857)
