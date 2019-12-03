@@ -516,7 +516,7 @@ ui <- navbarPage(title = "Industrial Stormwater Assessment Tool", # theme = shin
                                       within a given range, sites which fall within CES tracts with a given range of scores for a selected CES parameter, 
                                       and/or sites that are within a given proximity to 303(d) waterbodies. Within the map, you can select the background 
                                       map and toggle layers on or off, through the menu in the upper right corner of the map. You can also view and download 
-                                      the a tabular summary of the WQI scores in the table below the map.'),
+                                      a tabular summary of the WQI scores in the table below the map.'),
                               tags$li(tags$u(tags$b('Standards:', class = 'linkstyle', onclick = "fakeClick('Standards')")), 
                                       'Contains a table that defines the water quality parameters and associated thresholds used to calculate the WQI 
                                       scores (the standard to apply is selected in the ', 
@@ -528,6 +528,12 @@ ui <- navbarPage(title = "Industrial Stormwater Assessment Tool", # theme = shin
                                       below the table.'),
                               tags$li(tags$u(tags$b('Additional Data:', class = 'linkstyle', onclick = "fakeClick('Additional Data')")), 
                                       'Contains links to download the complete set of sampling data and facility information considered in computing the WQI scores.'),
+                              tags$li(tags$u(tags$b('All Facilities Map:', class = 'linkstyle', onclick = "fakeClick('All Facilities Map')")), 
+                                      'Displays a map of all regulated industrial stormwater facilities in the selected region, without consideration of WQI scores and 
+                                      associated monitoring data. The panel on the left side of this tab contains a menu with inputs that can be used to select the region 
+                                      and filter the facilities by the CES scores of the census tract they are in. The table below the map provides the details for all of the 
+                                      facilities shown in the map, and this tabular data can be downloaded to a csv or excel file by clicking on the "Download Data" 
+                                      button above the table.'),
                               tags$li(tags$u(tags$b('More Information:', class = 'linkstyle')), 
                                       tags$ul(
                                           tags$li(tags$u(tags$b('WQI Calculations:', class = 'linkstyle', onclick = "fakeClick('WQI Calculations')")),
@@ -603,6 +609,28 @@ ui <- navbarPage(title = "Industrial Stormwater Assessment Tool", # theme = shin
                             time period):'),
                           downloadButton('downloadFacilities', 'All Facility Information', class = "buttonstyle")
                           ),
+                 tabPanel('All Facilities Map',
+                          sidebarLayout(
+                              sidebarPanel( # Sidebar with inputs
+                                  # h4('Filters:'), # Filters
+                                  selectInput(inputId = 'region.selected_2', label = 'Select Water Board Region:', choices = c(1:4, '5R', '5S', '6A', '6B', 7:9), selected = '9'),
+                                  selectInput(inputId = 'WDID.selected_2', label = 'Select Facility WDIDs (Optional):', choices = WDID.list, multiple = TRUE, selected = WDID.list[1]),
+                                  selectInput(inputId = 'ces.parameter_2', 'Select CalEnviroScreen (CES) Parameter:', choices = ces_choices$Name, selected = 'Pollution Burden'),
+                                  sliderInput(inputId = 'ces.score.range_2', label = 'Filter by Score of Selected CES Parameter:', min = 0, max = 100, value = c(0,100)),
+                                  # textInput(inputId = 'dist.to.303', label = 'Filter for proximity to a 303d listed water body (ft):', placeholder = 'Enter a distance in feet'),
+                                  # checkboxInput(inputId = 'show.303d.buffer', label = 'Show 303d proximity buffer', value = FALSE),
+                                  # checkboxInput(inputId = 'show.excluded.points', label = 'Show excluded points', value = FALSE)#,
+                              ),
+                              mainPanel( # Show map and data table
+                                  h4('Facilities:'),
+                                  leaflet::leafletOutput('all.facilities.map',height = 500),
+                                  h6(textOutput('ces.legend.note_facilities')),
+                                  hr(style="border: 3px solid darkgrey"),
+                                  h5('Facilities - Tabular Data:'),
+                                  DT::dataTableOutput('facilities.map.table')
+                              )
+                          )
+                 ),
                  navbarMenu('More Information',
                           tabPanel('WQI Calculations',
                                    withMathJax(), # to create equations
@@ -677,7 +705,7 @@ ui <- navbarPage(title = "Industrial Stormwater Assessment Tool", # theme = shin
 server <- function(input, output, session) {
     
     output$ces.legend.note <- renderText({paste0('**CES =  CalEnviroScreen 3.0 ', input$ces.parameter, if(input$ces.parameter != 'CES Percentile') {' Percentile'}) })
-    
+    output$ces.legend.note_facilities <- renderText({paste0('**CES =  CalEnviroScreen 3.0 ', input$ces.parameter_2, if(input$ces.parameter_2 != 'CES Percentile') {' Percentile'}) })
     
     # 0. Get the standards---------------------------------------------------------------------------------------------------------------------------------------------------------
         # User Entered Standards ---------------------------------------------------------
@@ -918,6 +946,259 @@ server <- function(input, output, session) {
             #     g <-ggplot2::ggplot() + ggplot2::geom_sf(data = buffered_streams) + ggplot2::geom_sf(data = WQI.Scores_sf[!tf_points_303_distance,], color = 'black', aes(color = 'black')) + ggplot2::geom_sf(data = WQI_303d_dist_points, color = 'red', aes(color = 'red')) + ggplot2::geom_sf(data = impaired_lines_study_area)
         }
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    # All facilities map
+        # create the dataset
+            all.facilities.map_data <- as.data.frame(facilities %>% dplyr::filter(REGION == input$region.selected_2))
+            all.facilities.map_data <- all.facilities.map_data %>% dplyr::rename(Latitude = FACILITY_LATITUDE, Longitude = FACILITY_LONGITUDE)
+        # get the sf (geospatial) data for the selected region
+            rb_boundary_selected_facilities <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == input$region.selected_2))
+        # filter the CES polygons for the selected region ----------------------------------------------------------------------------------------------------------------------
+            # filter using the RB boundary polygons
+                tf_poly_bounds_facilities <- sf::st_intersects(ces_poly, rb_boundary_selected_facilities, sparse = FALSE) 
+        # create a new variable with the selected ces polygons
+            ces_poly_study_area_facilities <- ces_poly[tf_poly_bounds_facilities,] # creates a sf variable with just the CES polygons in / around the area where there are monitoring points
+            # create a new column in the ces data frame called fill.variable, with the selected parameter data
+                # Create the color palette for the CES polygons
+                    param_facilities <- ces_choices[ces_choices$Name == input$ces.parameter_2,2]
+                # create a numeric variable for the CES percentile that is in the middle of the values of the given 5% range
+                    ces.percentile.numeric_facilities <- suppressWarnings(tidyr::separate(as.data.frame(ces_poly_study_area_facilities), Percentile, sep = '-', into = c('Percentile', 'Perc2'), convert = TRUE)[,2]+1.5) # error here because there are NAs in the CES percentile scores
+                    ces_poly_study_area_facilities <- ces_poly_study_area_facilities %>% dplyr::mutate(ces.percentile.numeric_facilities = ces.percentile.numeric_facilities)
+                # get the selected parameter of CES data - if CES percentile is selected, use the numeric field that was created from the factor values in the lines above
+                    if (param_facilities == 'Percentile') {
+                        ces.pal.domain_facilities <- as.data.frame(ces_poly_study_area_facilities %>% dplyr::select(ces.percentile.numeric_facilities))[,1]
+                    } else {
+                        ces.pal.domain_facilities <- as.data.frame(ces_poly_study_area_facilities %>% dplyr::select(param_facilities))[,1]
+                    }
+                    ces_poly_study_area_facilities <- ces_poly_study_area_facilities %>% dplyr::mutate(fill.variable = ces.pal.domain_facilities)
+        # create a list of WDIDs in the CES polygons that meet the selected criteria
+            # Create a sf object from the Facilities data
+                facilities_sf <- sf::st_as_sf(facilities[!is.na(facilities$FACILITY_LATITUDE),], coords = c('FACILITY_LONGITUDE', 'FACILITY_LATITUDE'), crs = 4326, agr = 'constant')
+             # find the CES polygons that meet the selected criteria (range of values)
+                ces_poly_study_area_facilities_filtered <- ces_poly_study_area_facilities %>% dplyr::filter(fill.variable >= input$ces.score.range_2[1] & fill.variable <= input$ces.score.range_2[2]) %>% sf::st_as_sf()
+            facilities_ces_filter <- sf::st_intersects(facilities_sf, ces_poly_study_area_facilities_filtered, sparse = TRUE) # lists the polygon number for each monitoring point; if no polygon number, the point is not in a polygon that meets the criteria
+            tf_points_facilities <- as.logical(sapply(facilities_ces_filter, length)) # gives a logical vector where TRUE means the monitoring point meets the criteria (sapply and length argument needed because there may be more than 1 polygon in some cases)
+            WDIDs_ces_filter_facilities <- (as.data.frame(facilities_sf)[tf_points_facilities,] %>% dplyr::select(WDID))[,1] # list of WDIDs in the polygons that satisfy the criteria
+        # Filter for points in polygons that meet the CES filter criteria - only do this if a filter is applied because some points may fall outside of CES polygons (NOTE: May need to find a better way to handle those points that do fall outside of CES polygons)
+            if (input$ces.score.range_2[1] > 0 | input$ces.score.range_2[2] < 100) {
+                all.facilities.map_data <- all.facilities.map_data %>% dplyr::filter(WDID %in% WDIDs_ces_filter_facilities)
+            }
+        # Filter for the selected WDIDs (if selected)
+            all.facilities.map_data <- tryCatch(expr = if(input$WDID.selected_2 != 'All WDIDs') {all.facilities.map_data <- all.facilities.map_data %>% dplyr::filter(WDID %in% input$WDID.selected_2)} else {all.facilities.map_data}, error = function(e) {all.facilities.map_data})
+            
+            
+        # filter the 303d lines and polygons for the selected region ----------------------------------------------------------------------------------------------------------------------
+            # first filter using the attributes in the 303d shapefile
+                impaired_lines_region_facilities <- impaired_303d_lines %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected_2, start = 1, stop = 1)) %>% sf::st_as_sf()
+                impaired_polygons_region_facilities <- impaired_303d_polygons %>% dplyr::filter(REGION_NUM == substr(x = input$region.selected_2, start = 1, stop = 1)) %>% sf::st_as_sf()
+            # then filter using the RB boundary polygons (for regions where there is more that 1 office / subregion)
+                tf_impaired_bounds_lines_facilities <- sf::st_intersects(impaired_lines_region_facilities, rb_boundary_selected_facilities, sparse = FALSE) # sparse = FALSE because there is only one element in poly_bounds, so this just returns a single true/false list
+                tf_impaired_bounds_polys_facilities <- sf::st_intersects(impaired_polygons_region_facilities, rb_boundary_selected_facilities, sparse = FALSE)
+            # create a new variable with the selected 303d lines
+                impaired_lines_study_area_facilities <- impaired_lines_region_facilities[tf_impaired_bounds_lines_facilities,] # creates a sf variable with just the impaired waters in / around the area where there are monitoring points
+                impaired_polygons_study_area_facilities <- impaired_polygons_region_facilities[tf_impaired_bounds_polys_facilities,]
+                
+            # create shared map data, that links the map and the data table
+                shared.map.data_facilities <- crosstalk::SharedData$new(all.facilities.map_data)
+                
+        # Create the map
+            output$all.facilities.map <- leaflet::renderLeaflet({
+                # create the empty map
+                    l_facilities <- leaflet::leaflet(shared.map.data_facilities)
+                # enter the basemap options to allow the user to select
+                    basemap.options <- c('Esri.WorldTopoMap', 'CartoDB.Positron', 'Esri.WorldGrayCanvas','Esri.WorldImagery','Esri.WorldStreetMap') 
+                    #'OpenStreetMap', 'OpenStreetMap.BlackAndWhite', 'Thunderforest.SpinalMap'
+                # add the basemaps listed above to the map (for options, see: http://leaflet-extras.github.io/leaflet-providers/preview/)
+                    for (provider in basemap.options) {
+                        l_facilities <- l_facilities %>% leaflet::addProviderTiles(provider, group = provider)
+                    }
+                # add the min-map window
+                    l_facilities <- l_facilities %>% leaflet::addMiniMap(tiles = basemap.options[[1]], toggleDisplay = TRUE, position = "bottomleft")
+                # code to make the basemap/min-map selector work (copied from: https://rstudio.github.io/leaflet/morefeatures.html)
+                    l_facilities <- l_facilities %>% htmlwidgets::onRender("
+                                                         function(el, x) {
+                                                         var myMap = this;
+                                                         myMap.on('baselayerchange',
+                                                         function (e) {
+                                                         myMap.minimap.changeLayer(L.tileLayer.provider(e.name));
+                                                         })
+                                                     }")
+                # get the bounds of the regional board
+                    bounds_facilities <- attributes(sf::st_geometry(rb_boundary_selected_facilities))$bbox
+                # Set the bounds of the map dynamically - initial view is based on the full extent of the WQI score points for the selected region, after that the map is based on the most recent bounds when a new option (standard, period, etc) is selected
+                    isolate(if (is.null(input$all.facilities.map_bounds)) {
+                        l_facilities <- l_facilities %>% leaflet::fitBounds(lng1 = bounds_facilities[[1]], 
+                                                                            lat1 = bounds_facilities[[2]], 
+                                                                            lng2 = bounds_facilities[[3]], 
+                                                                            lat2 = bounds_facilities[[4]])
+                    } else { # maintain the current view
+                        l_facilities <- l_facilities %>% leaflet::setView(lng = mean(c(input$all.facilities.map_bounds$west, input$all.facilities.map_bounds$east)), 
+                                                                          lat = mean(c(input$all.facilities.map_bounds$north, input$all.facilities.map_bounds$south)), 
+                                                                          zoom = input$all.facilities.map_zoom)                                
+                    })
+                # create a button to re-center the map
+                    l_facilities <- l_facilities %>% leaflet::addEasyButton(leaflet::easyButton(
+                        icon="fa-globe", title="Center Map on Regional Board Boundary",
+                        # fit to WQI data points
+                        # onClick=leaflet::JS(paste0('function(btn, map){ map.fitBounds([[',
+                        #                   min(map.data$Latitude, na.rm = TRUE), ', ',
+                        #                   min(map.data$Longitude, na.rm = TRUE), '],[',
+                        #                   max(map.data$Latitude, na.rm = TRUE), ', ',
+                        #                   max(map.data$Longitude, na.rm = TRUE), ']]); }'))))
+                        # fit to RB boundary
+                        onClick=leaflet::JS(paste0('function(btn, map){ map.fitBounds([[',
+                                                   round(bounds_facilities[[2]],4), ', ',
+                                                   round(bounds_facilities[[1]],4), '],[',
+                                                   round(bounds_facilities[[4]],4), ', ',
+                                                   round(bounds_facilities[[3]],4), ']]); }'))))
+                # Add the CalEnvironScreen Polygons
+                    l_facilities <- l_facilities %>% leaflet::addPolygons(data = ces_poly_study_area_facilities, 
+                                                                          color = 'grey', # "#444444", 
+                                                                          weight = 0.5, 
+                                                                          smoothFactor = 1.0,
+                                                                          opacity = 0.8, 
+                                                                          fillOpacity = 0.5,
+                                                                          # fillColor = ~colorNumeric('YlOrBr', Poll_pctl)(Poll_pctl), # view RColorBrewer palettes with: RColorBrewer::display.brewer.all()
+                                                                          fillColor = ~ces.leaflet.pal(fill.variable),
+                                                                          highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                                          popup = ~paste0('<b>', '<u>','CalEnviroScreen 3.0 Tract', '</u>','</b>','<br/>',
+                                                                                          '<b>', 'Tract: ', '</b>', Tract_1,'<br/>',
+                                                                                          '<b>', 'Location: ', '</b>', City,', ', County, ' ', ZIP,'<br/>',
+                                                                                          '<b>', 'Population: ', '</b>', Population,'<br/>','<br/>',
+                                                                                          '<b>', 'Scores: ', '</b>','<br/>',
+                                                                                          '<b>', 'CES Percentile: ', '</b>', Percentile,'<br/>',
+                                                                                          '<b>', 'Impaired Waterbodies Percentile: ', '</b>', IWB_pctl,'<br/>',
+                                                                                          '<b>', 'Pollution Burden Percentile: ', '</b>', Poll_pctl,'<br/>',
+                                                                                          '<b>', 'Pesticides Percentile: ', '</b>', Pest_pctl,'<br/>',
+                                                                                          '<b>', 'Toxic Releases Percentile: ', '</b>', TR_pctl,'<br/>',
+                                                                                          '<b>', 'Cleanups Percentile: ', '</b>', Clean_Pctl,'<br/>',
+                                                                                          '<b>', 'Groundwater Threats Percentile: ', '</b>', GW_pctl,'<br/>',
+                                                                                          '<b>', 'Hazardous Waste Generators Percentile: ', '</b>', Haz_pctl),
+                                                                          group = 'CES Polygons')#,'<br/>'
+                # Add the 303d lines
+                    l_facilities <- l_facilities %>% leaflet::addPolylines(data = impaired_lines_study_area_facilities, 
+                                                                           color = 'blue',
+                                                                           weight = 2.0, 
+                                                                           opacity = 1.0, 
+                                                                           # fillOpacity = 0.5,
+                                                                           smoothFactor = 1.0,
+                                                                           highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),
+                                                                           popup = ~paste0('<b>', '<u>','303d Listed Waterbody (2012)','</u>', '</b>','<br/>',
+                                                                                           '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                                           '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
+                                                                                           '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                                           '<b>', 'ID: ', '</b>', WBID, '<br/>',
+                                                                                           '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
+                                                                                           '<b>', 'Listing Comments: ', '</b>', Comments,  '<br/>',
+                                                                                           '<b>', 'Potential Sources: ', '</b>', Sources),
+                                                                           
+                                                                           group = '303d Listed Waters')
+                # Add the 303d polygons
+                    l_facilities <- l_facilities %>% leaflet::addPolygons(data = impaired_polygons_study_area_facilities, 
+                                                                          color = 'darkblue',
+                                                                          weight = 0.5, 
+                                                                          opacity = 0.8,
+                                                                          fillColor = 'blue',
+                                                                          fillOpacity = 0.5,
+                                                                          smoothFactor = 1.0,
+                                                                          highlightOptions = leaflet::highlightOptions(color = "white", weight = 2),
+                                                                          popup = ~paste0('<b>', '<u>','303d Listed Waterbody (2012)', '</u>','</b>','<br/>',
+                                                                                          '<b>', 'Water Body Name: ', '</b>', WBNAME,'<br/>',
+                                                                                          '<b>', 'Type: ', '</b>', WBTYPE,'<br/>',
+                                                                                          '<b>', 'Region: ', '</b>', REGION_NUM, ' (', REGION_NAM,')','<br/>',
+                                                                                          '<b>', 'ID: ', '</b>', WBID, '<br/>',
+                                                                                          '<b>', 'Listed Pollutants: ', '</b>', Pollutant, '<br/>',
+                                                                                          '<b>', 'Listing Comments: ', '</b>', Comments, '<br/>',
+                                                                                          '<b>', 'Potential Sources: ', '</b>', Sources),
+                                                                          group = '303d Listed Waters')
+                # Add the regional board boundary
+                    l_facilities <- l_facilities %>% leaflet::addPolygons(data = rb_boundary_selected_facilities,
+                                                                          color = 'black', # "#444444",
+                                                                          weight = 2.0,
+                                                                          smoothFactor = 1.0,
+                                                                          opacity = 1.0,
+                                                                          fill = FALSE,
+                                                                          # fillOpacity = 0.5,
+                                                                          # fillColor = 'lightblue',
+                                                                          highlightOptions = highlightOptions(color = "white", weight = 2),#,bringToFront = TRUE
+                                                                          popup = ~paste0('<b>', '<u>', 'Regional Board Boundary', '</u>', '</b>','<br/>',
+                                                                                          '<b>', 'Region Number: ', '</b>', RB_OFF, '<br/>',
+                                                                                          '<b>', 'Region Name: ', '</b>', RB_NAME),
+                                                                          group = 'Regional Board Boundary'
+                    )
+                # Add the facilities
+                    l_facilities <- l_facilities %>% leaflet::addCircleMarkers(radius = 4,
+                                                                               stroke = TRUE, weight = 0.5, color = 'black', opacity = 1,
+                                                                               fill = TRUE, fillOpacity = 1, fillColor = 'grey', # ~wqi.leaflet.pal(WQI),
+                                                                               # clusterOptions = leaflet::markerClusterOptions(spiderfyDistanceMultiplier = 2),# freezeAtZoom = 13, maxClusterRadius = 10),#,#singleMarkerMode = TRUE),
+                                                                               popup = ~paste0('<b>', '<u>', 'Facility Information', '</u>','</b>','<br/>',
+                                                                                               '<b>', 'WDID: ', '</b>', WDID,'<br/>',
+                                                                                               '<b>', 'Region: ', '</b>', REGION,'<br/>',
+                                                                                               '<b>', 'Facility Name: ', '</b>', FACILITY_NAME, '<br/>',
+                                                                                               '<b>', 'Operator: ', '</b>', OPERATOR_NAME, '<br/>',
+                                                                                               '<b>', 'Status: ', '</b>', STATUS_CODE_NAME, '<br/>',
+                                                                                               '<b>', 'Primary SIC: ', '</b>', PRIMARY_SIC,'<br/>',
+                                                                                               '<b>', 'Address: ', '</b>', FACILITY_ADDRESS, '<br/>',
+                                                                                               '<b>', 'City: ', '</b>', FACILITY_CITY, '<br/>',
+                                                                                               '<b>', 'Receiving Water: ', '</b>', RECEIVING_WATER_NAME,'<br/>'
+                                                                                               ),
+                                                                               group = 'Facilities')
+                # add the legend
+                    l_facilities <- l_facilities %>% leaflet::addLegend(position = 'bottomright', colors = 'blue', opacity = 1.0, labels = '2012 303d Listed Waterbodies', layerId = '303d.list')
+                    l_facilities <- l_facilities %>% leaflet::addLegend(position = 'bottomright', pal = ces.leaflet.pal, values = ces_poly_study_area_facilities$fill.variable, opacity = 1, layerId = 'ces.legend', bins = 4, title = paste0('CES**'))#: ', input$ces.parameter))
+                    # l_facilities <- l_facilities %>% leaflet::addLegend(position = "bottomright", pal = wqi.leaflet.pal, values = WQI.Scores$WQI, title = "WQI*", opacity = 1, layerId = 'wqi.legend', bins = 2)
+                # Add controls to select the basemap
+                    l_facilities <- l_facilities %>% leaflet::addLayersControl(baseGroups = basemap.options,
+                                                         overlayGroups = c('Facilities', 'CES Polygons', '303d Listed Waters', 'Regional Board Boundary'),
+                                                         options = leaflet::layersControlOptions(collapsed = TRUE, autoZIndex = TRUE))
+                # Add the measuring tool
+                    l_facilities <- l_facilities %>% leaflet::addMeasure(position = 'topleft')
+                # output the map object
+                    l_facilities
+        })
+        
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
         
         # Create the mapping data 
             # create the dataset 
@@ -1199,6 +1480,43 @@ server <- function(input, output, session) {
                 server = FALSE,
                 rownames = FALSE
             )
+            
+            # facilities map
+            output$facilities.map.table <- DT::renderDataTable(
+                shared.map.data_facilities, 
+                extensions = c('Buttons', 'Scroller'),
+                options = list(dom = 'Bfrtip', 
+                               buttons = list('colvis', list(
+                                   extend = 'collection',
+                                   buttons = list(list(extend='csv', filename = 'Filtered_Facilities'),
+                                                  list(extend='excel', filename= 'Filtered_Facilities')),
+                                   text = 'Download Data' )),
+                               scrollX = TRUE,
+                               scrollY = 250, 
+                               scroller = TRUE, 
+                               deferRender = TRUE),
+                class = 'cell-border stripe',
+                server = FALSE,
+                rownames = FALSE
+            )
+            
+            # output$all_facilities_table <- DT::renderDataTable(
+            #     shared.map.data, 
+            #     extensions = c('Buttons', 'Scroller'),
+            #     options = list(dom = 'Bfrtip', 
+            #                    buttons = list('colvis', list(
+            #                        extend = 'collection',
+            #                        buttons = list(list(extend='csv', filename = 'WQI_Scores'),
+            #                                       list(extend='excel', filename= 'WQI_Scores')),
+            #                        text = 'Download Data' )),
+            #                    scrollX = TRUE,
+            #                    scrollY = 250, 
+            #                    scroller = TRUE, 
+            #                    deferRender = TRUE),
+            #     class = 'cell-border stripe',
+            #     server = FALSE,
+            #     rownames = FALSE
+            # )
         
         
         # Monitoring Data Download -------------------------------------------------
@@ -1245,7 +1563,24 @@ server <- function(input, output, session) {
             # update map to appropriate bounds
             leaflet::leafletProxy(mapId = 'monitoring.map') %>% 
                 # leaflet::fitBounds(lng1 = min(filtered.data$Longitude, na.rm = TRUE), lat1 = min(filtered.data$Latitude, na.rm = TRUE), lng2 = max(filtered.data$Longitude, na.rm = TRUE), lat2 = max(filtered.data$Latitude, na.rm = TRUE))
-                leaflet::fitBounds(lng1 = bounds[[1]], lat1 = bounds[[2]], lng2 = bounds[[3]], lat2 = bounds[[4]])
+                leaflet::fitBounds(lng1 = bounds[[1]], 
+                                   lat1 = bounds[[2]], 
+                                   lng2 = bounds[[3]], 
+                                   lat2 = bounds[[4]])
+        })
+        
+    # Center facilities map on change in region selection
+        observeEvent(input$region.selected_2, {
+            # fit to RB boundary - get RB bounds
+                rb.boundary.selected_facilities <- sf::st_as_sf(RB_Boundaries %>% dplyr::filter(RB_OFF == input$region.selected_2))
+                bounds_facilities <- attributes(sf::st_geometry(rb.boundary.selected_facilities))$bbox
+            # update map to appropriate bounds
+                leaflet::leafletProxy(mapId = 'all.facilities.map') %>% 
+                    # leaflet::fitBounds(lng1 = min(filtered.data$Longitude, na.rm = TRUE), lat1 = min(filtered.data$Latitude, na.rm = TRUE), lng2 = max(filtered.data$Longitude, na.rm = TRUE), lat2 = max(filtered.data$Latitude, na.rm = TRUE))
+                    leaflet::fitBounds(lng1 = bounds_facilities[[1]], 
+                                       lat1 = bounds_facilities[[2]], 
+                                       lng2 = bounds_facilities[[3]], 
+                                       lat2 = bounds_facilities[[4]])
         })
     
     # Reset Standards
