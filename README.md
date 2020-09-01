@@ -1,15 +1,13 @@
 This (draft) tool is intended to analyze effluent water quality monitoring data from industrial stormwater discharge facilities that report to the [California State Water Resources Control Board](https://www.waterboards.ca.gov/) (the tool draws from the data stored in the Waterboard's [SMARTS](https://smarts.waterboards.ca.gov/smarts/faces/SwSmartsLogin.xhtml) database). It also assesses the monitoring data relative to other indicators of impairment and pollution burden (e.g., 303d impaired water bodies, CalEnviroScreen scores) in areas near each facility.
 
 ## Application Location
-The application is available at: https://daltare.shinyapps.io/Industrial-Stormwater-Tool/
-
-If the link above doesn't work, the application is also available on an alternate site at: https://sccwrp.shinyapps.io/Stormwater_Enforcement_Tool-master (thanks to [SCCWRP](http://www.sccwrp.org/Homepage.aspx) for hosting this site)
+The application is available at: https://cawaterdatadive.shinyapps.io/Industrial-Stormwater-Tool/
 
 ## Data Sources
 #### Stormwater Monitoring and Facility Information
 Industrial stormwater effluent monitoring data, as well as information about the industrial discharge facilities where that monitoring occurs, is retrieved from the datasets stored on the data.ca.gov portal, here:
-- [Industrial Stormwater Effluent Monitoring Data](https://data.ca.gov/dataset/stormwater-%E2%80%93-regulatory-and-enforcement-actions-%E2%80%93-smarts/resource/fe4712db-015a-4e92-a13f)
-- [Industrial Stormwater Discharger Facility Information](https://data.ca.gov/dataset/stormwater-%E2%80%93-regulatory-and-enforcement-actions-%E2%80%93-smarts/resource/a5f001af-abbb-4bc7-9196#{})
+- [Industrial Stormwater Effluent Monitoring Data](https://data.ca.gov/dataset/stormwater-regulatory-including-enforcement-actions-information-and-water-quality-results/resource/7871e8fe-576d-4940-acdf-eca0b399c1aa)
+- [Industrial Stormwater Discharger Facility Information](https://data.ca.gov/dataset/stormwater-regulatory-including-enforcement-actions-information-and-water-quality-results/resource/33e69394-83ec-4872-b644-b9f494de1824)
 
 The data contained in those two datasets is from the California Water Resources Control Board's Stormwater Multiple Application and Report Tracking System (SMARTS). These two datasets are updated daily using data contained in files on the [SMARTS Public Access Interface](https://smarts.waterboards.ca.gov/smarts/faces/SwSmartsLogin.xhtml), which can be accessed by following the link to *View SW Data* → *Download NOI Data By Regional Board* → from the dropdown menu select *State Board*. The files used are:
 - *Industrial Ad Hoc Reports - Parameter Data* (Monitoring Data)

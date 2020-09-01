@@ -1,27 +1,27 @@
 # Load Packages (NOTE: most of the functions in the script below are called explicitly with the `package::function()` syntax, but listing the packages here to make it easy to see what packages are being used)
     # Shiny platform
-        # library(shiny) # the Shiny web application framework (https://shiny.rstudio.com) (https://cran.r-project.org/package=shiny)
+        library(shiny) # the Shiny web application framework (https://shiny.rstudio.com) (https://cran.r-project.org/package=shiny)
     # General data analysis and transformation
-        # library(dplyr) # data transformation (http://dplyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (https://cran.r-project.org/package=dplyr)
-        # library(magrittr) # just for the ` %>% ` operator, used to make code more readable (http://magrittr.tidyverse.org/) (https://cran.r-project.org/package=magrittr)
-        # library(readr) # for reading data into R from various sources (in this case from text files and RDS objects) (https://cran.r-project.org/package=readr)
-        # library(tidyr) # for reshaping data (http://tidyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf) (https://cran.r-project.org/package=tidyr)
-        # library(tidyverse) # loads all of the tidyverse packages (including dplyr, magrittr, readr, tidyr) (https://www.tidyverse.org/) (https://cran.r-project.org/package=tidyverse)
+        library(dplyr) # data transformation (http://dplyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf) (https://cran.r-project.org/package=dplyr)
+        library(magrittr) # just for the ` %>% ` operator, used to make code more readable (http://magrittr.tidyverse.org/) (https://cran.r-project.org/package=magrittr)
+        library(readr) # for reading data into R from various sources (in this case from text files and RDS objects) (https://cran.r-project.org/package=readr)
+        library(tidyr) # for reshaping data (http://tidyr.tidyverse.org/) (https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf) (https://cran.r-project.org/package=tidyr)
+        library(tidyverse) # loads all of the tidyverse packages (including dplyr, magrittr, readr, tidyr) (https://www.tidyverse.org/) (https://cran.r-project.org/package=tidyverse)
     # Interactive objects for data entry and display
-        # library(DT) # interactive data tables (https://rstudio.github.io/DT/) (https://cran.r-project.org/package=DT)
-        # library(crosstalk) # interaction between html objects (in this case, used to link data table with map) (https://rstudio.github.io/crosstalk/) (https://cran.r-project.org/package=crosstalk)
-        # library(rhandsontable) # allows data entry by user, in a table format (https://jrowen.github.io/rhandsontable/) (https://cran.r-project.org/package=rhandsontable)
+        library(DT) # interactive data tables (https://rstudio.github.io/DT/) (https://cran.r-project.org/package=DT)
+        library(crosstalk) # interaction between html objects (in this case, used to link data table with map) (https://rstudio.github.io/crosstalk/) (https://cran.r-project.org/package=crosstalk)
+        library(rhandsontable) # allows data entry by user, in a table format (https://jrowen.github.io/rhandsontable/) (https://cran.r-project.org/package=rhandsontable)
     # Mapping and GIS operations
         library(leaflet) # creates interactive maps (https://rstudio.github.io/leaflet/) (https://cran.r-project.org/package=leaflet)
-        # library(htmlwidgets) #  framework for creating HTML widgets - used in this case for adding some custom features to the leaflet map (https://cran.r-project.org/web/packages/htmlwidgets/vignettes/develop_intro.html) (https://cran.r-project.org/package=htmlwidgets)
-        # library(sf) # for working with vector-based geospatial data using 'Simple Features' objects (reading, analyzing, etc.) (https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) (https://cran.r-project.org/package=sf)
-        # library(rmapshaper) # used in this case for simplifying polylines and polygons - also has some other geospatial analysis functions (https://cran.r-project.org/web/packages/rmapshaper/vignettes/rmapshaper.html) (https://cran.r-project.org/package=rmapshaper)
-        # library(raster) # for working with raster-based geospatial data - in this case for simplifying large Region 1 polylines, by converting polylines -> raster, then raster -> polygons (http://www.rspatial.org/spatial/rst/4-rasterdata.html) (https://cran.r-project.org/package=raster)
-        # library(units) # for working with measurement units (assigning units, unit conversion, etc.) (https://cran.r-project.org/web/packages/units/vignettes/units.html) (https://cran.r-project.org/package=units)
-        # library(rgeos) # interface to Geometry Engine - not used explicitly here (https://cran.r-project.org/package=rgeos)
+        library(htmlwidgets) #  framework for creating HTML widgets - used in this case for adding some custom features to the leaflet map (https://cran.r-project.org/web/packages/htmlwidgets/vignettes/develop_intro.html) (https://cran.r-project.org/package=htmlwidgets)
+        library(sf) # for working with vector-based geospatial data using 'Simple Features' objects (reading, analyzing, etc.) (https://cran.r-project.org/web/packages/sf/vignettes/sf1.html) (https://cran.r-project.org/package=sf)
+        library(rmapshaper) # used in this case for simplifying polylines and polygons - also has some other geospatial analysis functions (https://cran.r-project.org/web/packages/rmapshaper/vignettes/rmapshaper.html) (https://cran.r-project.org/package=rmapshaper)
+        library(raster) # for working with raster-based geospatial data - in this case for simplifying large Region 1 polylines, by converting polylines -> raster, then raster -> polygons (http://www.rspatial.org/spatial/rst/4-rasterdata.html) (https://cran.r-project.org/package=raster)
+        library(units) # for working with measurement units (assigning units, unit conversion, etc.) (https://cran.r-project.org/web/packages/units/vignettes/units.html) (https://cran.r-project.org/package=units)
+        library(rgeos) # interface to Geometry Engine - not used explicitly here (https://cran.r-project.org/package=rgeos)
 
 # Assign the pipe operator (if not loading/attaching packages with the library() function)
-    `%>%` <- magrittr::`%>%` # manually assigns the pipe operator (`%>%`) - not really needed if calling library(magrittr)
+    # `%>%` <- magrittr::`%>%` # manually assigns the pipe operator (`%>%`) - not really needed if calling library(magrittr)
 
 
 # Set the data source - this tool is based on an MS Access database tool designed by the San Diego Coastkeepers for Region 9 - this determines whether to use a copy of the inputs to that tool, or to use statewide data from SMARTS
@@ -136,15 +136,21 @@
         # create a column of sample dates (separate out from the time)
             monitoring.data <- tidyr::separate(data = monitoring.data, col = Date.time.of.sample.collection, into = c('Sample_date_calc','Sample_time_calc'), sep = ' ')
         # convert into a date class
-            monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(Sample_date_calc))
+            monitoring.data <- monitoring.data %>% 
+                dplyr::mutate(Sample_date_calc = lubridate::mdy(Sample_date_calc))
     }
     if (data.type == 'SMARTS' | data.type == 'DataPortal') {
         # Rename columns            
-            monitoring.data <- monitoring.data %>% dplyr::rename(Parameter = PARAMETER, Result = RESULT, Units = UNITS)
+            monitoring.data <- monitoring.data %>% 
+                dplyr::rename(Parameter = PARAMETER, Result = RESULT, Units = UNITS)
         # convert date field to a date class
-            monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(SAMPLE_DATE))
+            # monitoring.data <- monitoring.data %>% dplyr::mutate(Sample_date_calc = lubridate::mdy(SAMPLE_DATE))
+            monitoring.data <- monitoring.data %>% 
+                dplyr::mutate(Sample_date_calc = lubridate::ymd(SAMPLE_DATE))
         # Rename latitude and longitude columns
-            monitoring.data <- monitoring.data %>% dplyr::rename(Latitude = MONITORING_LATITUDE) %>% dplyr::rename(Longitude = MONITORING_LONGITUDE)
+            monitoring.data <- monitoring.data %>% 
+                dplyr::rename(Latitude = MONITORING_LATITUDE) %>% 
+                dplyr::rename(Longitude = MONITORING_LONGITUDE)
     }
     
     # filter the SMARTS data so that it only includes effluent data
